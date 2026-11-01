@@ -247,3 +247,9 @@ Enable **Include region images · review before sending** beneath the assistant.
 Muse can describe visible spatial context, suggest a tentative anatomical identity when supported, explain general functions conditional on that identity, and identify missing evidence. It must distinguish these suggestions from source atlas labels and cannot diagnose disease or establish clinical meaning. Images are not automatically included in later conversation turns or sent to literature search. The reviewed plane metadata and sharing event appear in the conversation/activity; image bytes are not persisted in conversation history.
 
 A live public-atlas test on November 2, 2026 returned a qualified, image-grounded explanation for an unlabeled proposal with no atlas selection. Existing reference metadata was present, so this is an integration test, not an independent anatomical recognition benchmark.
+
+### Saved research views
+
+New questions, answers and Activity events retain their visual context. **Restore view** returns to the saved camera, slices, cut plane, selected anatomy, rendering settings, layout and reference/proposal masks. When Muse navigates, **Question view** preserves the starting context separately from the answer's resulting view. Reviewed image questions also retain a **Shared image slices** view for the attachment anchor.
+
+Restoring makes no AI request and first saves the current workspace in Activity. Conversation, saved views and compressed, deduplicated historical masks persist locally in IndexedDB and are included in the review JSON export. History is scoped to the active study; switching studies clears it. Older entries created before this feature have no recoverable snapshot. The latest 100 messages and 100 Activity entries are retained; unreferenced snapshots are pruned. See [verification notes](docs/saved-view-verification-2026-11-02.md).

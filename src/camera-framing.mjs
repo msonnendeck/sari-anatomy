@@ -34,3 +34,7 @@ export function fitDistance(bounds,fov,aspect,direction=[2.6,1.4,3.4]){
  }
  return distance*1.12;
 }
+
+export function cameraViewKey(volume,spatial,bodyContext=false){
+ return JSON.stringify([volume.id,!!bodyContext,spatial.mode,spatial.isolate||'all',!!spatial.atlasIsolate,spatial.atlasIsolate?spatial.region:null,spatial.hemisphere||'both']);
+}

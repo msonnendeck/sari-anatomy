@@ -8,7 +8,7 @@ import PrivacyPixelation from "./PrivacyPixelation.jsx";
 import SolidVolume from "./SolidVolume.jsx";
 import NavigationMarker from "./NavigationMarker.jsx";
 import { sceneToVoxel } from "./navigation.mjs";
-import {visibleBounds,fitDistance} from "./camera-framing.mjs";
+import {visibleBounds,fitDistance,cameraViewKey} from "./camera-framing.mjs";
 import AtlasAnatomy from "./AtlasAnatomy.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
@@ -234,6 +234,13 @@ class Boundary extends React.Component {
 }
 function CameraRig({volume,spatial,bodyContext,revision,cameraCommand,cameraState}) {
   const {camera,controls,gl}=useThree();
+  const readyKey=useRef(null),viewKey=cameraViewKey(volume,spatial,bodyContext);
+  function saveCamera(){
+    if(!controls)return;
+    cameraState.current={studyId:volume.id,viewKey:readyKey.current,position:camera.position.toArray(),target:controls.target.toArray(),up:camera.up.toArray(),zoom:camera.zoom,fov:camera.fov};
+    gl.domElement.dataset.cameraPosition=JSON.stringify(cameraState.current.position);gl.domElement.dataset.cameraTarget=JSON.stringify(cameraState.current.target);gl.domElement.dataset.cameraViewKey=readyKey.current||"";
+  }
+
   const bounds=useMemo(()=>visibleBounds(volume,spatial,bodyContext),[volume,spatial.mode,spatial.isolate,spatial.atlasIsolate,spatial.region,spatial.hemisphere,spatial.threshold,bodyContext,revision]);
   const latest=useRef(bounds);latest.current=bounds;
   function fit(reset=false){
@@ -242,16 +249,23 @@ function CameraRig({volume,spatial,bodyContext,revision,cameraCommand,cameraStat
     const direction=reset?new THREE.Vector3(2.6,1.4,3.4).normalize():camera.position.clone().sub(controls.target).normalize();
     if(direction.lengthSq()<.1)direction.set(1,.5,1).normalize();
     controls.target.copy(center);camera.position.copy(center).addScaledVector(direction,fitDistance(box,camera.fov,camera.aspect,direction.toArray()));
-    controls.update();
+    controls.update();readyKey.current=viewKey;saveCamera();
   }
   useEffect(()=>{
     if(!controls)return;
-    const save=()=>{cameraState.current={position:camera.position.toArray(),target:controls.target.toArray()};gl.domElement.dataset.cameraPosition=JSON.stringify(cameraState.current.position);gl.domElement.dataset.cameraTarget=JSON.stringify(cameraState.current.target);};
+    const save=()=>saveCamera();
     controls.addEventListener('change',save);save();return()=>controls.removeEventListener('change',save);
-  },[camera,controls,gl,cameraState]);
-  // Only content changes fit automatically. Layout/size changes keep this camera mounted.
-  useEffect(()=>{fit();},[controls,volume.id,bodyContext,spatial.mode,spatial.isolate,spatial.atlasIsolate,spatial.atlasIsolate?spatial.region:null,spatial.hemisphere]);
-  useEffect(()=>{if(cameraCommand?.id)fit(cameraCommand.kind==='reset');},[cameraCommand?.id]);
+  },[camera,controls,gl,cameraState,volume.id]);
+  const restoredCommand=useRef(null);
+  // A snapshot restore takes precedence over content-triggered automatic fitting.
+  useEffect(()=>{if(cameraCommand?.kind==='restore'&&restoredCommand.current!==cameraCommand.id)return;fit();},[controls,volume.id,bodyContext,spatial.mode,spatial.isolate,spatial.atlasIsolate,spatial.atlasIsolate?spatial.region:null,spatial.hemisphere]);
+  useEffect(()=>{
+    if(!controls||!cameraCommand?.id)return;
+    if(cameraCommand.kind==='restore'&&cameraCommand.pose){
+      const p=cameraCommand.pose;camera.position.fromArray(p.position);controls.target.fromArray(p.target);
+      if(p.up)camera.up.fromArray(p.up);camera.zoom=p.zoom||1;camera.fov=p.fov||40;camera.updateProjectionMatrix();controls.update();readyKey.current=viewKey;saveCamera();restoredCommand.current=cameraCommand.id;
+    }else fit(cameraCommand.kind==='reset');
+  },[cameraCommand?.id,controls]);
   return null;
 }
 export default function Scene(props) {

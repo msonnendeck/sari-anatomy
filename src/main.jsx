@@ -61,6 +61,8 @@ import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } fro
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
 import {eventPresentation,studyHelp} from "./review-presentation.mjs";
+import {cameraViewKey} from "./camera-framing.mjs";
+import {emptyArchive,captureMasks,addView,restoreView,prunedArchive} from "./view-snapshots.mjs";
 import RegionImagesDialog from "./RegionImagesDialog.jsx";
 import WorkspaceResize from "./WorkspaceResize.jsx";
 import EvidenceDialog from "./EvidenceDialog.jsx";
@@ -326,6 +328,10 @@ function App() {
     [brainOpacity, setBrainOpacity] = useState(0.18),
     [rotate, setRotate] = useState(false),
     [tab, setTab] = useState("assistant");
+  const [inspectorOpen,setInspectorOpen]=useState(false);
+  const archive=useRef(emptyArchive()),pendingSnapshots=useRef([]),liveView=useRef(null),inflightSnapshots=useRef(0);
+  const [archiveRevision,setArchiveRevision]=useState(0);
+  const skipPlaneInitialization=useRef(false);
   const [roiJob,setRoiJob]=useState(null);
   const [evidenceOpen,setEvidenceOpen]=useState(false);
   const latestRevision=useRef(revision);latestRevision.current=revision;
@@ -347,6 +353,7 @@ function App() {
     [loadingStudy, setLoadingStudy] = useState(false),
     [overview, setOverview] = useState(true),
     [bodyContext, setBodyContext] = useState(false);
+  liveView.current={position,axis,spatial,settings,point,tool,brush,zoom,brainOpacity,rotate,bodyContext,privacy,theme,layout,libraryCollapsed,assistantCollapsed,libraryWidth,assistantWidth,sceneShare,rowShare,workspaceFocus,focus3d,focusTools,inspectorOpen};
   useEffect(() => {
     loadSession()
       .then((saved) => {
@@ -357,6 +364,9 @@ function App() {
           setSpatial((s) => ({...s, mode: saved.volume.atlas ? "atlas" : "solid", cut: !saved.volume.atlas, region: null, hemisphere: "both", atlasIsolate: false, threshold: saved.volume.id === "slicer-tumor" ? 10 : 30}));
           setPosition(saved.position);
           setEvents(saved.events || []);
+          setMessages(saved.messages || []);
+          if(saved.viewArchive?.version===1)archive.current=saved.viewArchive;
+          if(saved.currentView){skipPlaneInitialization.current=true;applyViewState(saved.currentView);}
           setRevision((r) => r + 1);
         }
       })
@@ -366,16 +376,39 @@ function App() {
   useEffect(() => {
     if (!hydrated) return;
     const t = setTimeout(
-      () =>
-        saveSession({ volume, position, events, settings }).catch(() =>
+      () => {
+        if(!inflightSnapshots.current)archive.current=prunedArchive(archive.current,messages,events);
+        return saveSession({ volume, position, events, settings, messages, viewArchive:prunedArchive(archive.current,messages,events), currentView:{...structuredClone(liveView.current),camera:cameraState.current?.studyId===volume.id?structuredClone(cameraState.current):(cameraCommand.kind==="restore"?cameraCommand.pose:null)} }).catch(() =>
           setToast(
             "Browser storage is unavailable. Export your review to keep it.",
           ),
-        ),
+        );
+      },
       800,
     );
     return () => clearTimeout(t);
-  }, [hydrated, volume, position, events, revision, settings]);
+  }, [hydrated, volume, position, events, messages, revision, settings, archiveRevision, spatial, layout, libraryCollapsed, assistantCollapsed, libraryWidth, assistantWidth, sceneShare, rowShare, workspaceFocus, focus3d, focusTools, inspectorOpen, theme, point, tool, brush, zoom, brainOpacity, rotate, bodyContext, privacy]);
+  useEffect(()=>{
+    if(!pendingSnapshots.current.length)return;
+    const batch=pendingSnapshots.current.splice(0),state=structuredClone(liveView.current),study=volume;
+    const masks=captureMasks(archive.current,study);
+    inflightSnapshots.current++;
+    let attempts=0;
+    const finish=()=>{
+      if(activeVolume.current!==study){inflightSnapshots.current--;return;}
+      const camera=cameraState.current;
+      const ready=camera?.studyId===study.id&&camera.viewKey===cameraViewKey(study,state.spatial,state.bodyContext);
+      if(!ready&&attempts++<240){requestAnimationFrame(finish);return;}
+      try{
+        const snapshotId=addView(archive.current,study,{...state,camera:ready?structuredClone(camera):null},masks);
+        const eventIds=new Set(batch.filter(j=>j.eventId).map(j=>j.eventId)),messageIds=new Set(batch.filter(j=>j.messageId).map(j=>j.messageId));
+        if(eventIds.size)setEvents(old=>old.map(e=>eventIds.has(e.id)?{...e,snapshotId}:e));
+        if(messageIds.size)setMessages(old=>old.map(m=>messageIds.has(m.id)?{...m,snapshotId,snapshotPending:false}:m));
+        setArchiveRevision(n=>n+1);
+      }finally{inflightSnapshots.current--;}
+    };
+    requestAnimationFrame(()=>requestAnimationFrame(finish));
+  },[events,messages]);
   const file = useRef(),
     maskFile = useRef(),
     beforeStroke = useRef(null);
@@ -412,12 +445,44 @@ function App() {
     return () => clearTimeout(t);
   }, [toast]);
   useEffect(() => {
+    if(skipPlaneInitialization.current){skipPlaneInitialization.current=false;return;}
     setSpatial((s) => ({...s,offset:planeOffset(volume,[position.sagittal,position.coronal,position.axial],s)}));
   }, [volume.id]);
-  function record(text) {
-    setEvents((e) =>
-      [{ text, time: new Date().toISOString() }, ...e].slice(0, 100),
-    );
+  function captureCurrentView(overrides={}) {
+    const state={...structuredClone(liveView.current),camera:cameraState.current?.studyId===volume.id?structuredClone(cameraState.current):null,...overrides};
+    const expected=cameraViewKey(volume,state.spatial,state.bodyContext),study=volume;
+    const ready=state.camera?.viewKey===expected;
+    if(!ready)state.camera=null;
+    const id=addView(archive.current,study,state);
+    if(!ready){let attempts=0;const enrich=()=>{
+      if(activeVolume.current!==study||!archive.current.views[id])return;
+      const camera=cameraState.current;
+      if(camera?.studyId===study.id&&camera.viewKey===expected){archive.current.views[id].state.camera=structuredClone(camera);setArchiveRevision(n=>n+1);}
+      else if(attempts++<240)requestAnimationFrame(enrich);
+    };requestAnimationFrame(enrich);}
+    setArchiveRevision(n=>n+1);return id;
+  }
+  function applyViewState(s) {
+    setPosition(s.position);setAxis(s.axis);setSpatial(s.spatial);setSettings(s.settings);setPoint(s.point||null);setTool(s.tool||"navigate");setBrush(s.brush||3);setZoom(s.zoom||1);setBrainOpacity(s.brainOpacity??.18);setRotate(!!s.rotate);setBodyContext(!!s.bodyContext);setPrivacy(!!s.privacy);setTheme(s.theme||"dark");setLayout(s.layout||"anatomy");setLibraryCollapsed(!!s.libraryCollapsed);setAssistantCollapsed(!!s.assistantCollapsed);setLibraryWidth(s.libraryWidth||230);setAssistantWidth(s.assistantWidth||294);setSceneShare(s.sceneShare||60);setRowShare(s.rowShare||50);setWorkspaceFocus(!!s.workspaceFocus);setFocus3d(!!s.focus3d);setFocusTools(!!s.focusTools);setInspectorOpen(!!s.inspectorOpen);
+    setCameraCommand(c=>({id:c.id+1,kind:s.camera?"restore":"fit",pose:s.camera}));
+  }
+  function restoreSavedView(id) {
+    if(busy||samBusy||roiJob||imageQuestion||evidenceOpen){setToast("Finish the active request or close the review before restoring a view.");return;}
+    try{
+      const restored=restoreView(archive.current,id,volume);
+      const backup=captureCurrentView();
+      record("Workspace before restoring a saved view",backup);
+      volume.proposal.set(restored.proposal);volume.reference.set(restored.reference);
+      Object.assign(volume,restored.metadata);applyViewState(restored.state);
+      setHistory([]);setFuture([]);setRevision(r=>r+1);setOverview(false);
+      record("Restored saved research view",id);
+      setToast("Saved view and markings restored. Your previous workspace is retained in Activity.");
+    }catch(e){setToast(e.message);}
+  }
+  function record(text,snapshotId=null) {
+    const id=crypto.randomUUID();
+    if(!snapshotId)pendingSnapshots.current.push({eventId:id});
+    setEvents(e=>[{id,text,time:new Date().toISOString(),snapshotId},...e].slice(0,100));
   }
   function navigate(xyz, seedAxis = null) {
     setPosition({sagittal:xyz[0],coronal:xyz[1],axial:xyz[2]});
@@ -530,7 +595,7 @@ function App() {
     setHistory([]);
     setFuture([]);
     setEvents([]);
-    setMessages([]);
+    setMessages([]);archive.current=emptyArchive();pendingSnapshots.current=[];
     setPoint(null);
     setConsent(false);
     setZoom(1);
@@ -551,7 +616,7 @@ function App() {
       setAxis("axial");
       setHistory([]);
       setFuture([]);
-      setMessages([]);
+      setMessages([]);archive.current=emptyArchive();pendingSnapshots.current=[];
       setEvents([]);
       setPoint(null);
       setConsent(false);
@@ -595,7 +660,7 @@ function App() {
         );
         setHistory([]);
         setFuture([]);
-        setMessages([]);
+        setMessages([]);archive.current=emptyArchive();pendingSnapshots.current=[];
         setEvents([]);
         setPoint(null);
         setConsent(false);
@@ -637,6 +702,8 @@ function App() {
       metrics: { ...metrics, slices: metrics.slices, currentSlice: {axis,slice:position[axis],...sliceAgreement} },
       position,
       events,
+      messages,
+      viewArchive:prunedArchive(archive.current,messages,events),
       proposalMask: Array.from(volume.proposal),
       referenceMask: Array.from(volume.reference),
       disclaimer: "Research only. Not clinically validated. No medical advice.",
@@ -714,8 +781,10 @@ function App() {
       if(!status.enabled){setModal("connection");return;}
       setImageQuestion({text,volume,position:{...position}});return;
     }
+    const questionSnapshotId=captureCurrentView();
+    const imageSnapshotId=media?captureCurrentView({position:{sagittal:media.anchor[0],coronal:media.anchor[1],axial:media.anchor[2]},point:slicePoint(volume,axis,media.anchor),spatial:{...spatial,offset:planeOffset(volume,media.anchor,spatial)}}):null;
     setInput("");
-    setMessages((m) => [...m, { role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }]);
+    setMessages((m) => [...m, {id:crypto.randomUUID(),snapshotId:questionSnapshotId,imageSnapshotId, role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }].slice(-100));
     setBusy(true);
     try {
       if (status.enabled) {
@@ -760,27 +829,28 @@ function App() {
         if (!response.ok) throw new Error(data.error);
         if(activeVolume.current !== volume) throw new Error("Study changed while Muse was working; response discarded.");
         applyActions(data.actions);
-        setMessages((m) => [
-          ...m,
-          { role: "assistant", text: data.text, source: data.model },
-        ]);
-        record(`Muse action: ${JSON.stringify(data.actions)}`);
-        if(media) record(`Asked Muse with six reviewed region images; focus ${media.selectionBasis}; anchor ${media.anchor.join(",")}; ${media.frames.map(f=>`${f.axis}:${f.slice}`).join(" ")}`);
+        const answerId=crypto.randomUUID();
+        if(data.actions.length)pendingSnapshots.current.push({messageId:answerId});
+        setMessages((m) => [...m,{id:answerId,role:"assistant",text:data.text,source:data.model,snapshotId:questionSnapshotId,questionSnapshotId,imageSnapshotId,snapshotPending:data.actions.length>0}].slice(-100));
+        if(data.actions.length)record(`Muse action: ${JSON.stringify(data.actions)}`);
+        else record("Answered research question",questionSnapshotId);
+        if(media) record(`Asked Muse with six reviewed region images; focus ${media.selectionBasis}; anchor ${media.anchor.join(",")}; ${media.frames.map(f=>`${f.axis}:${f.slice}`).join(" ")}`,imageSnapshotId);
       } else {
         let answer = localAction(text);
+        const answerId=crypto.randomUUID();pendingSnapshots.current.push({messageId:answerId});
         setMessages((m) => [
           ...m,
           {
             role: "assistant",
             text: answer,
-            source: "Local workspace command",
+            id:answerId,source: "Local workspace command",snapshotId:questionSnapshotId,questionSnapshotId,
           },
         ]);
       }
     } catch (e) {
       setMessages((m) => [
         ...m,
-        { role: "assistant", text: e.message, source: "Connection error" },
+        { role: "assistant", text: e.message, source: "Connection error",snapshotId:questionSnapshotId },
       ]);
     } finally {
       setBusy(false);
@@ -1300,7 +1370,7 @@ function App() {
               </button>
             </div>
           </div>
-          {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <details className="spatial-inspector"><summary>3D inspector · Cut & isolation</summary><div className="cut-controls">
+          {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <details className="spatial-inspector" open={inspectorOpen} onToggle={e=>setInspectorOpen(e.currentTarget.open)}><summary>3D inspector · Cut & isolation</summary><div className="cut-controls">
                 <label><input type="checkbox" checked={spatial.cut} onChange={(e) => changeCut({cut:e.target.checked})} /> Cut plane</label>
                 <label><input type="checkbox" checked={spatial.linked !== false} onChange={(e) => changeCut({linked:e.target.checked})} /> Link views</label>
                 <select aria-label="Cut plane orientation" value={spatial.pitch===90&&spatial.yaw===0?"axial":spatial.pitch===0&&spatial.yaw===90?"sagittal":spatial.pitch===0&&spatial.yaw===0?"coronal":"free"} onChange={(e)=>{
@@ -1514,6 +1584,7 @@ function App() {
                       </span>
                       {m.imageContext && <small className="image-message-note">6 reviewed images · {m.imageContext.selectionBasis} focus</small>}
                       <p>{m.text}</p>
+                      {m.snapshotId && archive.current.views[m.snapshotId]?.version===2 && <div className="saved-view-actions"><button disabled={busy||samBusy||m.snapshotPending} onClick={()=>restoreSavedView(m.snapshotId)}>{m.snapshotPending?"Saving view…":"Restore view"}</button>{m.questionSnapshotId&&m.questionSnapshotId!==m.snapshotId&&<button disabled={busy||samBusy} onClick={()=>restoreSavedView(m.questionSnapshotId)}>Question view</button>}{m.imageSnapshotId&&<button disabled={busy||samBusy} onClick={()=>restoreSavedView(m.imageSnapshotId)}>Shared image slices</button>}</div>}
                     </div>
                   ))
                 )}
@@ -1669,7 +1740,8 @@ function App() {
                   <div className="event" key={i}>
                     <span className="status-dot" />
                     <div>
-                      <span>{eventPresentation(e.text,volume.atlas?.regions).title}</span>
+                      {e.snapshotId&&archive.current.views[e.snapshotId]?.version===2?<button className="history-view-link" disabled={busy||samBusy} onClick={()=>restoreSavedView(e.snapshotId)} title="Restore this view and markings">{eventPresentation(e.text,volume.atlas?.regions).title}</button>:<span>{eventPresentation(e.text,volume.atlas?.regions).title}</span>}
+                      {e.snapshotId&&archive.current.views[e.snapshotId]?.version===2&&<small>Saved view · click to restore</small>}
                       {eventPresentation(e.text,volume.atlas?.regions).details && <details className="event-details"><summary>Technical record</summary><pre>{e.text}</pre></details>}
                       <small>
                         {new Date(e.time).toLocaleTimeString([], {
