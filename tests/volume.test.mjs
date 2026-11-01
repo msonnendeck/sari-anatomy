@@ -1,6 +1,52 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {phantom,compareMasks,paintMask,index3,voxelAt,slicePixels} from '../src/volume.mjs';
-test('known overlap and worst slice are numerically correct',()=>{const a=new Uint8Array([1,1,0,0,0,0,1,0]),b=new Uint8Array([1,0,0,0,1,1,1,0]);const r=compareMasks(a,b,[2,2,2]);assert.equal(r.dice,4/7);assert.equal(r.difference,3);assert.equal(r.worst,1);assert.deepEqual(r.slices,[1,2]);});
-test('phantom is deterministic and both masks are explicitly synthetic',()=>{const a=phantom(32),b=phantom(32);assert.deepEqual(a.data,b.data);assert.deepEqual(a.reference,b.reference);const r=compareMasks(a.reference,a.proposal,a.dims);assert.ok(r.dice>0&&r.dice<1);assert.ok(r.difference>0);assert.equal(a.synthetic,true);});
-test('painting in each plane modifies exactly the addressed voxel',()=>{for(const axis of ['axial','coronal','sagittal']){const v=phantom(16);v.proposal.fill(0);paintMask(v,axis,6,4,5,0,false);const i=index3(...voxelAt(v,axis,4,5,6),v.dims);assert.equal(v.proposal[i],1);assert.equal(v.proposal.reduce((a,b)=>a+b),1);paintMask(v,axis,6,4,5,0,true);assert.equal(v.proposal[i],0);}});
-test('slice export has exact pixel size and finite opaque values',()=>{const v=phantom(16);for(const axis of ['axial','coronal','sagittal']){const s=slicePixels(v,axis,8);assert.equal(s.rgba.length,16*16*4);for(let i=3;i<s.rgba.length;i+=4)assert.equal(s.rgba[i],255);}});
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import {
+  phantom,
+  compareMasks,
+  paintMask,
+  index3,
+  voxelAt,
+  slicePixels,
+} from "../src/volume.mjs";
+test("known overlap and worst slice are numerically correct", () => {
+  const a = new Uint8Array([1, 1, 0, 0, 0, 0, 1, 0]),
+    b = new Uint8Array([1, 0, 0, 0, 1, 1, 1, 0]);
+  const r = compareMasks(a, b, [2, 2, 2]);
+  assert.equal(r.dice, 4 / 7);
+  assert.equal(r.difference, 3);
+  assert.equal(r.worst, 1);
+  assert.deepEqual(r.slices, [1, 2]);
+});
+test("phantom is deterministic and both masks are explicitly synthetic", () => {
+  const a = phantom(32),
+    b = phantom(32);
+  assert.deepEqual(a.data, b.data);
+  assert.deepEqual(a.reference, b.reference);
+  const r = compareMasks(a.reference, a.proposal, a.dims);
+  assert.ok(r.dice > 0 && r.dice < 1);
+  assert.ok(r.difference > 0);
+  assert.equal(a.synthetic, true);
+});
+test("painting in each plane modifies exactly the addressed voxel", () => {
+  for (const axis of ["axial", "coronal", "sagittal"]) {
+    const v = phantom(16);
+    v.proposal.fill(0);
+    paintMask(v, axis, 6, 4, 5, 0, false);
+    const i = index3(...voxelAt(v, axis, 4, 5, 6), v.dims);
+    assert.equal(v.proposal[i], 1);
+    assert.equal(
+      v.proposal.reduce((a, b) => a + b),
+      1,
+    );
+    paintMask(v, axis, 6, 4, 5, 0, true);
+    assert.equal(v.proposal[i], 0);
+  }
+});
+test("slice export has exact pixel size and finite opaque values", () => {
+  const v = phantom(16);
+  for (const axis of ["axial", "coronal", "sagittal"]) {
+    const s = slicePixels(v, axis, 8);
+    assert.equal(s.rgba.length, 16 * 16 * 4);
+    for (let i = 3; i < s.rgba.length; i += 4) assert.equal(s.rgba[i], 255);
+  }
+});
