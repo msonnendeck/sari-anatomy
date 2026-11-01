@@ -25,6 +25,12 @@ Focus on one brain MRI research task and a small, appropriately licensed dataset
 
 These are planned capabilities, not claims of working functionality or validated model performance. Dataset selection and feasibility evaluation remain outstanding.
 
+## Broader vision
+
+Brain MRI is the starting point for SARI, not the limit of the concept. The longer-term vision is a spatial research interface that can expand to other anatomical regions, including the thorax, thyroid, and heart, with region-specific imaging workflows and annotation tools.
+
+These extensions are future directions, not implemented features. Each additional region and imaging modality will require suitable licensed data, appropriate spatial mapping, and its own evaluation. The research-only boundary applies throughout.
+
 ## Research boundary
 
 **Research use only. Not clinically validated. Not for diagnosis, treatment, or medical advice.**
