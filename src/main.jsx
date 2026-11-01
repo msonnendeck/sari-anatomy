@@ -680,6 +680,7 @@ function App() {
   function applyActions(actions) {
     const context = {dims:volume.dims,atlasRegions:volume.atlas?.regions};
     if (!Array.isArray(actions) || actions.some(a => !validAction(a,context))) throw new Error("Invalid navigation response; workspace preserved.");
+    if (!actions.length) return;
     let nextSpatial={...spatial}, nextPosition={...position}, nextAxis=axis;
     for (const a of actions) {
       if (a.action === "select_region") {
@@ -739,7 +740,7 @@ function App() {
               proposalAvailable: metrics.countB > 0,
               referenceKind:
                 volume.referenceKind || "user-defined binary reference",
-              studyKind: volume.id === "slicer-tumor" ? "source-labeled tumor teaching sample; subtype not supplied" : volume.bundled
+              studyKind: volume.atlas ? "source-labeled anatomical research atlas; labels are not AI findings" : volume.id === "slicer-tumor" ? "source-labeled tumor teaching sample; subtype not supplied" : volume.bundled
                 ? "population-average MRI template"
                 : volume.synthetic
                   ? "synthetic phantom"
