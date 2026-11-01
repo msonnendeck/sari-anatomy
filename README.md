@@ -235,3 +235,5 @@ voxel directly. Point markers remain visible through surfaces for orientation.
 Use **Expand 3D view** in the spatial viewer header to inspect anatomy at workspace size. Return restores the existing Anatomy or Four views layout with the same camera and annotations. **Fit to visible content** and **Reset camera** recover framing after zoom or rendering-mode changes. Cut-plane and isolation settings are in the collapsible **3D inspector** above the canvases.
 
 Drag the workspace dividers or focus one and use arrow keys to resize panels. The rail toggles the study library and assistant. On narrow desktop widths the assistant stays alongside the images; below mobile widths it becomes a drawer. See [Chrome verification](docs/spatial-inspection-verification-2026-11-01.md).
+
+**Focus workspace** also removes the large page header and editing chrome while retaining all linked views. A compact 40 px bar keeps the active target, layout switch, tools toggle, export and **Exit focus**. Escape returns to the full workspace. Expanding just the 3D view uses the same compact header. Camera, annotations and side-panel preferences are retained in session.

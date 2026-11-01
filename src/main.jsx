@@ -299,6 +299,7 @@ function App() {
   const [spatial, setSpatial] = useState({mode: "solid", cut: true, pitch: 0, yaw: 0, offset: 0, threshold: 30, isolate: "all", color: false});
   const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
   useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
+  const [workspaceFocus,setWorkspaceFocus]=useState(false),[focusTools,setFocusTools]=useState(false);
   const [focus3d,setFocus3d]=useState(false),[libraryCollapsed,setLibraryCollapsed]=useState(()=>window.innerWidth<1200),[assistantCollapsed,setAssistantCollapsed]=useState(false);
   const [libraryWidth,setLibraryWidth]=useState(230),[assistantWidth,setAssistantWidth]=useState(294),[sceneShare,setSceneShare]=useState(60),[rowShare,setRowShare]=useState(50);
   useEffect(()=>{const media=window.matchMedia("(max-width:1100px)");const changed=()=>{if(media.matches)setLibraryCollapsed(true);};media.addEventListener("change",changed);return()=>media.removeEventListener("change",changed);},[]);
@@ -859,12 +860,14 @@ function App() {
   }
   useEffect(() => {
     function key(e) {
-      if (e.defaultPrevented || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.closest?.('[role="separator"]')) return;
       if (e.key === "Escape") {
         setFocus3d(false);
+        setWorkspaceFocus(false);
         setModal(null);
         setTool("navigate");
+        return;
       }
+      if (e.defaultPrevented || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.closest?.('[role="separator"]')) return;
       if ((e.metaKey || e.ctrlKey) && e.key === "z") {
         e.preventDefault();
         e.shiftKey ? redo() : undo();
@@ -910,7 +913,7 @@ function App() {
       )}
     </React.Suspense>
   ) : (
-    <div className="app">
+    <div className={`app ${workspaceFocus||focus3d?"compact-workspace":""} ${focusTools?"focus-tools-open":""}`}>
       <input
         type="file"
         ref={file}
@@ -925,6 +928,15 @@ function App() {
         hidden
         onChange={(e) => load(e, true)}
       />
+      <div className="compact-workspace-bar" role="toolbar" aria-label="Focused workspace navigation">
+        <a href="/" aria-label="SARI overview" onClick={e=>{e.preventDefault();setOverview(true);}}>SARI</a>
+        <span className="compact-target" title={volume.name}>{volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || volume.name}</span>
+        <span className="compact-research">Research only</span>
+        <div className="layout-switch" role="group" aria-label="Focused workspace layout">{["anatomy","grid"].map(value=><button key={value} aria-label={value==="anatomy"?"Focus layout: Anatomy":"Focus layout: Four views"} aria-pressed={layout===value} onClick={()=>setLayout(value)}>{value==="anatomy"?"Anatomy":"Four views"}</button>)}</div>
+        <button className="focus-action" aria-label="Toggle focus tools" aria-pressed={focusTools} onClick={()=>setFocusTools(v=>!v)}><SlidersHorizontal size={13}/> Tools</button>
+        <IconButton icon={ArrowDownToLine} label="Export review" onClick={exportSession}/>
+        <button className="focus-action" aria-label="Exit workspace focus" title="Exit workspace focus (Escape)" onClick={()=>{setWorkspaceFocus(false);setFocus3d(false);}}><Maximize2 size={13}/> Exit focus</button>
+      </div>
       <header className="topbar">
         <a href="/" className="brand" aria-label="SARI overview" onClick={(e) => { e.preventDefault(); setModal(null); setOverview(true); }}>
           <Logo />
@@ -954,7 +966,7 @@ function App() {
           <span className="avatar">SS</span>
         </div>
       </header>
-      <div className={`shell inspection-shell ${libraryCollapsed||focus3d?"library-collapsed":""} ${assistantCollapsed||focus3d?"assistant-collapsed":""} ${focus3d?"focus-3d":""}`} style={{"--library-width":`${libraryWidth}px`,"--assistant-width":`${assistantWidth}px`,"--scene-fr":`${sceneShare}fr`,"--slice-fr":`${100-sceneShare}fr`,"--row-fr":`${rowShare}fr`,"--bottom-fr":`${100-rowShare}fr`}}>
+      <div className={`shell inspection-shell ${libraryCollapsed||workspaceFocus||focus3d?"library-collapsed":""} ${assistantCollapsed||workspaceFocus||focus3d?"assistant-collapsed":""} ${focus3d?"focus-3d":""}`} style={{"--library-width":`${libraryWidth}px`,"--assistant-width":`${assistantWidth}px`,"--scene-fr":`${sceneShare}fr`,"--slice-fr":`${100-sceneShare}fr`,"--row-fr":`${rowShare}fr`,"--bottom-fr":`${100-rowShare}fr`}}>
         <nav className="rail" aria-label="Workspace navigation">
           <IconButton
             icon={Layers}
@@ -1183,6 +1195,7 @@ function App() {
               </p>
             </div>
             <div className="study-actions">
+            <button className="button secondary" aria-label="Focus workspace" title="Focus workspace" onClick={()=>setWorkspaceFocus(true)}><Maximize2 size={14}/><span>Focus</span></button>
             <div className="layout-switch" role="group" aria-label="Workspace layout">
               {["anatomy", "grid"].map((value) => <button key={value} aria-pressed={layout === value} onClick={() => setLayout(value)}>{value === "anatomy" ? "Anatomy" : "Four views"}</button>)}
             </div>
@@ -1257,7 +1270,7 @@ function App() {
               <button className="quiet-button" aria-label="Grow region" disabled={!point} onClick={growSeed} title="Replace proposal with connected voxels within ±12 intensity of the seed"><Crosshair size={14} /><span>Grow region</span></button>
               <button
                 className="quiet-button" aria-label="Display" title="Display"
-                onClick={() => {setTab("display");setAssistantCollapsed(false);}}
+                onClick={() => {setWorkspaceFocus(false);setFocus3d(false);setTab("display");setAssistantCollapsed(false);}}
               >
                 <SlidersHorizontal size={14} />
                 <span>Display</span>
