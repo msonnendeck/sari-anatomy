@@ -362,6 +362,8 @@ function App() {
   const file = useRef(),
     maskFile = useRef(),
     beforeStroke = useRef(null);
+  const activeVolume = useRef(volume);
+  activeVolume.current=volume;
   const metrics = useMemo(
     () => compareMasks(volume.reference, volume.proposal, volume.dims),
     [volume, revision],
@@ -669,7 +671,7 @@ function App() {
       } else if (a.action === "set_view") {
         Object.assign(nextSpatial,{mode:a.mode,hemisphere:a.hemisphere || nextSpatial.hemisphere,atlasIsolate:a.isolate});
       } else if (a.action === "set_cut") {
-        Object.assign(nextSpatial,{cut:a.enabled,pitch:a.pitch,yaw:a.yaw,linked:true});
+        Object.assign(nextSpatial,{cut:a.enabled ?? true,pitch:a.pitch,yaw:a.yaw,linked:true});
       } else if (a.action === "set_axis") nextAxis=a.axis;
       else if (a.action === "set_slice") {nextAxis=a.axis;nextPosition[a.axis]=a.slice;}
       else if (a.action === "worst_difference") {
@@ -728,6 +730,7 @@ function App() {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
+        if(activeVolume.current !== volume) throw new Error("Study changed while Muse was working; response discarded.");
         applyActions(data.actions);
         setMessages((m) => [
           ...m,
@@ -792,6 +795,8 @@ function App() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
+      if(activeVolume.current !== volume) throw new Error("Study changed while SAM was working; result discarded.");
+      if(!Array.isArray(data.mask) || data.width!==width || data.height!==height || data.mask.length!==width*height || data.mask.some(n=>n!==0&&n!==1)) throw new Error("Invalid SAM mask; existing proposal preserved.");
       remember();
       for (let y = 0; y < height; y++)
         for (let x = 0; x < width; x++) {

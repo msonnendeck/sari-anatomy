@@ -9,7 +9,7 @@ export function validAction(a, context = {}) {
     return axes.includes(a.axis) && Number.isInteger(a.slice) && a.slice >= 0 && a.slice < (context.dims?.[dim] || 0);
   }
   if (a.action === 'set_view') return ['atlas','solid','volume'].includes(a.mode) && (a.mode !== 'atlas' || !!context.atlasRegions?.length) && (a.hemisphere === undefined || ['both','left','right'].includes(a.hemisphere)) && typeof a.isolate === 'boolean';
-  if (a.action === 'set_cut') return typeof a.enabled === 'boolean' && Number.isFinite(a.pitch) && Math.abs(a.pitch)<=90 && Number.isFinite(a.yaw) && Math.abs(a.yaw)<=180;
+  if (a.action === 'set_cut') return (a.enabled === undefined || typeof a.enabled === 'boolean') && Number.isFinite(a.pitch) && Math.abs(a.pitch)<=90 && Number.isFinite(a.yaw) && Math.abs(a.yaw)<=180;
   return ['worst_difference','show_reference','show_proposal'].includes(a.action);
 }
 export function conversationHistory(history) {

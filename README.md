@@ -41,7 +41,7 @@ The server binds to loopback only. Set `PORT` if 5187 is occupied. This is a sin
 
 ## Included research data and body-first workflow
 
-SARI opens on an interactive **BodyParts3D reference human body**. Click the head or choose **Head & brain** to load the **MNI ICBM152 2009c symmetric T1 MRI template** and its supplied whole-brain extraction mask. This template is an average derived from real MRI scans, not an individual patient scan. The bundled 2 mm derivatives retain the RAS-aligned grid and source copyright notice. The proposal starts empty; no model accuracy score is fabricated.
+SARI opens on an interactive **BodyParts3D reference human body**. Click the head or choose **Head & brain** to open the **SPL/NAC brain atlas**, with 0.75 mm MRI and 90 named anatomical surfaces. These are source annotations, not AI findings. MNI population-average templates and the Slicer teaching case are additional studies. Proposals start empty; no model accuracy score is fabricated.
 
 The workspace's **Show full-body context** control places the study at the head of the generic body. This placement is illustrative, not patient-specific registration: the body and MRI come from different reference sources. Imported volumes remain in native voxel axes and must not be assumed to be anatomically aligned.
 
@@ -68,22 +68,24 @@ PORT=5187
 
 Restart the server. The UI should show **Muse Spark connected** when the server is configured. This status checks configuration, not API validity, model entitlement, or credit balance. Live calls still require appropriate Meta account access. Verify the model variant and credit coverage in your own account before enabling calls.
 
-- **Muse Spark** receives the current question, voxel dimensions, slice position, and computed annotation metrics. It does not receive scan pixels in assistant requests. It can select one bounded navigation tool per request. Conversation history is not currently sent.
+- **Muse Spark** receives the current question, voxel dimensions, slice position, and computed annotation metrics. It does not receive scan pixels in assistant requests. It proposes an ordered plan of up to six validated, reversible navigation actions: select a source atlas region, isolate it, change rendering mode or hemisphere, position an oblique cut, select an axis/slice, or reveal masks. The last eight conversational messages are supplied for follow-up context. This is bounded navigation, not an autonomous diagnostic agent.
 - **SAM 3.1** receives only the selected rendered grayscale slice and a selected foreground point, after the user confirms sharing rights. Its returned mask replaces the proposal on that slice only. This is not volumetric segmentation or medical validation.
 - API keys stay on the server; never use a `VITE_` prefix for secrets. No `.env` file belongs in Git.
 - Free-credit / Contributor terms may allow content to be used for product improvement or training. Dataset permission must cover the intended processing; public availability alone does not establish permission.
 
-Initial offline implementation used no Meta key. Subsequently, account authentication, Muse Spark availability, SAM availability in the model catalog, and a live Muse navigation-tool response were verified. Live SAM segmentation, medical-image performance, and billing deductions remain unverified. No additional model requests were needed to integrate the bundled MRI and body assets.
+Initial offline implementation used no Meta key. Subsequently, account authentication, Muse Spark availability, SAM availability in the model catalog, and a live Muse navigation-tool response were verified. Live SAM segmentation was verified on November 1, 2026: right hippocampus, SPL/NAC axial slice 132 (one-based), point (133,152), 572 proposed pixels versus 581 source-label pixels, 432 intersecting pixels, 74.9% 2D Dice. This single example is not a medical-image performance benchmark. Billing deductions remain unverified. No additional model requests were needed to integrate the bundled MRI and body assets.
 
 ## Try the workflow
 
-1. On the body overview, click the head to open the real MNI template. Use **Show full-body context** to view its contextual head placement.
-2. For the prepared disagreement demonstration, choose **Try synthetic study** from the overview, then select **Review largest difference**.
-3. Inspect the mint proposal and amber reference outline.
-4. Choose **Paint proposal mask** or **Erase proposal mask**, then draw on a slice.
-5. Observe the updated numeric overlap and 3D mask. Undo and redo the edit.
-6. Ask **Compare annotation overlap** or **Show the reference outline**.
-7. Export the research record. Reload to verify the current study is retained locally.
+1. Open **Explore head study** from the body overview.
+2. Ask **Explore the left hippocampus**. Muse selects source label 17, isolates it in anatomy view, and selects coronal slices.
+3. Ask “Now show its right-side counterpart, keep it isolated, and switch to axial.” Muse should select source label 53. Inspect the actual controls and views; model responses can vary.
+4. Click **Use structure as reference**. This derives a binary mask from the selected source atlas label and places a seed inside it.
+5. Click **SAM proposal**, review the slice-sharing notice, and confirm only if permitted. A live Meta key and model access are required. Inspect the proposal against the amber source outline; current-slice 2D Dice is separate from whole-volume 3D Dice.
+6. Ask “Show it in solid view with both hemispheres, no isolation, and an oblique cut through the selected point, tilt 25 degrees and rotate 35 degrees.”
+7. Review/correct the proposal with paint and erase, then **Export review**. The export includes masks, source target, geometry, computed metrics, and action provenance.
+
+SAM is not guaranteed to reproduce source atlas boundaries. The demo should show human review rather than imply automatic correctness. A single-slice proposal compared to a complete 3D structure naturally has low whole-volume Dice.
 
 ## Local data and limitations
 
@@ -95,8 +97,8 @@ Imported data stays in the browser unless the user explicitly requests a SAM sli
 - Reference import requires matching dimensions and spatial transforms. All nonzero labels are combined into one binary mask.
 - At most ten in-session undo states are retained; undo history is not persisted.
 - AI generation, slice upload, and large imports can take time. Local file parsing is currently on the main thread.
-- The assistant is a bounded single-step tool caller, not yet a multi-turn autonomous research agent.
-- Expert annotation review, additional reference cases, clinical evaluation, patient-specific registration, and live SAM feasibility testing remain outstanding. The supplied whole-brain mask is not ventricular ground truth; comparisons are meaningful only when proposal and reference target the same structure.
+- The assistant plans bounded workspace actions with conversational context. It cannot autonomously segment, retrieve reference cases, or make clinical judgments.
+- Expert annotation review, additional reference cases, clinical evaluation, patient-specific registration, remain outstanding. The supplied whole-brain mask is not ventricular ground truth; comparisons are meaningful only when proposal and reference target the same structure.
 
 ## Broader vision
 
@@ -111,7 +113,7 @@ npm test
 npm run build
 ```
 
-Browser checks verified both themes, disagreement navigation, painting, exact undo/redo results, JSON export contents, saved-mask restoration after reload, and an error-free browser console. Full browser file-import verification was blocked by the Chrome extension’s disabled file-URL access; the NIfTI parser was verified with generated fixtures instead. Live Meta calls were not tested.
+Browser checks verified both themes, disagreement navigation, painting, exact undo/redo results, JSON export contents, saved-mask restoration after reload, and an error-free browser console. Full browser file-import verification was blocked by the Chrome extension’s disabled file-URL access; the NIfTI parser was verified with generated fixtures instead. Live Muse region selection, conversational counterpart selection, and SAM mask application were verified on November 1, 2026. See the workflow above for the single-slice result and its limitations.
 
 The tests check known overlap values, worst-slice selection, deterministic phantom generation, coordinate-correct mask edits in every plane, rendered slice dimensions, valid NIfTI decoding, and invalid-file rejection.
 

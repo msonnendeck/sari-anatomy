@@ -1,3 +1,5 @@
+> Follow-up implementation: see [live demo verification](demo-verification-2026-11-01.md). Muse atlas navigation, conversational follow-up, one successful SAM example, and export are now verified. The assessment below records the earlier review.
+
 # SARI — hackathon readiness review
 
 Reviewed 1 November 2026. Evidence: current repository at c53ece4; live official
