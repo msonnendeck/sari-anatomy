@@ -366,6 +366,14 @@ function App() {
     () => compareMasks(volume.reference, volume.proposal, volume.dims),
     [volume, revision],
   );
+  const sliceAgreement = useMemo(() => {
+    const [width,height]=sliceSize(volume,axis), a=new Uint8Array(width*height),b=new Uint8Array(width*height);
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+      const i=index3(...voxelAt(volume,axis,x,y,position[axis]),volume.dims);
+      a[x+y*width]=volume.reference[i];b[x+y*width]=volume.proposal[i];
+    }
+    return binaryOverlap(a,b);
+  },[volume,revision,axis,position]);
   useEffect(() => {
     if (spatial.isolate === "proposal" && !metrics.countB) setSpatial((s) => ({...s, isolate: "all"}));
   }, [metrics.countB, spatial.isolate]);
@@ -603,7 +611,7 @@ function App() {
         : volume.bundled
           ? `${volume.referenceKind || "No reference supplied"}; proposal starts empty; local/manual/SAM edits recorded below`
           : "User-supplied reference / manual or SAM proposal",
-      metrics: { ...metrics, slices: metrics.slices },
+      metrics: { ...metrics, slices: metrics.slices, currentSlice: {axis,slice:position[axis],...sliceAgreement} },
       position,
       events,
       proposalMask: Array.from(volume.proposal),
@@ -699,6 +707,7 @@ function App() {
               axis,
               position,
               metrics: {
+                currentSlice: {axis,slice:position[axis],...sliceAgreement},
                 dice: metrics.countA && metrics.countB ? metrics.dice : null,
                 difference:
                   metrics.countA && metrics.countB ? metrics.difference : null,
@@ -1061,7 +1070,10 @@ function App() {
             </button>
           </div>
           <div className="review-card">
-            <div className="panel-eyebrow">ANNOTATION AGREEMENT</div>
+            <div className="panel-eyebrow">CURRENT SLICE · 2D DICE</div>
+            <div className="score">{sliceAgreement.reference && sliceAgreement.proposal ? `${(sliceAgreement.dice*100).toFixed(1)}%` : "—"}</div>
+            <div className="score-meta">{cap(axis)} {position[axis]+1} · source / proposal agreement</div>
+            <div className="panel-eyebrow">WHOLE VOLUME</div>
             <div className="score">
               {metrics.countA && metrics.countB ? (
                 <>

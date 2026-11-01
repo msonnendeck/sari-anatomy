@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { expandMask } from "./sam-mask.mjs";
 import { validAction, conversationHistory } from "../src/assistant-actions.mjs";
 import OpenAI from "openai";
 import { fileURLToPath } from "node:url";
@@ -217,7 +218,9 @@ app.post("/api/segment", async (req, res) => {
       ],
       stream: true,
     });
-    const result = await parseImageStream(events).finalResult;
+    const parsed = parseImageStream(events);
+    for await (const snapshot of parsed) { /* Drain the stream before reading its final result. */ }
+    const result = await parsed.finalResult;
     if (result.outcome.status !== "completed")
       throw new Error("Incomplete SAM response");
     const mask = recordsOfKind(result.records, "mask")[0];
@@ -226,14 +229,13 @@ app.post("/api/segment", async (req, res) => {
         .status(422)
         .json({ error: "SAM returned no mask. Try another foreground point." });
     const raster = decodeMaskToRaster(mask.mask);
-    if (raster.length !== width * height)
-      throw new Error("Mask dimensions do not match");
-    res.json({ mask: Array.from(raster), width, height, model: "sam-3.1" });
+    const fullMask=expandMask(raster,mask.bounds,width,height);
+    res.json({ mask: Array.from(fullMask), width, height, model: "sam-3.1" });
   } catch (e) {
     res
       .status(502)
       .json({
-        error: "SAM segmentation failed. The existing mask was preserved.",
+        error: e.status === 429 ? "Meta rate limit reached. Existing mask preserved." : "SAM segmentation failed. The existing mask was preserved.",
       });
   }
 });
