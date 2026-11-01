@@ -155,3 +155,12 @@ The study chooser also offers original-grid 1 mm MNI T1, 2 mm T2 and the
 3D Slicer MRBrainTumor1 teaching case. See [research sample provenance](public/data/research/README.md)
 for transformations, source checksums and licensing. The tumor name is supplied
 by the source; no subtype, pathology confirmation or lesion ground truth is included.
+
+### Viewing on a tablet over Wi-Fi
+
+The server defaults to loopback access. Set `HOST=0.0.0.0` in the ignored local
+`.env` and restart to allow devices on your trusted network. Open
+`http://<Mac Wi-Fi IP>:5187` on the tablet while the Mac and server remain running.
+API requests accept only this machine's local addresses and matching local origins;
+unrelated website origins and host names are rejected. The API key remains server-side.
+This does not configure router port forwarding or public hosting.

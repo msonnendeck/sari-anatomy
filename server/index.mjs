@@ -3,6 +3,17 @@ import express from "express";
 import OpenAI from "openai";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { networkInterfaces } from "node:os";
+const port = Number(process.env.PORT) || 5187;
+const host = process.env.HOST || "127.0.0.1";
+const localHosts = new Set(["localhost", "127.0.0.1"]);
+if (host !== "127.0.0.1" && host !== "localhost") {
+  for (const addresses of Object.values(networkInterfaces()))
+    for (const address of addresses || [])
+      if (address.family === "IPv4" && !address.internal) localHosts.add(address.address);
+}
+const allowedAuthorities = new Set([...localHosts].map((h) => `${h}:${port}`));
+const allowedOrigins = new Set([...allowedAuthorities].map((h) => `http://${h}`));
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const app = express();
 app.disable("x-powered-by");
@@ -11,8 +22,8 @@ const ready = () =>
   process.env.META_ENABLED === "true" && !!process.env.MODEL_API_KEY;
 app.use("/api", (req, res, next) => {
   const origin = req.get("origin");
-  if (origin && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin))
-    return res.status(403).json({ error: "Only local requests are accepted." });
+  if (!allowedAuthorities.has(req.get("host")) || (origin && !allowedOrigins.has(origin)))
+    return res.status(403).json({ error: "Only requests from this local app are accepted." });
   next();
 });
 app.get("/api/status", (req, res) =>
@@ -229,8 +240,7 @@ if (process.env.NODE_ENV === "production") {
   });
   app.use(vite.middlewares);
 }
-const port = Number(process.env.PORT) || 5187;
-const server = app.listen(port, "127.0.0.1", () =>
+const server = app.listen(port, host, () =>
   console.log(
     `SARI: http://127.0.0.1:${port} · Meta ${ready() ? "enabled" : "disabled"}`,
   ),
