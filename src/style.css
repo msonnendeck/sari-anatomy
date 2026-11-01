@@ -2426,3 +2426,71 @@ kbd {
 .roi-rationale li {font-size:13px;line-height:1.6;margin:8px 0;}
 .roi-history {font-size:12px;line-height:1.6;border-top:1px solid var(--border);padding:14px 0;color:var(--muted);}
 .roi-history summary {cursor:pointer;color:var(--text);}
+
+/* Spatial inspection: persistent canvas, external inspector, adjustable workspace. */
+.inspection-shell {grid-template-areas:"rail library libsplit main assistantsplit assistant";grid-template-columns:48px var(--library-width) 6px minmax(260px,1fr) 6px var(--assistant-width);height:calc(100dvh - 76px);min-height:0;overflow:hidden;}
+.inspection-shell>.rail{grid-area:rail;}
+.inspection-shell>.study-panel{grid-area:library;overflow:auto;min-width:0;min-height:0;padding:20px 16px;}
+.inspection-shell>.main{grid-area:main;min-width:0;min-height:0;padding:14px 14px 0;overflow:hidden;}
+.inspection-shell>.assistant-panel{grid-area:assistant;min-height:0;overflow:hidden;border-top:0;}
+.inspection-shell>.library-divider{grid-area:libsplit;}
+.inspection-shell>.assistant-divider{grid-area:assistantsplit;}
+.inspection-shell.library-collapsed{grid-template-columns:48px 0 0 minmax(260px,1fr) 6px var(--assistant-width);}
+.inspection-shell.assistant-collapsed{grid-template-columns:48px var(--library-width) 6px minmax(260px,1fr) 0 0;}
+.inspection-shell.library-collapsed.assistant-collapsed{grid-template-columns:48px 0 0 minmax(260px,1fr) 0 0;}
+.library-collapsed>.study-panel,.library-collapsed>.library-divider,.assistant-collapsed>.assistant-panel,.assistant-collapsed>.assistant-divider{display:none;}
+.workspace-resize{background:transparent;position:relative;touch-action:none;cursor:col-resize;z-index:5;outline-offset:-2px;}
+.workspace-resize::after{content:"";position:absolute;inset:0 2px;background:var(--border);border-radius:4px;}
+.workspace-resize:hover::after,.workspace-resize:focus-visible::after{background:var(--mint);}
+.inspection-shell .viewer-grid{position:relative;display:grid;grid-template-columns:minmax(0,var(--scene-fr)) minmax(0,var(--slice-fr));grid-template-rows:minmax(0,var(--row-fr)) minmax(0,var(--bottom-fr));height:0;min-height:0;max-height:none;flex:1;gap:10px;}
+.inspection-shell .layout-anatomy .viewer-grid{grid-template-rows:repeat(3,minmax(0,1fr));}
+.inspection-shell .slice-card,.inspection-shell .scene-card{min-height:0;}
+.inspection-shell .slice-image{height:0;min-height:0;}
+.inspection-shell .viewer-column-divider{position:absolute;top:0;bottom:0;width:8px;transform:translateX(-50%);}
+.inspection-shell .viewer-row-divider{position:absolute;left:0;right:0;height:8px;transform:translateY(-50%);cursor:row-resize;}
+.inspection-shell .viewer-row-divider::after{inset:2px 0;}
+.inspection-shell .layout-anatomy .viewer-row-divider{display:none;}
+.spatial-inspector{flex-shrink:0;border:1px solid var(--border);border-radius:7px;background:var(--panel);margin:0 0 8px;}
+.spatial-inspector summary{padding:8px 12px;font-size:11px;color:var(--muted);cursor:pointer;}
+.spatial-inspector .cut-controls{position:static;inset:auto;opacity:1;border:0;border-top:1px solid var(--border);border-radius:0;padding:10px 12px;gap:10px 18px;}
+.spatial-inspector .cut-controls input[type="range"]{width:100px;}
+.inspection-shell .scene-card>.viewport-heading{height:36px;padding:0 8px;gap:5px;}
+.inspection-shell .scene-card>div:nth-child(2){inset:36px 0 0;height:calc(100% - 36px)!important;}
+.inspection-shell .scene-overlay{display:none;}
+.scene-navigation{display:flex;align-items:center;gap:3px;margin-left:auto;}
+.scene-navigation .icon-button,.inspection-shell .scene-card .viewport-heading>.icon-button{margin-left:0;}
+.focus-action{display:flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);font-size:10px;white-space:nowrap;}
+.active-spatial-target{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.inspection-shell .assistant-tabs{padding:0 10px;gap:12px;flex-shrink:0;}
+.inspection-shell .assistant-messages{max-height:none;min-height:0;overflow:auto;}
+.inspection-shell .assistant-intro{display:flex;padding:18px 14px;}
+.inspection-shell .empty-conversation{display:block;}
+.inspection-shell .empty-conversation>button{min-width:0;}
+.inspection-shell .study-header{flex-wrap:wrap;margin-bottom:10px;}
+.inspection-shell .study-actions{gap:6px;}
+.inspection-shell .toolbar{flex-wrap:wrap;flex-shrink:0;}
+.inspection-shell .slice-filmstrip{flex-shrink:0;}
+.inspection-shell .workspace-footer{flex-shrink:0;}
+.focus-3d .viewer-grid{display:block!important;}
+.focus-3d .scene-card{height:100%;width:100%;}
+.focus-3d .slice-card,.focus-3d .viewer-column-divider,.focus-3d .viewer-row-divider,.focus-3d .slice-filmstrip,.focus-3d .workspace-footer{display:none;}
+@media(max-width:1100px){
+ .inspection-shell,.inspection-shell.library-collapsed{grid-template-columns:48px 0 0 minmax(240px,1fr) 6px min(var(--assistant-width),32vw);}
+ .inspection-shell.assistant-collapsed{grid-template-columns:48px 0 0 minmax(240px,1fr) 0 0;}
+ .inspection-shell>.study-panel{position:fixed;z-index:12;top:76px;bottom:0;left:48px;width:var(--library-width);box-shadow:var(--shadow);}
+ .inspection-shell>.library-divider{display:none;}
+ .inspection-shell .scene-card .active-spatial-target{display:none;}
+ .inspection-shell .scene-card .viewport-heading>.icon-button{display:none;}
+ .inspection-shell .scene-navigation{gap:1px;}
+ .inspection-shell .focus-action span{display:none;}
+ .inspection-shell .scene-navigation .icon-button{width:22px;}
+ .inspection-shell .assistant-intro{display:none;}
+ .inspection-shell .filmstrip-frames button{flex-basis:42px;}.inspection-shell .filmstrip-frames canvas{width:42px;height:38px;}
+}
+@media(max-width:700px){
+ .inspection-shell>.assistant-panel{position:fixed;right:0;top:76px;bottom:0;width:min(330px,70vw);z-index:14;box-shadow:var(--shadow);}
+ .inspection-shell{grid-template-columns:42px 0 0 minmax(240px,1fr) 0 0!important;}
+ .inspection-shell>.assistant-divider{display:none;}
+ .inspection-shell .layout-anatomy .viewer-grid{display:grid;}
+ .inspection-shell .layout-anatomy .scene-card,.inspection-shell .layout-anatomy .slice-card{height:auto;}
+}

@@ -60,6 +60,7 @@ import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
+import WorkspaceResize from "./WorkspaceResize.jsx";
 import EvidenceDialog from "./EvidenceDialog.jsx";
 import RoiDialog,{captureRoiFrame} from "./RoiDialog.jsx";
 import {seedViews} from "./roi.mjs";
@@ -297,6 +298,12 @@ function App() {
   const [spatial, setSpatial] = useState({mode: "solid", cut: true, pitch: 0, yaw: 0, offset: 0, threshold: 30, isolate: "all", color: false});
   const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
   useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
+  const [focus3d,setFocus3d]=useState(false),[libraryCollapsed,setLibraryCollapsed]=useState(()=>window.innerWidth<1200),[assistantCollapsed,setAssistantCollapsed]=useState(false);
+  const [libraryWidth,setLibraryWidth]=useState(230),[assistantWidth,setAssistantWidth]=useState(294),[sceneShare,setSceneShare]=useState(60),[rowShare,setRowShare]=useState(50);
+  useEffect(()=>{const media=window.matchMedia("(max-width:1100px)");const changed=()=>{if(media.matches)setLibraryCollapsed(true);};media.addEventListener("change",changed);return()=>media.removeEventListener("change",changed);},[]);
+  const [cameraCommand,setCameraCommand]=useState({id:0,kind:"fit"});
+  const cameraState=useRef(null);
+  const commandCamera=kind=>setCameraCommand(c=>({id:c.id+1,kind}));
   const [layout, setLayout] = useState(() => localStorage.getItem("sari-layout") === "grid" ? "grid" : "anatomy");
   useEffect(() => { localStorage.setItem("sari-layout", layout); }, [layout]);
   const [revision, setRevision] = useState(0);
@@ -851,8 +858,9 @@ function App() {
   }
   useEffect(() => {
     function key(e) {
-      if (/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+      if (e.defaultPrevented || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.closest?.('[role="separator"]')) return;
       if (e.key === "Escape") {
+        setFocus3d(false);
         setModal(null);
         setTool("navigate");
       }
@@ -945,13 +953,13 @@ function App() {
           <span className="avatar">SS</span>
         </div>
       </header>
-      <div className="shell">
+      <div className={`shell inspection-shell ${libraryCollapsed||focus3d?"library-collapsed":""} ${assistantCollapsed||focus3d?"assistant-collapsed":""} ${focus3d?"focus-3d":""}`} style={{"--library-width":`${libraryWidth}px`,"--assistant-width":`${assistantWidth}px`,"--scene-fr":`${sceneShare}fr`,"--slice-fr":`${100-sceneShare}fr`,"--row-fr":`${rowShare}fr`,"--bottom-fr":`${100-rowShare}fr`}}>
         <nav className="rail" aria-label="Workspace navigation">
           <IconButton
             icon={Layers}
-            label="Study library"
-            active
-            onClick={() => setModal("study")}
+            label={libraryCollapsed ? "Show study library" : "Hide study library"}
+            active={!libraryCollapsed}
+            onClick={() => {setFocus3d(false);setLibraryCollapsed(v=>!v);}}
           />
           <IconButton
             icon={Box}
@@ -963,6 +971,7 @@ function App() {
             label="Review history"
             onClick={() => setTab("history")}
           />
+          <IconButton icon={MessageSquare} label={assistantCollapsed ? "Show assistant" : "Hide assistant"} active={!assistantCollapsed} onClick={()=>{setFocus3d(false);setAssistantCollapsed(v=>!v);}}/>
           <div className="rail-bottom">
             <IconButton
               icon={Settings2}
@@ -974,7 +983,7 @@ function App() {
         </nav>
         <aside className="study-panel">
           <div className="panel-eyebrow">
-            STUDY LIBRARY <span>01</span>
+            STUDY LIBRARY <IconButton icon={ChevronLeft} label="Collapse study library" onClick={()=>setLibraryCollapsed(true)}/>
           </div>
           <h2>
             Your research,
@@ -1138,10 +1147,11 @@ function App() {
             <div className="status-dot" />{" "}
             {volume.synthetic
               ? "No patient data"
-              : "Local data stays in browser"}
-            <small>Research use · Not clinically validated</small>
+              : "Stored locally in this browser"}
+            <small>Reviewed images are shared with Meta only after approval.</small><small>Research use · Not clinically validated</small>
           </div>
         </aside>
+        <WorkspaceResize label="Resize study library" value={libraryWidth} min={180} max={360} onChange={setLibraryWidth} className="library-divider"/>
         <main className={`main layout-${layout}`}>
           <div className="study-header">
             <div>
@@ -1173,7 +1183,7 @@ function App() {
             <div className="layout-switch" role="group" aria-label="Workspace layout">
               {["anatomy", "grid"].map((value) => <button key={value} aria-pressed={layout === value} onClick={() => setLayout(value)}>{value === "anatomy" ? "Anatomy" : "Four views"}</button>)}
             </div>
-            <button className="button secondary" onClick={exportSession}>
+            <button className="button secondary" aria-label="Export review" title="Export review" onClick={exportSession}>
               <ArrowDownToLine size={15} />
               <span>Export review</span>
             </button>
@@ -1238,8 +1248,8 @@ function App() {
             <div className="toolbar-right">
               <button className="quiet-button" disabled={!point} onClick={growSeed} title="Replace proposal with connected voxels within ±12 intensity of the seed"><Crosshair size={14} /><span>Grow region</span></button>
               <button
-                className="quiet-button"
-                onClick={() => setTab("display")}
+                className="quiet-button" aria-label="Display" title="Display"
+                onClick={() => {setTab("display");setAssistantCollapsed(false);}}
               >
                 <SlidersHorizontal size={14} />
                 <span>Display</span>
@@ -1259,11 +1269,23 @@ function App() {
               </button>
             </div>
           </div>
+          {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <details className="spatial-inspector"><summary>3D inspector · Cut & isolation</summary><div className="cut-controls">
+                <label><input type="checkbox" checked={spatial.cut} onChange={(e) => changeCut({cut:e.target.checked})} /> Cut plane</label>
+                <label><input type="checkbox" checked={spatial.linked !== false} onChange={(e) => changeCut({linked:e.target.checked})} /> Link views</label>
+                <select aria-label="Cut plane orientation" value={spatial.pitch===90&&spatial.yaw===0?"axial":spatial.pitch===0&&spatial.yaw===90?"sagittal":spatial.pitch===0&&spatial.yaw===0?"coronal":"free"} onChange={(e)=>{
+                  const angles={axial:{pitch:90,yaw:0},coronal:{pitch:0,yaw:0},sagittal:{pitch:0,yaw:90}}[e.target.value];
+                  if(angles)changeCut({...angles,offset:planeOffset(volume,[position.sagittal,position.coronal,position.axial],angles)});
+                }}><option value="free" disabled>Oblique</option><option value="axial">Axial</option><option value="coronal">Coronal</option><option value="sagittal">Sagittal</option></select>
+                {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -Math.floor(cutRange(volume,spatial)*1000)/1000, Math.floor(cutRange(volume,spatial)*1000)/1000, .001] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => changeCut({[key]:+e.target.value})} /></label>)}
+                {(spatial.mode === "solid" || spatial.mode === "volume") && <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>}
+                {volume.tissues && <label><input type="checkbox" checked={spatial.color} onChange={(e) => setSpatial((s) => ({...s, color: e.target.checked}))} /> Tissue colors</label>}
+                <button onClick={() => changeCut({pitch:0,yaw:0,offset:0,isolate:"all"})}>Reset cut</button>
+              </div></details>}
           <div className="viewer-grid">
             <section className="scene-card" style={settings.background === "black" ? {background:"#05080c"} : settings.background === "white" ? {background:"#f4f3ee"} : undefined}>
               <div className="viewport-heading">
                 <span className="axis-dot spatial" />
-                <strong>{bodyContext ? "Body context" : "Head context"}</strong>
+                <strong className="active-spatial-target" title={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || "Head context"}>{bodyContext ? "Body context" : volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || "Head context"}</strong>
                 <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}>{volume.atlas && <option value="atlas">Anatomy</option>}<option value="solid">Solid</option><option value="volume">Volume</option><option value="context">Context</option></select>
                 <IconButton
                   icon={Box}
@@ -1279,13 +1301,18 @@ function App() {
                   active={rotate}
                   onClick={() => setRotate((r) => !r)}
                 />
+                <div className="scene-navigation">
+                  <IconButton icon={Focus} label="Fit to visible content" onClick={()=>commandCamera("fit")}/>
+                  <IconButton icon={RotateCcw} label="Reset camera" onClick={()=>commandCamera("reset")}/>
+                  <button className="focus-action" aria-label={focus3d?"Return from 3D focus":"Expand 3D view"} title={focus3d?"Return from 3D focus":"Expand 3D view"} onClick={()=>setFocus3d(v=>!v)}><Maximize2 size={13}/><span>{focus3d?"Return to layout":"Expand 3D"}</span></button>
+                </div>
               </div>
               <React.Suspense
                 fallback={
                   <div className="scene-fallback">Preparing spatial view…</div>
                 }
               >
-                <Scene
+                <Scene cameraCommand={cameraCommand} cameraState={cameraState}
                   spatial={spatial}
                   displaySettings={settings}
                   position={position}
@@ -1313,18 +1340,7 @@ function App() {
                 </span>
                 <span className="scene-caption mono">{spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume" ? (spatial.cut ? "Free cut plane" : "Whole anatomy") : `${cap(axis)} plane`}</span>
               </div>
-              {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <div className="cut-controls">
-                <label><input type="checkbox" checked={spatial.cut} onChange={(e) => changeCut({cut:e.target.checked})} /> Cut plane</label>
-                <label><input type="checkbox" checked={spatial.linked !== false} onChange={(e) => changeCut({linked:e.target.checked})} /> Link views</label>
-                <select aria-label="Cut plane orientation" value={spatial.pitch===90&&spatial.yaw===0?"axial":spatial.pitch===0&&spatial.yaw===90?"sagittal":spatial.pitch===0&&spatial.yaw===0?"coronal":"free"} onChange={(e)=>{
-                  const angles={axial:{pitch:90,yaw:0},coronal:{pitch:0,yaw:0},sagittal:{pitch:0,yaw:90}}[e.target.value];
-                  if(angles)changeCut({...angles,offset:planeOffset(volume,[position.sagittal,position.coronal,position.axial],angles)});
-                }}><option value="free" disabled>Oblique</option><option value="axial">Axial</option><option value="coronal">Coronal</option><option value="sagittal">Sagittal</option></select>
-                {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -Math.floor(cutRange(volume,spatial)*1000)/1000, Math.floor(cutRange(volume,spatial)*1000)/1000, .001] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => changeCut({[key]:+e.target.value})} /></label>)}
-                {(spatial.mode === "solid" || spatial.mode === "volume") && <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>}
-                {volume.tissues && <label><input type="checkbox" checked={spatial.color} onChange={(e) => setSpatial((s) => ({...s, color: e.target.checked}))} /> Tissue colors</label>}
-                <button onClick={() => changeCut({pitch:0,yaw:0,offset:0,isolate:"all"})}>Reset cut</button>
-              </div>}
+
               <div className="orbit-note">
                 <Compass size={12} /> Drag to orbit · scroll to zoom
               </div>
@@ -1358,6 +1374,8 @@ function App() {
                 zoom={zoom}
               />
             ))}
+            <WorkspaceResize label="Resize 3D and slice views" value={sceneShare} min={30} max={80} ratio onChange={setSceneShare} className="viewer-column-divider" style={{left:`${sceneShare}%`}}/>
+            <WorkspaceResize label="Resize view rows" value={rowShare} min={25} max={75} ratio axis="y" onChange={setRowShare} className="viewer-row-divider" style={{top:`${rowShare}%`}}/>
           </div>
           <SliceFilmstrip volume={volume} axis={axis} slice={position[axis]} onAxis={setAxis} onSlice={(s) => changeSlice(axis, s)} settings={settings} />
           <footer className="workspace-footer">
@@ -1378,8 +1396,10 @@ function App() {
             </span>
           </footer>
         </main>
+        <WorkspaceResize label="Resize assistant" value={assistantWidth} min={250} max={480} reverse onChange={setAssistantWidth} className="assistant-divider"/>
         <aside className="assistant-panel">
           <div className="assistant-tabs">
+            <IconButton icon={PanelRightClose} label="Collapse assistant" onClick={()=>setAssistantCollapsed(true)}/>
             <button
               className={tab === "assistant" ? "selected" : ""}
               onClick={() => setTab("assistant")}

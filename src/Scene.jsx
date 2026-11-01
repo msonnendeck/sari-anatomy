@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { slicePixels } from "./volume.mjs";
 import HumanBody from "./HumanBody.jsx";
@@ -8,6 +8,7 @@ import PrivacyPixelation from "./PrivacyPixelation.jsx";
 import SolidVolume from "./SolidVolume.jsx";
 import NavigationMarker from "./NavigationMarker.jsx";
 import { sceneToVoxel } from "./navigation.mjs";
+import {visibleBounds,fitDistance} from "./camera-framing.mjs";
 import AtlasAnatomy from "./AtlasAnatomy.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
@@ -231,15 +232,33 @@ class Boundary extends React.Component {
     );
   }
 }
+function CameraRig({volume,spatial,bodyContext,revision,cameraCommand,cameraState}) {
+  const {camera,controls,gl}=useThree();
+  const bounds=useMemo(()=>visibleBounds(volume,spatial,bodyContext),[volume,spatial.mode,spatial.isolate,spatial.atlasIsolate,spatial.region,spatial.hemisphere,spatial.threshold,bodyContext,revision]);
+  const latest=useRef(bounds);latest.current=bounds;
+  function fit(reset=false){
+    if(!controls)return;
+    const box=latest.current,center=new THREE.Vector3(...box.min.map((n,i)=>(n+box.max[i])/2));
+    const direction=reset?new THREE.Vector3(2.6,1.4,3.4).normalize():camera.position.clone().sub(controls.target).normalize();
+    if(direction.lengthSq()<.1)direction.set(1,.5,1).normalize();
+    controls.target.copy(center);camera.position.copy(center).addScaledVector(direction,fitDistance(box,camera.fov,camera.aspect,direction.toArray()));
+    controls.update();
+  }
+  useEffect(()=>{
+    if(!controls)return;
+    const save=()=>{cameraState.current={position:camera.position.toArray(),target:controls.target.toArray()};gl.domElement.dataset.cameraPosition=JSON.stringify(cameraState.current.position);gl.domElement.dataset.cameraTarget=JSON.stringify(cameraState.current.target);};
+    controls.addEventListener('change',save);save();return()=>controls.removeEventListener('change',save);
+  },[camera,controls,gl,cameraState]);
+  // Only content changes fit automatically. Layout/size changes keep this camera mounted.
+  useEffect(()=>{fit();},[controls,volume.id,bodyContext,spatial.mode,spatial.isolate,spatial.atlasIsolate,spatial.atlasIsolate?spatial.region:null,spatial.hemisphere]);
+  useEffect(()=>{if(cameraCommand?.id)fit(cameraCommand.kind==='reset');},[cameraCommand?.id]);
+  return null;
+}
 export default function Scene(props) {
+  const initialCamera=useMemo(()=>({position:[2.6,1.4,3.4],fov:40}),[]);
   return (
     <Boundary>
-      <Canvas
-        key={props.bodyContext ? "body" : "head"}
-        camera={{
-          position: props.bodyContext ? [4, 1, 8.8] : props.volume.atlas ? [2.6,1.4,3.4] : [3, 2.1, 4.2],
-          fov: 40,
-        }}
+      <Canvas camera={initialCamera}
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true, localClippingEnabled: true }}
       >
@@ -267,12 +286,13 @@ export default function Scene(props) {
         )}
         <OrbitControls
           makeDefault
-          enablePan={false}
-          minDistance={props.bodyContext ? 5 : props.volume.atlas ? .25 : 3}
-          maxDistance={props.bodyContext ? 12 : 9}
+          enablePan={true}
+          minDistance={.04}
+          maxDistance={80}
           autoRotate={props.rotate}
           autoRotateSpeed={0.4}
         />
+        <CameraRig {...props}/>
       </Canvas>
     </Boundary>
   );

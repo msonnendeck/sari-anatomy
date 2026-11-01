@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { sceneToVoxel } from "./navigation.mjs";
 let pending;
 function loadSurfaces() {
@@ -18,8 +18,6 @@ function loadSurfaces() {
 }
 export default function AtlasAnatomy({ volume, spatial, onAtlasSelect }) {
   const shared = React.use(loadSurfaces()), root = useRef();
-  const { camera, controls } = useThree();
-  const wasIsolated = useRef(false);
   const plane = useMemo(() => new THREE.Plane(), []);
   const geometries = useMemo(() => volume.atlas.regions.map((r) => {
     const g = new THREE.BufferGeometry();
@@ -29,23 +27,6 @@ export default function AtlasAnatomy({ volume, spatial, onAtlasSelect }) {
     return g;
   }), [shared, volume]);
   useEffect(() => () => geometries.forEach((g) => g.dispose()), [geometries]);
-  useEffect(() => {
-    if (!controls || !root.current) return;
-    const region = volume.atlas.regions.find((r) => r.id === spatial.region);
-    if (spatial.atlasIsolate && region) {
-      const box = new THREE.Box3(), p = new THREE.Vector3();
-      for(let j=region.indexStart;j<region.indexStart+region.indexCount;j++) box.expandByPoint(p.fromBufferAttribute(shared.attributes.position,shared.index.array[j]));
-      root.current.updateWorldMatrix(true,false); box.applyMatrix4(root.current.matrixWorld);
-      const center = box.getCenter(new THREE.Vector3()), radius=box.getSize(new THREE.Vector3()).length()/2;
-      const direction = camera.position.clone().sub(controls.target).normalize();
-      controls.target.copy(center); camera.position.copy(center).addScaledVector(direction,radius/Math.sin(camera.fov*Math.PI/360)*1.35);
-      wasIsolated.current=true; controls.update();
-    } else if (wasIsolated.current) {
-      const direction=camera.position.clone().sub(controls.target).normalize();
-      controls.target.set(0,.25,0); camera.position.copy(controls.target).addScaledVector(direction,4.4);
-      wasIsolated.current=false; controls.update();
-    }
-  }, [spatial.atlasIsolate, spatial.region, controls, camera, shared, volume]);
   useFrame(() => {
     const p = spatial.pitch * Math.PI / 180, y = spatial.yaw * Math.PI / 180;
     // Match the solid renderer's normalized-volume clipping coordinates.
