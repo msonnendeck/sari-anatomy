@@ -53,6 +53,7 @@ import {
   paintMask,
 } from "./volume.mjs";
 import { readVolume } from "./nifti.mjs";
+import { loadMniTemplate } from "./datasets.mjs";
 import "./style.css";
 const axes = ["axial", "coronal", "sagittal"];
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
@@ -145,7 +146,7 @@ function Slice({
       <div className="viewport-heading">
         <span className={`axis-dot ${axis}`} />
         <strong>
-          {volume.synthetic
+          {volume.synthetic || volume.anatomicalAxes
             ? cap(axis)
             : { axial: "Voxel K", coronal: "Voxel J", sagittal: "Voxel I" }[
                 axis
@@ -177,16 +178,36 @@ function Slice({
         }}
       >
         <span className="orientation top">
-          {volume.synthetic ? (axis === "axial" ? "A" : "S") : "+"}
+          {volume.synthetic || volume.anatomicalAxes
+            ? axis === "axial"
+              ? "A"
+              : "S"
+            : "+"}
         </span>
         <span className="orientation left">
-          {volume.synthetic ? (axis === "sagittal" ? "P" : "R") : "−"}
+          {volume.synthetic || volume.anatomicalAxes
+            ? axis === "sagittal"
+              ? "P"
+              : volume.anatomicalAxes
+                ? "L"
+                : "R"
+            : "−"}
         </span>
         <span className="orientation right">
-          {volume.synthetic ? (axis === "sagittal" ? "A" : "L") : "+"}
+          {volume.synthetic || volume.anatomicalAxes
+            ? axis === "sagittal"
+              ? "A"
+              : volume.anatomicalAxes
+                ? "R"
+                : "L"
+            : "+"}
         </span>
         <span className="orientation bottom">
-          {volume.synthetic ? (axis === "axial" ? "P" : "I") : "−"}
+          {volume.synthetic || volume.anatomicalAxes
+            ? axis === "axial"
+              ? "P"
+              : "I"
+            : "−"}
         </span>
         <div
           className="canvas-wrap"
@@ -227,7 +248,11 @@ function Slice({
           )}
         </div>
         <div className="scan-caption mono">
-          {volume.synthetic ? "T1 · SYNTHETIC" : "NIFTI · NATIVE AXES"}
+          {volume.synthetic
+            ? "T1 · SYNTHETIC"
+            : volume.bundled
+              ? "T1 · MNI152"
+              : "NIFTI · NATIVE AXES"}
         </div>
         <div className="cross-center" aria-hidden="true">
           <span />
@@ -287,7 +312,8 @@ function App() {
     [events, setEvents] = useState([]),
     [samBusy, setSamBusy] = useState(false),
     [consent, setConsent] = useState(false),
-    [hydrated, setHydrated] = useState(false);
+    [hydrated, setHydrated] = useState(false),
+    [loadingStudy, setLoadingStudy] = useState(false);
   useEffect(() => {
     loadSession()
       .then((saved) => {
@@ -345,6 +371,10 @@ function App() {
     setPosition((p) => ({ ...p, [a]: s }));
   }
   function worst() {
+    if (!metrics.countA || !metrics.countB) {
+      setToast("Add a proposal mask before comparing annotations.");
+      return;
+    }
     if (!metrics.difference) {
       setToast("No annotation differences to navigate to.");
       return;
@@ -401,6 +431,31 @@ function App() {
     setRevision((r) => r + 1);
     setModal(null);
     setToast("Synthetic study restored.");
+  }
+  async function openMni() {
+    setLoadingStudy(true);
+    try {
+      const v = await loadMniTemplate();
+      setVolume(v);
+      setPosition({ axial: 50, coronal: 66, sagittal: 48 });
+      setAxis("axial");
+      setHistory([]);
+      setFuture([]);
+      setMessages([]);
+      setEvents([]);
+      setPoint(null);
+      setConsent(false);
+      setZoom(1);
+      setRevision((r) => r + 1);
+      setModal(null);
+      setToast(
+        "MNI152 MRI template loaded. No AI proposal has been generated.",
+      );
+    } catch (e) {
+      setToast(e.message);
+    } finally {
+      setLoadingStudy(false);
+    }
   }
   async function load(e, isMask = false) {
     let f = e.target.files?.[0];
@@ -480,6 +535,11 @@ function App() {
     record("Exported research record");
   }
   function localAction(text) {
+    if (
+      !metrics.countB &&
+      /disagree|difference|largest|worst|compare|overlap|dice/i.test(text)
+    )
+      return "No proposal mask exists yet. Draw a proposal or request SAM segmentation before comparing it with the reference.";
     const t = text.toLowerCase();
     if (/disagree|difference|largest|worst/.test(t)) {
       worst();
@@ -741,7 +801,11 @@ function App() {
             <div className="study-art">
               <div className="mini-brain" />
               <span className="sample-tag">
-                {volume.synthetic ? "SYNTHETIC" : "LOCAL FILE"}
+                {volume.synthetic
+                  ? "SYNTHETIC"
+                  : volume.bundled
+                    ? "MRI TEMPLATE"
+                    : "LOCAL FILE"}
               </span>
             </div>
             <div className="study-tile-body">
@@ -753,7 +817,9 @@ function App() {
               <small>
                 {volume.synthetic
                   ? "Brain · T1-like · Demo study"
-                  : "NIfTI · Native voxel axes"}
+                  : volume.bundled
+                    ? "Brain · T1 · MNI152 template"
+                    : "NIfTI · Native voxel axes"}
               </small>
             </div>
           </button>
@@ -771,7 +837,9 @@ function App() {
             <div>
               <span>Source</span>
               <span>
-                {volume.synthetic ? "Procedural phantom" : "Browser-local"}
+                {volume.synthetic
+                  ? "Procedural phantom"
+                  : volume.sourceLabel || "Browser-local"}
               </span>
             </div>
           </div>
@@ -790,7 +858,11 @@ function App() {
               <div>
                 <strong>Proposal</strong>
                 <small>
-                  {volume.synthetic ? "Perturbed demo mask" : "Editable mask"}
+                  {volume.synthetic
+                    ? "Perturbed demo mask"
+                    : metrics.countB
+                      ? "Editable proposal"
+                      : "No proposal yet"}
                 </small>
               </div>
               <IconButton
@@ -808,9 +880,11 @@ function App() {
                 <small>
                   {volume.synthetic
                     ? "Synthetic ground truth"
-                    : metrics.countA
-                      ? "Imported binary mask"
-                      : "No reference loaded"}
+                    : volume.referenceLabel
+                      ? volume.referenceLabel
+                      : metrics.countA
+                        ? "Imported binary mask"
+                        : "No reference loaded"}
                 </small>
               </div>
               <IconButton
@@ -831,7 +905,7 @@ function App() {
           <div className="review-card">
             <div className="panel-eyebrow">ANNOTATION AGREEMENT</div>
             <div className="score">
-              {metrics.countA ? (
+              {metrics.countA && metrics.countB ? (
                 <>
                   {(metrics.dice * 100).toFixed(1)}
                   <span>%</span>
@@ -843,11 +917,15 @@ function App() {
             </div>
             <div className="score-track">
               <span
-                style={{ width: `${metrics.countA ? metrics.dice * 100 : 0}%` }}
+                style={{
+                  width: `${metrics.countA && metrics.countB ? metrics.dice * 100 : 0}%`,
+                }}
               />
             </div>
             <div className="score-meta">
-              {metrics.difference.toLocaleString()} differing voxels
+              {metrics.countB
+                ? `${metrics.difference.toLocaleString()} differing voxels`
+                : "Add a proposal to compare"}
             </div>
             <button onClick={worst}>
               Review largest difference <ArrowRight size={14} />
@@ -866,18 +944,26 @@ function App() {
             <div>
               <div className="breadcrumbs">
                 Workspace <ChevronRight size={12} />{" "}
-                {volume.synthetic ? "Brain research" : "Local research"}
+                {volume.synthetic || volume.bundled
+                  ? "Brain research"
+                  : "Local research"}
               </div>
               <h1>
                 {volume.name}{" "}
                 <span className="study-id">
-                  {volume.synthetic ? "SYN-001" : "LOCAL"}
+                  {volume.synthetic
+                    ? "SYN-001"
+                    : volume.bundled
+                      ? "MNI-152"
+                      : "LOCAL"}
                 </span>
               </h1>
               <p>
                 {volume.synthetic
                   ? "A spatial workspace for annotation review."
-                  : "Native voxel coordinates · anatomical orientation not inferred."}
+                  : volume.bundled
+                    ? "Population-average MRI · 2 mm · McGill University"
+                    : "Native voxel coordinates · anatomical orientation not inferred."}
               </p>
             </div>
             <button className="button secondary" onClick={exportSession}>
@@ -1339,6 +1425,24 @@ function App() {
                   Start with the synthetic phantom or open a local 3D NIfTI
                   volume. Imported files remain in your browser.
                 </p>
+                <button
+                  className="study-option"
+                  onClick={openMni}
+                  disabled={loadingStudy}
+                >
+                  {loadingStudy ? (
+                    <Loader2 size={24} className="spin" />
+                  ) : (
+                    <ScanLine size={24} />
+                  )}
+                  <span>
+                    <strong>MNI152 brain MRI</strong>
+                    <small>
+                      Real scan-derived average · T1 · 2 mm · McGill
+                    </small>
+                  </span>
+                  <ArrowRight size={17} />
+                </button>
                 <button className="study-option" onClick={restore}>
                   <ScanLine size={24} />
                   <span>
