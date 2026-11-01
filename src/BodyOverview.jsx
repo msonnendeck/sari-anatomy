@@ -84,7 +84,7 @@ export default function BodyOverview({
               </span>
               <span>
                 <strong>Head & brain</strong>
-                <small>MRI · MNI152 research template</small>
+                <small>MRI · SPL/NAC anatomical atlas</small>
               </span>
               {loading ? (
                 <Loader2 size={18} className="spin" />
@@ -216,14 +216,14 @@ export default function BodyOverview({
           </div>
           <div className="mri-thumbnail">
             <img
-              src="/data/mni152/preview.png"
-              alt="Axial slice from the MNI152 population-average MRI template"
+              src="/data/spl-atlas/preview.png"
+              alt="Axial MRI slice from the SPL/NAC anatomical atlas"
             />
             <span>T1-WEIGHTED MRI</span>
           </div>
           <div className="body-study-heading">
-            <span className="study-id">MNI152</span>
-            <span className="template-label">RESEARCH TEMPLATE</span>
+            <span className="study-id">SPL/NAC</span>
+            <span className="template-label">ANATOMICAL ATLAS</span>
           </div>
           <h2>
             Real imaging.
@@ -231,21 +231,20 @@ export default function BodyOverview({
             Shared understanding.
           </h2>
           <p>
-            An average of real brain scans, ready to explore in three
-            dimensions.
+            High-resolution MRI and 90 named structures, ready to explore together.
           </p>
           <div className="body-study-facts">
             <div>
               <span>Source</span>
-              <strong>McGill University</strong>
+              <strong>Brigham and Women’s</strong>
             </div>
             <div>
               <span>Dataset</span>
-              <strong>ICBM 2009c · symmetric</strong>
+              <strong>SPL/NAC brain atlas</strong>
             </div>
             <div>
               <span>Resolution</span>
-              <strong>2 mm · derived preview</strong>
+              <strong>0.75 mm MRI</strong>
             </div>
           </div>
           <button

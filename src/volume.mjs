@@ -150,6 +150,8 @@ export function slicePixels(
     reference = true,
     opacity = 0.55,
     tissueColors = false,
+    atlasRegion = null,
+    atlasColors = false,
   } = {},
 ) {
   const [width, height] = sliceSize(v, axis);
@@ -167,6 +169,13 @@ export function slicePixels(
       if (tissueColors && v.tissues?.[i]) {
         const tint = [[0,0,0], [184,125,199], [219,168,110], [110,186,232]][v.tissues[i]];
         color = tint.map((c) => c * .65 + val * .35);
+      }
+      const atlasId = v.atlasLabels?.[i];
+      if (atlasColors && atlasId && v.atlas?.table[atlasId]) color = v.atlas.table[atlasId].color.map((c) => c * .6 + val * .4);
+      if (atlasRegion && atlasId === Number(atlasRegion)) {
+        const adjacent = [Math.max(0,x-1), Math.max(0,y-1)];
+        const edge = x === 0 || y === 0 || x === width-1 || y === height-1 || v.atlasLabels[index3(...voxelAt(v,axis,adjacent[0],y,s),v.dims)] !== atlasId || v.atlasLabels[index3(...voxelAt(v,axis,x,adjacent[1],s),v.dims)] !== atlasId;
+        color = edge ? [90,180,245] : color.map((c,j) => c*.55 + [90,180,245][j]*.45);
       }
       if (overlay && v.proposal?.[i])
         color = color.map(

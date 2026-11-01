@@ -6,6 +6,7 @@ import { slicePixels } from "./volume.mjs";
 import HumanBody from "./HumanBody.jsx";
 import PrivacyPixelation from "./PrivacyPixelation.jsx";
 import SolidVolume from "./SolidVolume.jsx";
+import AtlasAnatomy from "./AtlasAnatomy.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
   const d = v.dims,
@@ -101,7 +102,7 @@ function surface(v, mask, step = 2) {
   g.computeVertexNormals();
   return g;
 }
-function Anatomy({
+function VoxelAnatomy({
   volume,
   slice,
   axis,
@@ -207,6 +208,11 @@ function Anatomy({
     </group>
   );
 }
+function Anatomy(props) {
+  if (props.spatial.mode === "atlas" && props.volume.atlas) return <React.Suspense fallback={null}><AtlasAnatomy {...props} /></React.Suspense>;
+  if (props.spatial.mode === "solid") return <SolidVolume {...props} />;
+  return <VoxelAnatomy {...props} />;
+}
 class Boundary extends React.Component {
   state = { error: false };
   static getDerivedStateFromError() {
@@ -228,11 +234,11 @@ export default function Scene(props) {
       <Canvas
         key={props.bodyContext ? "body" : "head"}
         camera={{
-          position: props.bodyContext ? [4, 1, 8.8] : [3, 2.1, 4.2],
+          position: props.bodyContext ? [4, 1, 8.8] : props.volume.atlas ? [2.6,1.4,3.4] : [3, 2.1, 4.2],
           fov: 40,
         }}
         dpr={[1, 1.8]}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, localClippingEnabled: true }}
       >
         {props.bodyContext && props.privacy && <PrivacyPixelation />}
         <ambientLight intensity={1.3} />
@@ -259,7 +265,7 @@ export default function Scene(props) {
         <OrbitControls
           makeDefault
           enablePan={false}
-          minDistance={props.bodyContext ? 5 : 3}
+          minDistance={props.bodyContext ? 5 : props.volume.atlas ? .25 : 3}
           maxDistance={props.bodyContext ? 12 : 9}
           autoRotate={props.rotate}
           autoRotateSpeed={0.4}

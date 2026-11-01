@@ -2418,3 +2418,9 @@ kbd {
 .study-header > div:first-child { min-width: 0; }
 .study-header h1 { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .study-actions { flex-shrink: 0; }
+.atlas-browser { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.atlas-browser select { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; color: var(--text); background: var(--surface); font-size: 10px; }
+.atlas-browser label { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); }
+.atlas-browser input { accent-color: var(--mint); }
+.atlas-browser a { font-size: 9px; color: var(--muted); }
+.atlas-selected { font-size: 12px; color: var(--mint); line-height: 1.5; }

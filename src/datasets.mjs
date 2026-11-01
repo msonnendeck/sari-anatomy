@@ -1,11 +1,13 @@
 import { readVolume } from "./nifti.mjs";
 export const researchSamples = [
+  { id: "spl-atlas", title: "SPL/NAC · anatomical atlas", detail: "0.75 mm MRI · 90 named surfaces · Brigham and Women’s", path: "spl-atlas/t1" },
   { id: "mni-t1", title: "MNI152 · T1", detail: "2 mm · population average · tissue colors", path: "mni152/t1", mask: true, tissues: true },
   { id: "mni-hires", title: "MNI152 · T1 high resolution", detail: "1 mm · original spatial grid · population average", path: "research/mni-t1-1mm" },
   { id: "mni-t2", title: "MNI152 · T2", detail: "2 mm · complementary contrast · tissue colors", path: "research/mni-t2-2mm", mask: true, tissues: true },
   { id: "slicer-tumor", title: "Brain tumor · teaching case", detail: "0.94 × 0.94 × 1.4 mm · 3D Slicer · source-labeled tumor", path: "research/slicer-tumor", case: true },
 ];
 export async function loadResearchSample(id = "mni-t1") {
+  if (id === "spl-atlas") return loadSplAtlas();
   const sample = researchSamples.find((s) => s.id === id);
   if (!sample) throw new Error("Unknown research sample");
   async function read(path) {
@@ -55,4 +57,15 @@ export async function loadMniTemplate() {
     referenceKind: "brain extraction mask",
     placement: "Generic head context; not patient-specific body registration",
   };
+}
+
+async function loadSplAtlas() {
+  const [image, labelResponse, infoResponse] = await Promise.all([fetch("/data/spl-atlas/t1.nii.gz"), fetch("/data/spl-atlas/labels.u16.gz"), fetch("/data/spl-atlas/atlas.json")]);
+  if (![image,labelResponse,infoResponse].every((r) => r.ok)) throw new Error("SPL atlas files unavailable");
+  const [v, buffer, atlas] = await Promise.all([readVolume(new File([await image.arrayBuffer()], "spl-t1.nii.gz")), new Response(labelResponse.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer(), infoResponse.json()]);
+  if (buffer.byteLength !== v.data.length * 2 || v.dims.some((n,i) => n !== atlas.dims[i])) throw new Error("Atlas image and labels do not share a grid");
+  const view = new DataView(buffer), atlasLabels = new Uint16Array(v.data.length);
+  for (let i=0;i<atlasLabels.length;i++) atlasLabels[i]=view.getUint16(i*2,true);
+  return {...v,id:"spl-atlas",name:"SPL/NAC · brain atlas",series:"0.75 mm T1 · source-labeled anatomy",atlas,atlasLabels,
+    bundled:true,synthetic:false,anatomicalAxes:true,source:"SPL/NAC brain atlas · Brigham and Women’s Hospital / Martinos Center · pinned source bec24db",sourceLabel:"SPL/NAC · BWH",referenceLabel:"No comparison reference",referenceKind:"none; anatomical atlas labels are a separate layer",caseContext:"Healthy volunteer atlas; anatomical labels, not clinical findings.",orientation:"RAS-aligned 0.75mm MRI; source 1mm labels resampled by physical coordinates",placement:"Generic body context, not patient registration"};
 }

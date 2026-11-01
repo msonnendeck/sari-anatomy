@@ -164,3 +164,24 @@ The server defaults to loopback access. Set `HOST=0.0.0.0` in the ignored local
 API requests accept only this machine's local addresses and matching local origins;
 unrelated website origins and host names are rejected. The API key remains server-side.
 This does not configure router port forwarding or public hosting.
+
+### SPL/NAC anatomy atlas
+
+The body entry now opens the SPL/NAC atlas: source **0.75 mm T1 MRI** plus 90
+interactive source surfaces (about 1.64 million triangles). Choose Anatomy in the
+3D rendering menu, click a surface or choose a named structure in the sidebar.
+The three scans navigate to its label centroid and highlight the source label.
+Isolate selected structure hides the other surfaces and frames the selected model;
+turn it off to return to the wider view. Context hemisphere opens one side while
+retaining the selected structure. Atlas colors shows source region colors.
+Solid and Context remain available for the same image volume.
+
+The source MRI grid is retained without spatial downsampling. The source label map
+is **1 mm**, resampled by physical coordinates onto the MRI grid; it does not gain
+0.75 mm annotation accuracy. All labels and models come from the atlas, not Meta
+predictions. This atlas is a separate healthy-volunteer reference, not registered
+to imported scans or the generic whole body. See [atlas provenance and license](public/data/spl-atlas/README.md).
+
+The current demo targets the M1 MacBook. A mobile-optimized atlas is not claimed.
+The atlas files were converted offline from NRRD/VTK; direct local-file import
+continues to accept scalar NIfTI only.

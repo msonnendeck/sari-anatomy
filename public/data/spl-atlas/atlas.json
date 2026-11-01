@@ -1,0 +1,4824 @@
+{
+  "sourceCommit": "bec24db25aad5f7600e2df3becfb1f883e61ff56",
+  "dims": [
+    208,
+    288,
+    320
+  ],
+  "spacing": 0.75,
+  "origin": [
+    -77.625,
+    -107.625,
+    -119.625
+  ],
+  "regions": [
+    {
+      "id": 1000,
+      "name": "left insula",
+      "color": [
+        125,
+        5,
+        25
+      ],
+      "indexStart": 0,
+      "indexCount": 34728,
+      "source": "Model_1000_left_insula.vtk",
+      "voxelCount": 16308,
+      "centroid": [
+        59,
+        150,
+        163
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1001,
+      "name": "left superior temporal gyrus (banks of left superior temporal sulcus)",
+      "color": [
+        25,
+        100,
+        40
+      ],
+      "indexStart": 34728,
+      "indexCount": 17268,
+      "source": "Model_1001_left_superior_temporal_gyrus_(banks_of_left_superior_temporal_sulcus).vtk",
+      "voxelCount": 6320,
+      "centroid": [
+        41,
+        85,
+        151
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1002,
+      "name": "caudal part of left anterior cingulate gyrus",
+      "color": [
+        125,
+        100,
+        160
+      ],
+      "indexStart": 51996,
+      "indexCount": 11538,
+      "source": "Model_1002_caudal_part_of_left_anterior_cingulate_gyrus.vtk",
+      "voxelCount": 4127,
+      "centroid": [
+        98,
+        176,
+        195
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1003,
+      "name": "posterior part of left middle frontal gyrus",
+      "color": [
+        100,
+        25,
+        0
+      ],
+      "indexStart": 63534,
+      "indexCount": 38238,
+      "source": "Model_1003_posterior_part_of_left_middle_frontal_gyrus.vtk",
+      "voxelCount": 16295,
+      "centroid": [
+        65,
+        158,
+        221
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1005,
+      "name": "left cuneus",
+      "color": [
+        220,
+        20,
+        100
+      ],
+      "indexStart": 101772,
+      "indexCount": 22290,
+      "source": "Model_1005_left_cuneus.vtk",
+      "voxelCount": 6442,
+      "centroid": [
+        101,
+        43,
+        152
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1006,
+      "name": "left ambiens gyrus",
+      "color": [
+        185,
+        15,
+        10
+      ],
+      "indexStart": 124062,
+      "indexCount": 10536,
+      "source": "Model_1006_left_ambiens_gyrus.vtk",
+      "voxelCount": 4970,
+      "centroid": [
+        75,
+        153,
+        118
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1007,
+      "name": "left fusiform gyrus",
+      "color": [
+        180,
+        220,
+        140
+      ],
+      "indexStart": 134598,
+      "indexCount": 58416,
+      "source": "Model_1007_left_fusiform_gyrus.vtk",
+      "voxelCount": 23317,
+      "centroid": [
+        63,
+        100,
+        120
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1008,
+      "name": "left inferior parietal lobule",
+      "color": [
+        185,
+        90,
+        185
+      ],
+      "indexStart": 193014,
+      "indexCount": 73176,
+      "source": "Model_1008_left_inferior_parietal_lobule.vtk",
+      "voxelCount": 30698,
+      "centroid": [
+        55,
+        53,
+        161
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1009,
+      "name": "left inferior temporal gyrus",
+      "color": [
+        180,
+        40,
+        120
+      ],
+      "indexStart": 266190,
+      "indexCount": 56868,
+      "source": "Model_1009_left_inferior_temporal_gyrus.vtk",
+      "voxelCount": 24618,
+      "centroid": [
+        44,
+        115,
+        119
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1010,
+      "name": "isthmus of left cingulate gyrus",
+      "color": [
+        140,
+        20,
+        140
+      ],
+      "indexStart": 323058,
+      "indexCount": 15774,
+      "source": "Model_1010_isthmus_of_left_cingulate_gyrus.vtk",
+      "voxelCount": 5250,
+      "centroid": [
+        101,
+        92,
+        166
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1011,
+      "name": "left lateral occipital gyrus",
+      "color": [
+        20,
+        30,
+        140
+      ],
+      "indexStart": 338832,
+      "indexCount": 84996,
+      "source": "Model_1011_left_lateral_occipital_gyrus.vtk",
+      "voxelCount": 32558,
+      "centroid": [
+        76,
+        34,
+        123
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1012,
+      "name": "left lateral orbital gyrus",
+      "color": [
+        35,
+        75,
+        50
+      ],
+      "indexStart": 423828,
+      "indexCount": 48066,
+      "source": "Model_1012_left_lateral_orbital_gyrus.vtk",
+      "voxelCount": 20436,
+      "centroid": [
+        69,
+        199,
+        151
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1013,
+      "name": "left lingual gyrus",
+      "color": [
+        225,
+        140,
+        140
+      ],
+      "indexStart": 471894,
+      "indexCount": 56142,
+      "source": "Model_1013_left_lingual_gyrus.vtk",
+      "voxelCount": 19979,
+      "centroid": [
+        92,
+        67,
+        126
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1014,
+      "name": "left straight gyrus",
+      "color": [
+        200,
+        35,
+        75
+      ],
+      "indexStart": 528036,
+      "indexCount": 29760,
+      "source": "Model_1014_left_straight_gyrus.vtk",
+      "voxelCount": 11237,
+      "centroid": [
+        93,
+        209,
+        156
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1015,
+      "name": "left middle temporal gyrus",
+      "color": [
+        160,
+        100,
+        50
+      ],
+      "indexStart": 557796,
+      "indexCount": 68004,
+      "source": "Model_1015_left_middle_temporal_gyrus.vtk",
+      "voxelCount": 30939,
+      "centroid": [
+        34,
+        122,
+        135
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1016,
+      "name": "left parahippocampal gyrus",
+      "color": [
+        244,
+        244,
+        24
+      ],
+      "indexStart": 625800,
+      "indexCount": 13230,
+      "source": "Model_1016_left_parahippocampal_gyrus.vtk",
+      "voxelCount": 4657,
+      "centroid": [
+        77,
+        117,
+        125
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1017,
+      "name": "left paracentral lobule",
+      "color": [
+        60,
+        175,
+        80
+      ],
+      "indexStart": 639030,
+      "indexCount": 31482,
+      "source": "Model_1017_left_paracentral_lobule.vtk",
+      "voxelCount": 12312,
+      "centroid": [
+        100,
+        101,
+        216
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1018,
+      "name": "opercular part of left inferior frontal gyrus",
+      "color": [
+        220,
+        180,
+        140
+      ],
+      "indexStart": 670512,
+      "indexCount": 33522,
+      "source": "Model_1018_opercular_part_of_left_inferior_frontal_gyrus.vtk",
+      "voxelCount": 13626,
+      "centroid": [
+        47,
+        174,
+        186
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1019,
+      "name": "orbital part of left inferior frontal gyrus",
+      "color": [
+        220,
+        140,
+        180
+      ],
+      "indexStart": 704034,
+      "indexCount": 15702,
+      "source": "Model_1019_orbital_part_of_left_inferior_frontal_gyrus.vtk",
+      "voxelCount": 5584,
+      "centroid": [
+        47,
+        209,
+        162
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1020,
+      "name": "triangular part of left inferior frontal gyrus",
+      "color": [
+        220,
+        60,
+        20
+      ],
+      "indexStart": 719736,
+      "indexCount": 25818,
+      "source": "Model_1020_triangular_part_of_left_inferior_frontal_gyrus.vtk",
+      "voxelCount": 9421,
+      "centroid": [
+        46,
+        200,
+        178
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1021,
+      "name": "left visual cortex",
+      "color": [
+        120,
+        100,
+        60
+      ],
+      "indexStart": 745554,
+      "indexCount": 15408,
+      "source": "Model_1021_left_visual_cortex.vtk",
+      "voxelCount": 4396,
+      "centroid": [
+        97,
+        46,
+        134
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1022,
+      "name": "left postcentral gyrus",
+      "color": [
+        195,
+        40,
+        40
+      ],
+      "indexStart": 760962,
+      "indexCount": 81546,
+      "source": "Model_1022_left_postcentral_gyrus.vtk",
+      "voxelCount": 29166,
+      "centroid": [
+        57,
+        110,
+        201
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1023,
+      "name": "left posterior cingulate gyrus",
+      "color": [
+        220,
+        180,
+        220
+      ],
+      "indexStart": 842508,
+      "indexCount": 24030,
+      "source": "Model_1023_left_posterior_cingulate_gyrus.vtk",
+      "voxelCount": 8807,
+      "centroid": [
+        101,
+        122,
+        196
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1024,
+      "name": "left precentral gyrus",
+      "color": [
+        95,
+        75,
+        175
+      ],
+      "indexStart": 866538,
+      "indexCount": 91068,
+      "source": "Model_1024_left_precentral_gyrus.vtk",
+      "voxelCount": 40003,
+      "centroid": [
+        56,
+        135,
+        205
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1025,
+      "name": "left precuneus",
+      "color": [
+        160,
+        140,
+        180
+      ],
+      "indexStart": 957606,
+      "indexCount": 68472,
+      "source": "Model_1025_left_precuneus.vtk",
+      "voxelCount": 28389,
+      "centroid": [
+        100,
+        69,
+        174
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1026,
+      "name": "rostral part of left anterior cingulate gyrus",
+      "color": [
+        80,
+        20,
+        140
+      ],
+      "indexStart": 1026078,
+      "indexCount": 13578,
+      "source": "Model_1026_rostral_part_of_left_anterior_cingulate_gyrus.vtk",
+      "voxelCount": 5286,
+      "centroid": [
+        96,
+        209,
+        175
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1027,
+      "name": "anterior part of left middle frontal gyrus",
+      "color": [
+        75,
+        50,
+        125
+      ],
+      "indexStart": 1039656,
+      "indexCount": 86004,
+      "source": "Model_1027_anterior_part_of_left_middle_frontal_gyrus.vtk",
+      "voxelCount": 33723,
+      "centroid": [
+        63,
+        212,
+        196
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1028,
+      "name": "left superior frontal gyrus",
+      "color": [
+        50,
+        160,
+        150
+      ],
+      "indexStart": 1125660,
+      "indexCount": 122874,
+      "source": "Model_1028_left_superior_frontal_gyrus.vtk",
+      "voxelCount": 57383,
+      "centroid": [
+        93,
+        181,
+        218
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1029,
+      "name": "left superior parietal lobule",
+      "color": [
+        20,
+        180,
+        140
+      ],
+      "indexStart": 1248534,
+      "indexCount": 99834,
+      "source": "Model_1029_left_superior_parietal_lobule.vtk",
+      "voxelCount": 38248,
+      "centroid": [
+        82,
+        56,
+        190
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1030,
+      "name": "left superior temporal gyrus",
+      "color": [
+        140,
+        220,
+        220
+      ],
+      "indexStart": 1348368,
+      "indexCount": 69234,
+      "source": "Model_1030_left_superior_temporal_gyrus.vtk",
+      "voxelCount": 31694,
+      "centroid": [
+        39,
+        131,
+        152
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1031,
+      "name": "left supramarginal gyrus",
+      "color": [
+        80,
+        160,
+        20
+      ],
+      "indexStart": 1417602,
+      "indexCount": 78972,
+      "source": "Model_1031_left_supramarginal_gyrus.vtk",
+      "voxelCount": 32481,
+      "centroid": [
+        45,
+        88,
+        186
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1032,
+      "name": "left frontal pole",
+      "color": [
+        100,
+        0,
+        100
+      ],
+      "indexStart": 1496574,
+      "indexCount": 6666,
+      "source": "Model_1032_left_frontal_pole.vtk",
+      "voxelCount": 2302,
+      "centroid": [
+        87,
+        244,
+        168
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1033,
+      "name": "left temporal pole",
+      "color": [
+        70,
+        70,
+        70
+      ],
+      "indexStart": 1503240,
+      "indexCount": 15156,
+      "source": "Model_1033_left_temporal_pole.vtk",
+      "voxelCount": 7818,
+      "centroid": [
+        57,
+        178,
+        124
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1034,
+      "name": "left transverse temporal gyrus",
+      "color": [
+        150,
+        150,
+        200
+      ],
+      "indexStart": 1518396,
+      "indexCount": 12858,
+      "source": "Model_1034_left_transverse_temporal_gyrus.vtk",
+      "voxelCount": 5685,
+      "centroid": [
+        51,
+        125,
+        161
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 1035,
+      "name": "left limen insulae",
+      "color": [
+        145,
+        50,
+        65
+      ],
+      "indexStart": 1531254,
+      "indexCount": 3552,
+      "source": "Model_1035_left_limen_insulae.vtk",
+      "voxelCount": 1372,
+      "centroid": [
+        67,
+        160,
+        136
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 11,
+      "name": "left caudate nucleus",
+      "color": [
+        30,
+        111,
+        85
+      ],
+      "indexStart": 1534806,
+      "indexCount": 18366,
+      "source": "Model_11_left_caudate_nucleus.vtk",
+      "voxelCount": 11210,
+      "centroid": [
+        86,
+        161,
+        173
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 12,
+      "name": "left putamen",
+      "color": [
+        210,
+        157,
+        166
+      ],
+      "indexStart": 1553172,
+      "indexCount": 16722,
+      "source": "Model_12_left_putamen.vtk",
+      "voxelCount": 14104,
+      "centroid": [
+        72,
+        156,
+        160
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 15,
+      "name": "fourth ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ],
+      "indexStart": 1569894,
+      "indexCount": 18936,
+      "source": "Model_15_fourth_ventricle.vtk",
+      "voxelCount": 13146,
+      "centroid": [
+        100,
+        102,
+        94
+      ],
+      "group": "Ventricles"
+    },
+    {
+      "id": 17,
+      "name": "left hippocampus",
+      "color": [
+        220,
+        215,
+        20
+      ],
+      "indexStart": 1588830,
+      "indexCount": 16650,
+      "source": "Model_17_left_hippocampus.vtk",
+      "voxelCount": 10965,
+      "centroid": [
+        75,
+        129,
+        133
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 18,
+      "name": "left amygdala",
+      "color": [
+        98,
+        153,
+        112
+      ],
+      "indexStart": 1605480,
+      "indexCount": 6306,
+      "source": "Model_18_left_amygdala.vtk",
+      "voxelCount": 4060,
+      "centroid": [
+        75,
+        153,
+        134
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 2000,
+      "name": "right insula",
+      "color": [
+        125,
+        5,
+        25
+      ],
+      "indexStart": 1611786,
+      "indexCount": 30816,
+      "source": "Model_2000_right_insula.vtk",
+      "voxelCount": 15256,
+      "centroid": [
+        149,
+        159,
+        158
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2001,
+      "name": "right superior temporal gyrus (banks of right superior temporal sulcus)",
+      "color": [
+        25,
+        100,
+        40
+      ],
+      "indexStart": 1642602,
+      "indexCount": 16200,
+      "source": "Model_2001_right_superior_temporal_gyrus_(banks_of_right_superior_temporal_sulcus).vtk",
+      "voxelCount": 5616,
+      "centroid": [
+        173,
+        104,
+        149
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2002,
+      "name": "caudal part of right anterior cingulate gyrus",
+      "color": [
+        125,
+        100,
+        160
+      ],
+      "indexStart": 1658802,
+      "indexCount": 17226,
+      "source": "Model_2002_caudal_part_of_right_anterior_cingulate_gyrus.vtk",
+      "voxelCount": 7053,
+      "centroid": [
+        110,
+        179,
+        199
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2003,
+      "name": "posterior part of right middle frontal gyrus",
+      "color": [
+        100,
+        25,
+        0
+      ],
+      "indexStart": 1676028,
+      "indexCount": 29196,
+      "source": "Model_2003_posterior_part_of_right_middle_frontal_gyrus.vtk",
+      "voxelCount": 11444,
+      "centroid": [
+        150,
+        164,
+        215
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2005,
+      "name": "right cuneus",
+      "color": [
+        220,
+        20,
+        100
+      ],
+      "indexStart": 1705224,
+      "indexCount": 32622,
+      "source": "Model_2005_right_cuneus.vtk",
+      "voxelCount": 10263,
+      "centroid": [
+        121,
+        48,
+        154
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2006,
+      "name": "right ambiens gyrus",
+      "color": [
+        185,
+        15,
+        10
+      ],
+      "indexStart": 1737846,
+      "indexCount": 14148,
+      "source": "Model_2006_right_ambiens_gyrus.vtk",
+      "voxelCount": 6503,
+      "centroid": [
+        129,
+        164,
+        115
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2007,
+      "name": "right fusiform gyrus",
+      "color": [
+        180,
+        220,
+        140
+      ],
+      "indexStart": 1751994,
+      "indexCount": 62424,
+      "source": "Model_2007_right_fusiform_gyrus.vtk",
+      "voxelCount": 25895,
+      "centroid": [
+        144,
+        114,
+        114
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2008,
+      "name": "right inferior parietal lobule",
+      "color": [
+        185,
+        90,
+        185
+      ],
+      "indexStart": 1814418,
+      "indexCount": 90132,
+      "source": "Model_2008_right_inferior_parietal_lobule.vtk",
+      "voxelCount": 38155,
+      "centroid": [
+        169,
+        74,
+        165
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2009,
+      "name": "right inferior temporal gyrus",
+      "color": [
+        180,
+        40,
+        120
+      ],
+      "indexStart": 1904550,
+      "indexCount": 61650,
+      "source": "Model_2009_right_inferior_temporal_gyrus.vtk",
+      "voxelCount": 26561,
+      "centroid": [
+        165,
+        126,
+        113
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2010,
+      "name": "isthmus of right cingulate gyrus",
+      "color": [
+        140,
+        20,
+        140
+      ],
+      "indexStart": 1966200,
+      "indexCount": 18612,
+      "source": "Model_2010_isthmus_of_right_cingulate_gyrus.vtk",
+      "voxelCount": 6401,
+      "centroid": [
+        115,
+        93,
+        168
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2011,
+      "name": "right lateral occipital gyrus",
+      "color": [
+        20,
+        30,
+        140
+      ],
+      "indexStart": 1984812,
+      "indexCount": 73068,
+      "source": "Model_2011_right_lateral_occipital_gyrus.vtk",
+      "voxelCount": 29492,
+      "centroid": [
+        151,
+        50,
+        125
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2012,
+      "name": "right lateral orbital gyrus",
+      "color": [
+        35,
+        75,
+        50
+      ],
+      "indexStart": 2057880,
+      "indexCount": 47934,
+      "source": "Model_2012_right_lateral_orbital_gyrus.vtk",
+      "voxelCount": 20396,
+      "centroid": [
+        130,
+        205,
+        148
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2013,
+      "name": "right lingual gyrus",
+      "color": [
+        225,
+        140,
+        140
+      ],
+      "indexStart": 2105814,
+      "indexCount": 49338,
+      "source": "Model_2013_right_lingual_gyrus.vtk",
+      "voxelCount": 17825,
+      "centroid": [
+        123,
+        76,
+        128
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2014,
+      "name": "right straight gyrus",
+      "color": [
+        200,
+        35,
+        75
+      ],
+      "indexStart": 2155152,
+      "indexCount": 33306,
+      "source": "Model_2014_right_straight_gyrus.vtk",
+      "voxelCount": 12457,
+      "centroid": [
+        106,
+        211,
+        154
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2015,
+      "name": "right middle temporal gyrus",
+      "color": [
+        160,
+        100,
+        50
+      ],
+      "indexStart": 2188458,
+      "indexCount": 70524,
+      "source": "Model_2015_right_middle_temporal_gyrus.vtk",
+      "voxelCount": 30150,
+      "centroid": [
+        173,
+        139,
+        127
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2016,
+      "name": "right parahippocampal gyrus",
+      "color": [
+        244,
+        244,
+        24
+      ],
+      "indexStart": 2258982,
+      "indexCount": 12228,
+      "source": "Model_2016_right_parahippocampal_gyrus.vtk",
+      "voxelCount": 4518,
+      "centroid": [
+        133,
+        131,
+        120
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2017,
+      "name": "right paracentral lobule",
+      "color": [
+        60,
+        175,
+        80
+      ],
+      "indexStart": 2271210,
+      "indexCount": 26262,
+      "source": "Model_2017_right_paracentral_lobule.vtk",
+      "voxelCount": 10810,
+      "centroid": [
+        119,
+        109,
+        214
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2018,
+      "name": "opercular part of right inferior frontal gyrus",
+      "color": [
+        220,
+        180,
+        140
+      ],
+      "indexStart": 2297472,
+      "indexCount": 24642,
+      "source": "Model_2018_opercular_part_of_right_inferior_frontal_gyrus.vtk",
+      "voxelCount": 8992,
+      "centroid": [
+        163,
+        179,
+        176
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2019,
+      "name": "orbital part of right inferior frontal gyrus",
+      "color": [
+        220,
+        140,
+        180
+      ],
+      "indexStart": 2322114,
+      "indexCount": 19734,
+      "source": "Model_2019_orbital_part_of_right_inferior_frontal_gyrus.vtk",
+      "voxelCount": 7412,
+      "centroid": [
+        150,
+        223,
+        159
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2020,
+      "name": "triangular part of right inferior frontal gyrus",
+      "color": [
+        220,
+        60,
+        20
+      ],
+      "indexStart": 2341848,
+      "indexCount": 27720,
+      "source": "Model_2020_triangular_part_of_right_inferior_frontal_gyrus.vtk",
+      "voxelCount": 10379,
+      "centroid": [
+        161,
+        200,
+        167
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2021,
+      "name": "right visual cortex",
+      "color": [
+        120,
+        100,
+        60
+      ],
+      "indexStart": 2369568,
+      "indexCount": 26586,
+      "source": "Model_2021_right_visual_cortex.vtk",
+      "voxelCount": 7634,
+      "centroid": [
+        122,
+        54,
+        137
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2022,
+      "name": "right postcentral gyrus",
+      "color": [
+        195,
+        40,
+        40
+      ],
+      "indexStart": 2396154,
+      "indexCount": 69228,
+      "source": "Model_2022_right_postcentral_gyrus.vtk",
+      "voxelCount": 23360,
+      "centroid": [
+        162,
+        121,
+        196
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2023,
+      "name": "right posterior cingulate gyrus",
+      "color": [
+        220,
+        180,
+        220
+      ],
+      "indexStart": 2465382,
+      "indexCount": 25836,
+      "source": "Model_2023_right_posterior_cingulate_gyrus.vtk",
+      "voxelCount": 10007,
+      "centroid": [
+        114,
+        127,
+        197
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2024,
+      "name": "right precentral gyrus",
+      "color": [
+        95,
+        75,
+        175
+      ],
+      "indexStart": 2491218,
+      "indexCount": 83256,
+      "source": "Model_2024_right_precentral_gyrus.vtk",
+      "voxelCount": 36387,
+      "centroid": [
+        157,
+        139,
+        203
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2025,
+      "name": "right precuneus",
+      "color": [
+        160,
+        140,
+        180
+      ],
+      "indexStart": 2574474,
+      "indexCount": 71532,
+      "source": "Model_2025_right_precuneus.vtk",
+      "voxelCount": 28737,
+      "centroid": [
+        123,
+        72,
+        179
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2026,
+      "name": "rostral part of right anterior cingulate gyrus",
+      "color": [
+        80,
+        20,
+        140
+      ],
+      "indexStart": 2646006,
+      "indexCount": 11466,
+      "source": "Model_2026_rostral_part_of_right_anterior_cingulate_gyrus.vtk",
+      "voxelCount": 4662,
+      "centroid": [
+        107,
+        208,
+        177
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2027,
+      "name": "anterior part of right middle frontal gyrus",
+      "color": [
+        75,
+        50,
+        125
+      ],
+      "indexStart": 2657472,
+      "indexCount": 115224,
+      "source": "Model_2027_anterior_part_of_right_middle_frontal_gyrus.vtk",
+      "voxelCount": 45512,
+      "centroid": [
+        146,
+        211,
+        193
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2028,
+      "name": "right superior frontal gyrus",
+      "color": [
+        50,
+        160,
+        150
+      ],
+      "indexStart": 2772696,
+      "indexCount": 121194,
+      "source": "Model_2028_right_superior_frontal_gyrus.vtk",
+      "voxelCount": 55519,
+      "centroid": [
+        119,
+        188,
+        216
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2029,
+      "name": "right superior parietal lobule",
+      "color": [
+        20,
+        180,
+        140
+      ],
+      "indexStart": 2893890,
+      "indexCount": 90546,
+      "source": "Model_2029_right_superior_parietal_lobule.vtk",
+      "voxelCount": 33849,
+      "centroid": [
+        141,
+        61,
+        190
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2030,
+      "name": "right superior temporal gyrus",
+      "color": [
+        140,
+        220,
+        220
+      ],
+      "indexStart": 2984436,
+      "indexCount": 71484,
+      "source": "Model_2030_right_superior_temporal_gyrus.vtk",
+      "voxelCount": 33157,
+      "centroid": [
+        171,
+        147,
+        144
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2031,
+      "name": "right supramarginal gyrus",
+      "color": [
+        80,
+        160,
+        20
+      ],
+      "indexStart": 3055920,
+      "indexCount": 58716,
+      "source": "Model_2031_right_supramarginal_gyrus.vtk",
+      "voxelCount": 25807,
+      "centroid": [
+        174,
+        111,
+        184
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2032,
+      "name": "right frontal pole",
+      "color": [
+        100,
+        0,
+        100
+      ],
+      "indexStart": 3114636,
+      "indexCount": 5256,
+      "source": "Model_2032_right_frontal_pole.vtk",
+      "voxelCount": 1947,
+      "centroid": [
+        107,
+        247,
+        167
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2033,
+      "name": "right temporal pole",
+      "color": [
+        70,
+        70,
+        70
+      ],
+      "indexStart": 3119892,
+      "indexCount": 12150,
+      "source": "Model_2033_right_temporal_pole.vtk",
+      "voxelCount": 6148,
+      "centroid": [
+        141,
+        187,
+        123
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2034,
+      "name": "right transverse temporal gyrus",
+      "color": [
+        150,
+        150,
+        200
+      ],
+      "indexStart": 3132042,
+      "indexCount": 12096,
+      "source": "Model_2034_right_transverse_temporal_gyrus.vtk",
+      "voxelCount": 5057,
+      "centroid": [
+        163,
+        139,
+        156
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 2035,
+      "name": "right limen insulae",
+      "color": [
+        145,
+        50,
+        65
+      ],
+      "indexStart": 3144138,
+      "indexCount": 4902,
+      "source": "Model_2035_right_limen_insulae.vtk",
+      "voxelCount": 2174,
+      "centroid": [
+        134,
+        167,
+        131
+      ],
+      "group": "Cortex"
+    },
+    {
+      "id": 24,
+      "name": "third ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ],
+      "indexStart": 3149040,
+      "indexCount": 7494,
+      "source": "Model_24_third_ventricle.vtk",
+      "voxelCount": 2747,
+      "centroid": [
+        103,
+        135,
+        156
+      ],
+      "group": "Ventricles"
+    },
+    {
+      "id": 2,
+      "name": "white matter of left cerebral hemisphere",
+      "color": [
+        250,
+        250,
+        225
+      ],
+      "indexStart": 3156534,
+      "indexCount": 688092,
+      "source": "Model_2_white_matter_of_left_cerebral_hemisphere.vtk",
+      "voxelCount": 550672,
+      "centroid": [
+        71,
+        123,
+        173
+      ],
+      "group": "White matter"
+    },
+    {
+      "id": 3004,
+      "name": "corpus callosum",
+      "color": [
+        97,
+        113,
+        158
+      ],
+      "indexStart": 3844626,
+      "indexCount": 70092,
+      "source": "Model_3004_corpus_callosum.vtk",
+      "voxelCount": 63835,
+      "centroid": [
+        106,
+        139,
+        173
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 35,
+      "name": "pons",
+      "color": [
+        50,
+        50,
+        135
+      ],
+      "indexStart": 3914718,
+      "indexCount": 28368,
+      "source": "Model_35_pons.vtk",
+      "voxelCount": 43107,
+      "centroid": [
+        102,
+        126,
+        107
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 40,
+      "name": "part of midbrain",
+      "color": [
+        145,
+        92,
+        109
+      ],
+      "indexStart": 3943086,
+      "indexCount": 35244,
+      "source": "Model_40_part_of_midbrain.vtk",
+      "voxelCount": 24747,
+      "centroid": [
+        104,
+        129,
+        134
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 41,
+      "name": "white matter of right cerebral hemisphere",
+      "color": [
+        250,
+        250,
+        225
+      ],
+      "indexStart": 3978330,
+      "indexCount": 697596,
+      "source": "Model_41_white_matter_of_right_cerebral_hemisphere.vtk",
+      "voxelCount": 559115,
+      "centroid": [
+        142,
+        132,
+        170
+      ],
+      "group": "White matter"
+    },
+    {
+      "id": 43,
+      "name": "right lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ],
+      "indexStart": 4675926,
+      "indexCount": 30192,
+      "source": "Model_43_right_lateral_ventricle.vtk",
+      "voxelCount": 19714,
+      "centroid": [
+        124,
+        129,
+        163
+      ],
+      "group": "Ventricles"
+    },
+    {
+      "id": 46,
+      "name": "white matter of right hemisphere of cerebellum",
+      "color": [
+        180,
+        210,
+        120
+      ],
+      "indexStart": 4706118,
+      "indexCount": 55098,
+      "source": "Model_46_white_matter_of_right_hemisphere_of_cerebellum.vtk",
+      "voxelCount": 31985,
+      "centroid": [
+        132,
+        89,
+        89
+      ],
+      "group": "Cerebellum"
+    },
+    {
+      "id": 4,
+      "name": "left lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ],
+      "indexStart": 4761216,
+      "indexCount": 33414,
+      "source": "Model_4_left_lateral_ventricle.vtk",
+      "voxelCount": 24034,
+      "centroid": [
+        86,
+        126,
+        165
+      ],
+      "group": "Ventricles"
+    },
+    {
+      "id": 50,
+      "name": "right caudate nucleus",
+      "color": [
+        30,
+        111,
+        85
+      ],
+      "indexStart": 4794630,
+      "indexCount": 18486,
+      "source": "Model_50_right_caudate_nucleus.vtk",
+      "voxelCount": 11085,
+      "centroid": [
+        120,
+        166,
+        173
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 51,
+      "name": "right putamen",
+      "color": [
+        210,
+        157,
+        166
+      ],
+      "indexStart": 4813116,
+      "indexCount": 15918,
+      "source": "Model_51_right_putamen.vtk",
+      "voxelCount": 13243,
+      "centroid": [
+        134,
+        162,
+        159
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 53,
+      "name": "right hippocampus",
+      "color": [
+        220,
+        215,
+        20
+      ],
+      "indexStart": 4829034,
+      "indexCount": 14892,
+      "source": "Model_53_right_hippocampus.vtk",
+      "voxelCount": 10349,
+      "centroid": [
+        133,
+        135,
+        131
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 54,
+      "name": "right amygdala",
+      "color": [
+        98,
+        153,
+        112
+      ],
+      "indexStart": 4843926,
+      "indexCount": 6822,
+      "source": "Model_54_right_amygdala.vtk",
+      "voxelCount": 5075,
+      "centroid": [
+        129,
+        157,
+        133
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 61,
+      "name": "medulla oblongata",
+      "color": [
+        135,
+        205,
+        235
+      ],
+      "indexStart": 4850748,
+      "indexCount": 18018,
+      "source": "Model_61_medulla_oblongata.vtk",
+      "voxelCount": 16692,
+      "centroid": [
+        101,
+        118,
+        75
+      ],
+      "group": "Deep structures"
+    },
+    {
+      "id": 7,
+      "name": "white matter of left hemisphere of cerebellum",
+      "color": [
+        180,
+        210,
+        120
+      ],
+      "indexStart": 4868766,
+      "indexCount": 60768,
+      "source": "Model_7_white_matter_of_left_hemisphere_of_cerebellum.vtk",
+      "voxelCount": 33609,
+      "centroid": [
+        69,
+        86,
+        91
+      ],
+      "group": "Cerebellum"
+    }
+  ],
+  "table": {
+    "0": {
+      "id": 0,
+      "name": "background",
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    "2": {
+      "id": 2,
+      "name": "white matter of left cerebral hemisphere",
+      "color": [
+        250,
+        250,
+        225
+      ]
+    },
+    "3": {
+      "id": 3,
+      "name": "skin",
+      "color": [
+        225,
+        190,
+        150
+      ]
+    },
+    "4": {
+      "id": 4,
+      "name": "left lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "5": {
+      "id": 5,
+      "name": "temporal horn of left lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "7": {
+      "id": 7,
+      "name": "white matter of left hemisphere of cerebellum",
+      "color": [
+        180,
+        210,
+        120
+      ]
+    },
+    "8": {
+      "id": 8,
+      "name": "left cerebellar cortex",
+      "color": [
+        230,
+        150,
+        35
+      ]
+    },
+    "11": {
+      "id": 11,
+      "name": "left caudate nucleus",
+      "color": [
+        30,
+        111,
+        85
+      ]
+    },
+    "12": {
+      "id": 12,
+      "name": "left putamen",
+      "color": [
+        210,
+        157,
+        166
+      ]
+    },
+    "13": {
+      "id": 13,
+      "name": "left globus pallidus pars externa",
+      "color": [
+        15,
+        50,
+        255
+      ]
+    },
+    "15": {
+      "id": 15,
+      "name": "fourth ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "17": {
+      "id": 17,
+      "name": "left hippocampus",
+      "color": [
+        220,
+        215,
+        20
+      ]
+    },
+    "18": {
+      "id": 18,
+      "name": "left amygdala",
+      "color": [
+        98,
+        153,
+        112
+      ]
+    },
+    "19": {
+      "id": 19,
+      "name": "aqueduct",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "24": {
+      "id": 24,
+      "name": "third ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "25": {
+      "id": 25,
+      "name": "left globus pallidus pars interna",
+      "color": [
+        255,
+        165,
+        0
+      ]
+    },
+    "26": {
+      "id": 26,
+      "name": "left nucleus accumbens",
+      "color": [
+        165,
+        0,
+        255
+      ]
+    },
+    "27": {
+      "id": 27,
+      "name": "left middle cerebellar peduncle",
+      "color": [
+        148,
+        128,
+        72
+      ]
+    },
+    "28": {
+      "id": 28,
+      "name": "left hypothalamus",
+      "color": [
+        165,
+        40,
+        40
+      ]
+    },
+    "31": {
+      "id": 31,
+      "name": "choroid plexus of left cerebral hemisphere",
+      "color": [
+        90,
+        105,
+        215
+      ]
+    },
+    "34": {
+      "id": 34,
+      "name": "left superior cerebellar peduncle",
+      "color": [
+        139,
+        126,
+        177
+      ]
+    },
+    "35": {
+      "id": 35,
+      "name": "pons",
+      "color": [
+        50,
+        50,
+        135
+      ]
+    },
+    "40": {
+      "id": 40,
+      "name": "part of midbrain",
+      "color": [
+        145,
+        92,
+        109
+      ]
+    },
+    "41": {
+      "id": 41,
+      "name": "white matter of right cerebral hemisphere",
+      "color": [
+        250,
+        250,
+        225
+      ]
+    },
+    "43": {
+      "id": 43,
+      "name": "right lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "44": {
+      "id": 44,
+      "name": "temporal horn of right lateral ventricle",
+      "color": [
+        88,
+        106,
+        215
+      ]
+    },
+    "46": {
+      "id": 46,
+      "name": "white matter of right hemisphere of cerebellum",
+      "color": [
+        180,
+        210,
+        120
+      ]
+    },
+    "47": {
+      "id": 47,
+      "name": "right cerebellar cortex",
+      "color": [
+        230,
+        150,
+        35
+      ]
+    },
+    "50": {
+      "id": 50,
+      "name": "right caudate nucleus",
+      "color": [
+        30,
+        111,
+        85
+      ]
+    },
+    "51": {
+      "id": 51,
+      "name": "right putamen",
+      "color": [
+        210,
+        157,
+        166
+      ]
+    },
+    "52": {
+      "id": 52,
+      "name": "right globus pallidus pars externa",
+      "color": [
+        15,
+        50,
+        255
+      ]
+    },
+    "53": {
+      "id": 53,
+      "name": "right hippocampus",
+      "color": [
+        220,
+        215,
+        20
+      ]
+    },
+    "54": {
+      "id": 54,
+      "name": "right amygdala",
+      "color": [
+        98,
+        153,
+        112
+      ]
+    },
+    "58": {
+      "id": 58,
+      "name": "right nucleus accumbens",
+      "color": [
+        165,
+        0,
+        255
+      ]
+    },
+    "60": {
+      "id": 60,
+      "name": "right hypothalamus",
+      "color": [
+        165,
+        40,
+        40
+      ]
+    },
+    "61": {
+      "id": 61,
+      "name": "medulla oblongata",
+      "color": [
+        135,
+        205,
+        235
+      ]
+    },
+    "63": {
+      "id": 63,
+      "name": "choroid plexus of right cerebral hemisphere",
+      "color": [
+        90,
+        105,
+        215
+      ]
+    },
+    "66": {
+      "id": 66,
+      "name": "left substantia nigra",
+      "color": [
+        0,
+        108,
+        112
+      ]
+    },
+    "71": {
+      "id": 71,
+      "name": "right substantia nigra",
+      "color": [
+        0,
+        108,
+        112
+      ]
+    },
+    "72": {
+      "id": 72,
+      "name": "pineal body",
+      "color": [
+        253,
+        135,
+        192
+      ]
+    },
+    "77": {
+      "id": 77,
+      "name": "left optic nerve",
+      "color": [
+        216,
+        220,
+        84
+      ]
+    },
+    "78": {
+      "id": 78,
+      "name": "left optic tract",
+      "color": [
+        156,
+        171,
+        108
+      ]
+    },
+    "79": {
+      "id": 79,
+      "name": "left red nucleus",
+      "color": [
+        255,
+        150,
+        10
+      ]
+    },
+    "83": {
+      "id": 83,
+      "name": "right globus pallidus pars interna",
+      "color": [
+        255,
+        165,
+        0
+      ]
+    },
+    "84": {
+      "id": 84,
+      "name": "right red nucleus",
+      "color": [
+        255,
+        150,
+        10
+      ]
+    },
+    "85": {
+      "id": 85,
+      "name": "optic chiasm",
+      "color": [
+        99,
+        106,
+        24
+      ]
+    },
+    "96": {
+      "id": 96,
+      "name": "pellucid septum",
+      "color": [
+        205,
+        10,
+        125
+      ]
+    },
+    "100": {
+      "id": 100,
+      "name": "left mammillothalamic tract",
+      "color": [
+        125,
+        140,
+        180
+      ]
+    },
+    "142": {
+      "id": 142,
+      "name": "anterior commissure",
+      "color": [
+        220,
+        225,
+        70
+      ]
+    },
+    "200": {
+      "id": 200,
+      "name": "right mammillothalamic tract",
+      "color": [
+        125,
+        140,
+        180
+      ]
+    },
+    "215": {
+      "id": 215,
+      "name": "right optic nerve",
+      "color": [
+        216,
+        220,
+        84
+      ]
+    },
+    "216": {
+      "id": 216,
+      "name": "right optic tract",
+      "color": [
+        156,
+        171,
+        108
+      ]
+    },
+    "300": {
+      "id": 300,
+      "name": "left I II v",
+      "color": [
+        235,
+        63,
+        159
+      ]
+    },
+    "301": {
+      "id": 301,
+      "name": "left III v",
+      "color": [
+        31,
+        175,
+        72
+      ]
+    },
+    "302": {
+      "id": 302,
+      "name": "left IV v",
+      "color": [
+        214,
+        27,
+        150
+      ]
+    },
+    "303": {
+      "id": 303,
+      "name": "left V v",
+      "color": [
+        220,
+        39,
+        44
+      ]
+    },
+    "304": {
+      "id": 304,
+      "name": "left VI v",
+      "color": [
+        49,
+        95,
+        178
+      ]
+    },
+    "305": {
+      "id": 305,
+      "name": "left VIIAf v",
+      "color": [
+        241,
+        235,
+        27
+      ]
+    },
+    "306": {
+      "id": 306,
+      "name": "left VIIAt v",
+      "color": [
+        158,
+        56,
+        161
+      ]
+    },
+    "307": {
+      "id": 307,
+      "name": "left VIIB v",
+      "color": [
+        56,
+        120,
+        63
+      ]
+    },
+    "308": {
+      "id": 308,
+      "name": "left VIIIA v",
+      "color": [
+        149,
+        75,
+        64
+      ]
+    },
+    "309": {
+      "id": 309,
+      "name": "left VIIIB v",
+      "color": [
+        116,
+        64,
+        163
+      ]
+    },
+    "310": {
+      "id": 310,
+      "name": "left IX v",
+      "color": [
+        124,
+        139,
+        88
+      ]
+    },
+    "311": {
+      "id": 311,
+      "name": "left X v",
+      "color": [
+        245,
+        213,
+        21
+      ]
+    },
+    "312": {
+      "id": 312,
+      "name": "left III m",
+      "color": [
+        115,
+        204,
+        130
+      ]
+    },
+    "313": {
+      "id": 313,
+      "name": "left IV m",
+      "color": [
+        220,
+        113,
+        174
+      ]
+    },
+    "314": {
+      "id": 314,
+      "name": "left V m",
+      "color": [
+        216,
+        106,
+        116
+      ]
+    },
+    "315": {
+      "id": 315,
+      "name": "left VI m",
+      "color": [
+        43,
+        169,
+        230
+      ]
+    },
+    "316": {
+      "id": 316,
+      "name": "left VIIA crusI m",
+      "color": [
+        237,
+        229,
+        148
+      ]
+    },
+    "317": {
+      "id": 317,
+      "name": "left VIIA crusII m",
+      "color": [
+        174,
+        116,
+        152
+      ]
+    },
+    "318": {
+      "id": 318,
+      "name": "left VIIB m",
+      "color": [
+        103,
+        164,
+        114
+      ]
+    },
+    "319": {
+      "id": 319,
+      "name": "left VIIIA m",
+      "color": [
+        167,
+        123,
+        89
+      ]
+    },
+    "320": {
+      "id": 320,
+      "name": "left VIIIB m",
+      "color": [
+        164,
+        123,
+        187
+      ]
+    },
+    "321": {
+      "id": 321,
+      "name": "left IX m",
+      "color": [
+        189,
+        199,
+        129
+      ]
+    },
+    "322": {
+      "id": 322,
+      "name": "left X m",
+      "color": [
+        243,
+        231,
+        100
+      ]
+    },
+    "323": {
+      "id": 323,
+      "name": "left V l",
+      "color": [
+        243,
+        182,
+        191
+      ]
+    },
+    "324": {
+      "id": 324,
+      "name": "left VI l",
+      "color": [
+        171,
+        216,
+        143
+      ]
+    },
+    "327": {
+      "id": 327,
+      "name": "left VIIA crusI l1",
+      "color": [
+        243,
+        241,
+        133
+      ]
+    },
+    "328": {
+      "id": 328,
+      "name": "left VIIA crusII l1",
+      "color": [
+        223,
+        162,
+        214
+      ]
+    },
+    "329": {
+      "id": 329,
+      "name": "left VIIB l",
+      "color": [
+        147,
+        210,
+        194
+      ]
+    },
+    "330": {
+      "id": 330,
+      "name": "left VIIIA l",
+      "color": [
+        216,
+        190,
+        132
+      ]
+    },
+    "331": {
+      "id": 331,
+      "name": "left VIIIB l",
+      "color": [
+        175,
+        176,
+        221
+      ]
+    },
+    "332": {
+      "id": 332,
+      "name": "left VIIA crusI l2",
+      "color": [
+        236,
+        245,
+        196
+      ]
+    },
+    "333": {
+      "id": 333,
+      "name": "left VIIA crusII l2",
+      "color": [
+        241,
+        216,
+        238
+      ]
+    },
+    "334": {
+      "id": 334,
+      "name": "right I II v",
+      "color": [
+        235,
+        63,
+        159
+      ]
+    },
+    "335": {
+      "id": 335,
+      "name": "right III v",
+      "color": [
+        31,
+        175,
+        72
+      ]
+    },
+    "336": {
+      "id": 336,
+      "name": "right IV v",
+      "color": [
+        214,
+        27,
+        150
+      ]
+    },
+    "337": {
+      "id": 337,
+      "name": "right V v",
+      "color": [
+        220,
+        39,
+        44
+      ]
+    },
+    "338": {
+      "id": 338,
+      "name": "right VI v",
+      "color": [
+        49,
+        95,
+        178
+      ]
+    },
+    "339": {
+      "id": 339,
+      "name": "right VIIAf v",
+      "color": [
+        241,
+        235,
+        27
+      ]
+    },
+    "340": {
+      "id": 340,
+      "name": "right VIIAt v",
+      "color": [
+        158,
+        56,
+        161
+      ]
+    },
+    "341": {
+      "id": 341,
+      "name": "right VIIB v",
+      "color": [
+        56,
+        120,
+        63
+      ]
+    },
+    "342": {
+      "id": 342,
+      "name": "right VIIIA v",
+      "color": [
+        149,
+        75,
+        64
+      ]
+    },
+    "343": {
+      "id": 343,
+      "name": "right VIIIB v",
+      "color": [
+        116,
+        64,
+        163
+      ]
+    },
+    "344": {
+      "id": 344,
+      "name": "right IX v",
+      "color": [
+        124,
+        139,
+        88
+      ]
+    },
+    "345": {
+      "id": 345,
+      "name": "right X v",
+      "color": [
+        245,
+        213,
+        21
+      ]
+    },
+    "346": {
+      "id": 346,
+      "name": "right III m",
+      "color": [
+        115,
+        204,
+        130
+      ]
+    },
+    "347": {
+      "id": 347,
+      "name": "right IV m",
+      "color": [
+        220,
+        113,
+        174
+      ]
+    },
+    "348": {
+      "id": 348,
+      "name": "right V m",
+      "color": [
+        216,
+        106,
+        116
+      ]
+    },
+    "349": {
+      "id": 349,
+      "name": "right VI m",
+      "color": [
+        43,
+        169,
+        230
+      ]
+    },
+    "350": {
+      "id": 350,
+      "name": "right VIIA crusI m",
+      "color": [
+        237,
+        229,
+        148
+      ]
+    },
+    "351": {
+      "id": 351,
+      "name": "right VIIA crusII m",
+      "color": [
+        174,
+        116,
+        152
+      ]
+    },
+    "352": {
+      "id": 352,
+      "name": "right VIIB m",
+      "color": [
+        103,
+        164,
+        114
+      ]
+    },
+    "353": {
+      "id": 353,
+      "name": "right VIIIA m",
+      "color": [
+        167,
+        123,
+        89
+      ]
+    },
+    "354": {
+      "id": 354,
+      "name": "right VIIIB m",
+      "color": [
+        164,
+        123,
+        187
+      ]
+    },
+    "355": {
+      "id": 355,
+      "name": "right IX m",
+      "color": [
+        189,
+        199,
+        129
+      ]
+    },
+    "356": {
+      "id": 356,
+      "name": "right X m",
+      "color": [
+        243,
+        231,
+        100
+      ]
+    },
+    "357": {
+      "id": 357,
+      "name": "right V l",
+      "color": [
+        243,
+        182,
+        191
+      ]
+    },
+    "358": {
+      "id": 358,
+      "name": "right VI l",
+      "color": [
+        171,
+        216,
+        143
+      ]
+    },
+    "361": {
+      "id": 361,
+      "name": "right VIIA crusI l1",
+      "color": [
+        243,
+        241,
+        133
+      ]
+    },
+    "362": {
+      "id": 362,
+      "name": "right VIIA crusII l1",
+      "color": [
+        223,
+        162,
+        214
+      ]
+    },
+    "363": {
+      "id": 363,
+      "name": "right VIIB l",
+      "color": [
+        147,
+        210,
+        194
+      ]
+    },
+    "364": {
+      "id": 364,
+      "name": "right VIIIA l",
+      "color": [
+        216,
+        190,
+        132
+      ]
+    },
+    "365": {
+      "id": 365,
+      "name": "right VIIIB l",
+      "color": [
+        175,
+        176,
+        221
+      ]
+    },
+    "366": {
+      "id": 366,
+      "name": "right VIIA crusI l2",
+      "color": [
+        236,
+        245,
+        196
+      ]
+    },
+    "367": {
+      "id": 367,
+      "name": "right VIIA crusII l2",
+      "color": [
+        241,
+        216,
+        238
+      ]
+    },
+    "371": {
+      "id": 371,
+      "name": "left Dentate nucleus",
+      "color": [
+        100,
+        200,
+        100
+      ]
+    },
+    "373": {
+      "id": 373,
+      "name": "left FaGE nuclei",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "375": {
+      "id": 375,
+      "name": "right Dentate nucleus",
+      "color": [
+        100,
+        200,
+        100
+      ]
+    },
+    "377": {
+      "id": 377,
+      "name": "right FaGE nuclei",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "380": {
+      "id": 380,
+      "name": "left anterior superior hypothalamus",
+      "color": [
+        243,
+        136,
+        62
+      ]
+    },
+    "381": {
+      "id": 381,
+      "name": "left anterior inferior hypothalamus",
+      "color": [
+        135,
+        247,
+        4
+      ]
+    },
+    "382": {
+      "id": 382,
+      "name": "left superior tuberal hypothalamus",
+      "color": [
+        147,
+        69,
+        18
+      ]
+    },
+    "383": {
+      "id": 383,
+      "name": "left inferior tuberal hypothalamus",
+      "color": [
+        4,
+        235,
+        125
+      ]
+    },
+    "384": {
+      "id": 384,
+      "name": "left posterior superior hypothalamus",
+      "color": [
+        125,
+        38,
+        205
+      ]
+    },
+    "385": {
+      "id": 385,
+      "name": "right anterior superior hypothalamus",
+      "color": [
+        243,
+        136,
+        62
+      ]
+    },
+    "386": {
+      "id": 386,
+      "name": "right anterior inferior hypothalamus",
+      "color": [
+        135,
+        247,
+        4
+      ]
+    },
+    "387": {
+      "id": 387,
+      "name": "right superior tuberal hypothalamus",
+      "color": [
+        147,
+        69,
+        18
+      ]
+    },
+    "388": {
+      "id": 388,
+      "name": "right inferior tuberal hypothalamus",
+      "color": [
+        4,
+        235,
+        125
+      ]
+    },
+    "389": {
+      "id": 389,
+      "name": "right posterior superior hypothalamus",
+      "color": [
+        125,
+        38,
+        205
+      ]
+    },
+    "390": {
+      "id": 390,
+      "name": "right subthalamic nucleus",
+      "color": [
+        200,
+        25,
+        140
+      ]
+    },
+    "391": {
+      "id": 391,
+      "name": "left subthalamic nucleus",
+      "color": [
+        200,
+        25,
+        140
+      ]
+    },
+    "500": {
+      "id": 500,
+      "name": "right internal medullary lamina",
+      "color": [
+        200,
+        200,
+        200
+      ]
+    },
+    "501": {
+      "id": 501,
+      "name": "left internal medullary lamina",
+      "color": [
+        200,
+        200,
+        200
+      ]
+    },
+    "502": {
+      "id": 502,
+      "name": "right medial geniculate body",
+      "color": [
+        125,
+        250,
+        20
+      ]
+    },
+    "503": {
+      "id": 503,
+      "name": "left medial geniculate body",
+      "color": [
+        125,
+        250,
+        20
+      ]
+    },
+    "504": {
+      "id": 504,
+      "name": "right lateral geniculate body",
+      "color": [
+        100,
+        180,
+        255
+      ]
+    },
+    "505": {
+      "id": 505,
+      "name": "left lateral geniculate body",
+      "color": [
+        100,
+        180,
+        255
+      ]
+    },
+    "506": {
+      "id": 506,
+      "name": "right pulvinar",
+      "color": [
+        63,
+        105,
+        225
+      ]
+    },
+    "507": {
+      "id": 507,
+      "name": "left pulvinar",
+      "color": [
+        63,
+        105,
+        225
+      ]
+    },
+    "508": {
+      "id": 508,
+      "name": "right anterior thalamic nucleus",
+      "color": [
+        255,
+        25,
+        130
+      ]
+    },
+    "509": {
+      "id": 509,
+      "name": "left anterior thalamic nucleus",
+      "color": [
+        255,
+        25,
+        130
+      ]
+    },
+    "510": {
+      "id": 510,
+      "name": "right dorsomedial thalamic nucleus",
+      "color": [
+        60,
+        190,
+        130
+      ]
+    },
+    "511": {
+      "id": 511,
+      "name": "left dorsomedial thalamic nucleus",
+      "color": [
+        60,
+        190,
+        130
+      ]
+    },
+    "512": {
+      "id": 512,
+      "name": "right centromedian thalamic nucleus",
+      "color": [
+        190,
+        180,
+        105
+      ]
+    },
+    "513": {
+      "id": 513,
+      "name": "left centromedian thalamic nucleus",
+      "color": [
+        190,
+        180,
+        105
+      ]
+    },
+    "514": {
+      "id": 514,
+      "name": "right ventral anterior thalamic nucleus",
+      "color": [
+        255,
+        213,
+        0
+      ]
+    },
+    "515": {
+      "id": 515,
+      "name": "left ventral anterior thalamic nucleus",
+      "color": [
+        255,
+        213,
+        0
+      ]
+    },
+    "516": {
+      "id": 516,
+      "name": "right ventral lateral thalamic nucleus",
+      "color": [
+        60,
+        180,
+        180
+      ]
+    },
+    "517": {
+      "id": 517,
+      "name": "left ventral lateral thalamic nucleus",
+      "color": [
+        60,
+        180,
+        180
+      ]
+    },
+    "518": {
+      "id": 518,
+      "name": "right lateral posterior thalamic nucleus",
+      "color": [
+        205,
+        130,
+        0
+      ]
+    },
+    "519": {
+      "id": 519,
+      "name": "left lateral posterior thalamic nucleus",
+      "color": [
+        205,
+        130,
+        0
+      ]
+    },
+    "520": {
+      "id": 520,
+      "name": "right lateral dorsal thalamic nucleus",
+      "color": [
+        175,
+        195,
+        220
+      ]
+    },
+    "521": {
+      "id": 521,
+      "name": "left lateral dorsal thalamic nucleus",
+      "color": [
+        175,
+        195,
+        220
+      ]
+    },
+    "522": {
+      "id": 522,
+      "name": "right ventral posteromedial thalamic nucleus",
+      "color": [
+        225,
+        170,
+        105
+      ]
+    },
+    "523": {
+      "id": 523,
+      "name": "left ventral posteromedial thalamic nucleus",
+      "color": [
+        225,
+        170,
+        105
+      ]
+    },
+    "524": {
+      "id": 524,
+      "name": "right ventral posterolateral thalamic nucleus",
+      "color": [
+        230,
+        130,
+        130
+      ]
+    },
+    "525": {
+      "id": 525,
+      "name": "left ventral posterolateral thalamic nucleus",
+      "color": [
+        230,
+        130,
+        130
+      ]
+    },
+    "1000": {
+      "id": 1000,
+      "name": "left insula",
+      "color": [
+        125,
+        5,
+        25
+      ]
+    },
+    "1001": {
+      "id": 1001,
+      "name": "left superior temporal gyrus (banks of left superior temporal sulcus)",
+      "color": [
+        25,
+        100,
+        40
+      ]
+    },
+    "1002": {
+      "id": 1002,
+      "name": "caudal part of left anterior cingulate gyrus",
+      "color": [
+        125,
+        100,
+        160
+      ]
+    },
+    "1003": {
+      "id": 1003,
+      "name": "posterior part of left middle frontal gyrus",
+      "color": [
+        100,
+        25,
+        0
+      ]
+    },
+    "1005": {
+      "id": 1005,
+      "name": "left cuneus",
+      "color": [
+        220,
+        20,
+        100
+      ]
+    },
+    "1006": {
+      "id": 1006,
+      "name": "left ambiens gyrus",
+      "color": [
+        185,
+        15,
+        10
+      ]
+    },
+    "1007": {
+      "id": 1007,
+      "name": "left fusiform gyrus",
+      "color": [
+        180,
+        220,
+        140
+      ]
+    },
+    "1008": {
+      "id": 1008,
+      "name": "left inferior parietal lobule",
+      "color": [
+        185,
+        90,
+        185
+      ]
+    },
+    "1009": {
+      "id": 1009,
+      "name": "left inferior temporal gyrus",
+      "color": [
+        180,
+        40,
+        120
+      ]
+    },
+    "1010": {
+      "id": 1010,
+      "name": "isthmus of left cingulate gyrus",
+      "color": [
+        140,
+        20,
+        140
+      ]
+    },
+    "1011": {
+      "id": 1011,
+      "name": "left lateral occipital gyrus",
+      "color": [
+        20,
+        30,
+        140
+      ]
+    },
+    "1012": {
+      "id": 1012,
+      "name": "left lateral orbital gyrus",
+      "color": [
+        35,
+        75,
+        50
+      ]
+    },
+    "1013": {
+      "id": 1013,
+      "name": "left lingual gyrus",
+      "color": [
+        225,
+        140,
+        140
+      ]
+    },
+    "1014": {
+      "id": 1014,
+      "name": "left straight gyrus",
+      "color": [
+        200,
+        35,
+        75
+      ]
+    },
+    "1015": {
+      "id": 1015,
+      "name": "left middle temporal gyrus",
+      "color": [
+        160,
+        100,
+        50
+      ]
+    },
+    "1016": {
+      "id": 1016,
+      "name": "left parahippocampal gyrus",
+      "color": [
+        244,
+        244,
+        24
+      ]
+    },
+    "1017": {
+      "id": 1017,
+      "name": "left paracentral lobule",
+      "color": [
+        60,
+        175,
+        80
+      ]
+    },
+    "1018": {
+      "id": 1018,
+      "name": "opercular part of left inferior frontal gyrus",
+      "color": [
+        220,
+        180,
+        140
+      ]
+    },
+    "1019": {
+      "id": 1019,
+      "name": "orbital part of left inferior frontal gyrus",
+      "color": [
+        220,
+        140,
+        180
+      ]
+    },
+    "1020": {
+      "id": 1020,
+      "name": "triangular part of left inferior frontal gyrus",
+      "color": [
+        220,
+        60,
+        20
+      ]
+    },
+    "1021": {
+      "id": 1021,
+      "name": "left visual cortex",
+      "color": [
+        120,
+        100,
+        60
+      ]
+    },
+    "1022": {
+      "id": 1022,
+      "name": "left postcentral gyrus",
+      "color": [
+        195,
+        40,
+        40
+      ]
+    },
+    "1023": {
+      "id": 1023,
+      "name": "left posterior cingulate gyrus",
+      "color": [
+        220,
+        180,
+        220
+      ]
+    },
+    "1024": {
+      "id": 1024,
+      "name": "left precentral gyrus",
+      "color": [
+        95,
+        75,
+        175
+      ]
+    },
+    "1025": {
+      "id": 1025,
+      "name": "left precuneus",
+      "color": [
+        160,
+        140,
+        180
+      ]
+    },
+    "1026": {
+      "id": 1026,
+      "name": "rostral part of left anterior cingulate gyrus",
+      "color": [
+        80,
+        20,
+        140
+      ]
+    },
+    "1027": {
+      "id": 1027,
+      "name": "anterior part of left middle frontal gyrus",
+      "color": [
+        75,
+        50,
+        125
+      ]
+    },
+    "1028": {
+      "id": 1028,
+      "name": "left superior frontal gyrus",
+      "color": [
+        50,
+        160,
+        150
+      ]
+    },
+    "1029": {
+      "id": 1029,
+      "name": "left superior parietal lobule",
+      "color": [
+        20,
+        180,
+        140
+      ]
+    },
+    "1030": {
+      "id": 1030,
+      "name": "left superior temporal gyrus",
+      "color": [
+        140,
+        220,
+        220
+      ]
+    },
+    "1031": {
+      "id": 1031,
+      "name": "left supramarginal gyrus",
+      "color": [
+        80,
+        160,
+        20
+      ]
+    },
+    "1032": {
+      "id": 1032,
+      "name": "left frontal pole",
+      "color": [
+        100,
+        0,
+        100
+      ]
+    },
+    "1033": {
+      "id": 1033,
+      "name": "left temporal pole",
+      "color": [
+        70,
+        70,
+        70
+      ]
+    },
+    "1034": {
+      "id": 1034,
+      "name": "left transverse temporal gyrus",
+      "color": [
+        150,
+        150,
+        200
+      ]
+    },
+    "1035": {
+      "id": 1035,
+      "name": "left limen insulae",
+      "color": [
+        145,
+        50,
+        65
+      ]
+    },
+    "2000": {
+      "id": 2000,
+      "name": "right insula",
+      "color": [
+        125,
+        5,
+        25
+      ]
+    },
+    "2001": {
+      "id": 2001,
+      "name": "right superior temporal gyrus (banks of right superior temporal sulcus)",
+      "color": [
+        25,
+        100,
+        40
+      ]
+    },
+    "2002": {
+      "id": 2002,
+      "name": "caudal part of right anterior cingulate gyrus",
+      "color": [
+        125,
+        100,
+        160
+      ]
+    },
+    "2003": {
+      "id": 2003,
+      "name": "posterior part of right middle frontal gyrus",
+      "color": [
+        100,
+        25,
+        0
+      ]
+    },
+    "2005": {
+      "id": 2005,
+      "name": "right cuneus",
+      "color": [
+        220,
+        20,
+        100
+      ]
+    },
+    "2006": {
+      "id": 2006,
+      "name": "right ambiens gyrus",
+      "color": [
+        185,
+        15,
+        10
+      ]
+    },
+    "2007": {
+      "id": 2007,
+      "name": "right fusiform gyrus",
+      "color": [
+        180,
+        220,
+        140
+      ]
+    },
+    "2008": {
+      "id": 2008,
+      "name": "right inferior parietal lobule",
+      "color": [
+        185,
+        90,
+        185
+      ]
+    },
+    "2009": {
+      "id": 2009,
+      "name": "right inferior temporal gyrus",
+      "color": [
+        180,
+        40,
+        120
+      ]
+    },
+    "2010": {
+      "id": 2010,
+      "name": "isthmus of right cingulate gyrus",
+      "color": [
+        140,
+        20,
+        140
+      ]
+    },
+    "2011": {
+      "id": 2011,
+      "name": "right lateral occipital gyrus",
+      "color": [
+        20,
+        30,
+        140
+      ]
+    },
+    "2012": {
+      "id": 2012,
+      "name": "right lateral orbital gyrus",
+      "color": [
+        35,
+        75,
+        50
+      ]
+    },
+    "2013": {
+      "id": 2013,
+      "name": "right lingual gyrus",
+      "color": [
+        225,
+        140,
+        140
+      ]
+    },
+    "2014": {
+      "id": 2014,
+      "name": "right straight gyrus",
+      "color": [
+        200,
+        35,
+        75
+      ]
+    },
+    "2015": {
+      "id": 2015,
+      "name": "right middle temporal gyrus",
+      "color": [
+        160,
+        100,
+        50
+      ]
+    },
+    "2016": {
+      "id": 2016,
+      "name": "right parahippocampal gyrus",
+      "color": [
+        244,
+        244,
+        24
+      ]
+    },
+    "2017": {
+      "id": 2017,
+      "name": "right paracentral lobule",
+      "color": [
+        60,
+        175,
+        80
+      ]
+    },
+    "2018": {
+      "id": 2018,
+      "name": "opercular part of right inferior frontal gyrus",
+      "color": [
+        220,
+        180,
+        140
+      ]
+    },
+    "2019": {
+      "id": 2019,
+      "name": "orbital part of right inferior frontal gyrus",
+      "color": [
+        220,
+        140,
+        180
+      ]
+    },
+    "2020": {
+      "id": 2020,
+      "name": "triangular part of right inferior frontal gyrus",
+      "color": [
+        220,
+        60,
+        20
+      ]
+    },
+    "2021": {
+      "id": 2021,
+      "name": "right visual cortex",
+      "color": [
+        120,
+        100,
+        60
+      ]
+    },
+    "2022": {
+      "id": 2022,
+      "name": "right postcentral gyrus",
+      "color": [
+        195,
+        40,
+        40
+      ]
+    },
+    "2023": {
+      "id": 2023,
+      "name": "right posterior cingulate gyrus",
+      "color": [
+        220,
+        180,
+        220
+      ]
+    },
+    "2024": {
+      "id": 2024,
+      "name": "right precentral gyrus",
+      "color": [
+        95,
+        75,
+        175
+      ]
+    },
+    "2025": {
+      "id": 2025,
+      "name": "right precuneus",
+      "color": [
+        160,
+        140,
+        180
+      ]
+    },
+    "2026": {
+      "id": 2026,
+      "name": "rostral part of right anterior cingulate gyrus",
+      "color": [
+        80,
+        20,
+        140
+      ]
+    },
+    "2027": {
+      "id": 2027,
+      "name": "anterior part of right middle frontal gyrus",
+      "color": [
+        75,
+        50,
+        125
+      ]
+    },
+    "2028": {
+      "id": 2028,
+      "name": "right superior frontal gyrus",
+      "color": [
+        50,
+        160,
+        150
+      ]
+    },
+    "2029": {
+      "id": 2029,
+      "name": "right superior parietal lobule",
+      "color": [
+        20,
+        180,
+        140
+      ]
+    },
+    "2030": {
+      "id": 2030,
+      "name": "right superior temporal gyrus",
+      "color": [
+        140,
+        220,
+        220
+      ]
+    },
+    "2031": {
+      "id": 2031,
+      "name": "right supramarginal gyrus",
+      "color": [
+        80,
+        160,
+        20
+      ]
+    },
+    "2032": {
+      "id": 2032,
+      "name": "right frontal pole",
+      "color": [
+        100,
+        0,
+        100
+      ]
+    },
+    "2033": {
+      "id": 2033,
+      "name": "right temporal pole",
+      "color": [
+        70,
+        70,
+        70
+      ]
+    },
+    "2034": {
+      "id": 2034,
+      "name": "right transverse temporal gyrus",
+      "color": [
+        150,
+        150,
+        200
+      ]
+    },
+    "2035": {
+      "id": 2035,
+      "name": "right limen insulae",
+      "color": [
+        145,
+        50,
+        65
+      ]
+    },
+    "2108": {
+      "id": 2108,
+      "name": "right angular and supramarginal gyri (obsolete label)",
+      "color": [
+        230,
+        250,
+        230
+      ]
+    },
+    "3000": {
+      "id": 3000,
+      "name": "right claustrum",
+      "color": [
+        230,
+        155,
+        215
+      ]
+    },
+    "3001": {
+      "id": 3001,
+      "name": "left claustrum",
+      "color": [
+        230,
+        155,
+        215
+      ]
+    },
+    "3002": {
+      "id": 3002,
+      "name": "right mammillary body",
+      "color": [
+        155,
+        230,
+        255
+      ]
+    },
+    "3003": {
+      "id": 3003,
+      "name": "left mammillary body",
+      "color": [
+        155,
+        230,
+        255
+      ]
+    },
+    "3004": {
+      "id": 3004,
+      "name": "corpus callosum",
+      "color": [
+        97,
+        113,
+        158
+      ]
+    },
+    "3005": {
+      "id": 3005,
+      "name": "right fornix of forebrain",
+      "color": [
+        64,
+        123,
+        147
+      ]
+    },
+    "3007": {
+      "id": 3007,
+      "name": "left fornix of forebrain",
+      "color": [
+        64,
+        123,
+        147
+      ]
+    },
+    "3008": {
+      "id": 3008,
+      "name": "infundibulum of neurohypophysis",
+      "color": [
+        35,
+        195,
+        35
+      ]
+    },
+    "3011": {
+      "id": 3011,
+      "name": "adenohypophysis",
+      "color": [
+        60,
+        143,
+        83
+      ]
+    },
+    "3012": {
+      "id": 3012,
+      "name": "neurohypophysis",
+      "color": [
+        92,
+        162,
+        109
+      ]
+    },
+    "3020": {
+      "id": 3020,
+      "name": "right superior colliculus",
+      "color": [
+        241,
+        214,
+        145
+      ]
+    },
+    "3021": {
+      "id": 3021,
+      "name": "left superior colliculus",
+      "color": [
+        221,
+        130,
+        101
+      ]
+    },
+    "3022": {
+      "id": 3022,
+      "name": "right inferior colliculus",
+      "color": [
+        177,
+        122,
+        101
+      ]
+    },
+    "3023": {
+      "id": 3023,
+      "name": "left inferior colliculus",
+      "color": [
+        111,
+        184,
+        210
+      ]
+    },
+    "3030": {
+      "id": 3030,
+      "name": "brachia of right superior colliculus",
+      "color": [
+        145,
+        140,
+        220
+      ]
+    },
+    "3031": {
+      "id": 3031,
+      "name": "brachia of left superior colliculus",
+      "color": [
+        175,
+        240,
+        140
+      ]
+    },
+    "3032": {
+      "id": 3032,
+      "name": "brachia of right inferior colliculus",
+      "color": [
+        120,
+        210,
+        210
+      ]
+    },
+    "3033": {
+      "id": 3033,
+      "name": "brachia of left inferior colliculus",
+      "color": [
+        140,
+        140,
+        114
+      ]
+    },
+    "4001": {
+      "id": 4001,
+      "name": "left temporalis",
+      "color": [
+        153,
+        0,
+        51
+      ]
+    },
+    "4002": {
+      "id": 4002,
+      "name": "right temporalis",
+      "color": [
+        153,
+        0,
+        51
+      ]
+    },
+    "4003": {
+      "id": 4003,
+      "name": "left masseter",
+      "color": [
+        133,
+        0,
+        51
+      ]
+    },
+    "4004": {
+      "id": 4004,
+      "name": "right masseter",
+      "color": [
+        133,
+        0,
+        51
+      ]
+    },
+    "4005": {
+      "id": 4005,
+      "name": "left lateral pterygoid",
+      "color": [
+        110,
+        0,
+        51
+      ]
+    },
+    "4006": {
+      "id": 4006,
+      "name": "right lateral pterygoid",
+      "color": [
+        110,
+        0,
+        51
+      ]
+    },
+    "4007": {
+      "id": 4007,
+      "name": "left medial pterygoid",
+      "color": [
+        90,
+        0,
+        51
+      ]
+    },
+    "4008": {
+      "id": 4008,
+      "name": "right medial pterygoid",
+      "color": [
+        90,
+        0,
+        51
+      ]
+    },
+    "4011": {
+      "id": 4011,
+      "name": "left medial rectus",
+      "color": [
+        90,
+        79,
+        130
+      ]
+    },
+    "4012": {
+      "id": 4012,
+      "name": "right medial rectus",
+      "color": [
+        90,
+        79,
+        130
+      ]
+    },
+    "4013": {
+      "id": 4013,
+      "name": "left superior rectus",
+      "color": [
+        111,
+        88,
+        147
+      ]
+    },
+    "4014": {
+      "id": 4014,
+      "name": "right superior rectus",
+      "color": [
+        111,
+        88,
+        147
+      ]
+    },
+    "4015": {
+      "id": 4015,
+      "name": "left superior oblique",
+      "color": [
+        123,
+        98,
+        130
+      ]
+    },
+    "4016": {
+      "id": 4016,
+      "name": "right superior oblique",
+      "color": [
+        123,
+        98,
+        130
+      ]
+    },
+    "4017": {
+      "id": 4017,
+      "name": "left inferior rectus",
+      "color": [
+        135,
+        108,
+        144
+      ]
+    },
+    "4018": {
+      "id": 4018,
+      "name": "right inferior rectus",
+      "color": [
+        135,
+        108,
+        144
+      ]
+    },
+    "4019": {
+      "id": 4019,
+      "name": "left lateral rectus",
+      "color": [
+        150,
+        120,
+        160
+      ]
+    },
+    "4020": {
+      "id": 4020,
+      "name": "right lateral rectus",
+      "color": [
+        150,
+        120,
+        160
+      ]
+    },
+    "4021": {
+      "id": 4021,
+      "name": "left levator palpebrae superioris",
+      "color": [
+        170,
+        120,
+        160
+      ]
+    },
+    "4022": {
+      "id": 4022,
+      "name": "right levator palpebrae superioris",
+      "color": [
+        170,
+        120,
+        160
+      ]
+    },
+    "4027": {
+      "id": 4027,
+      "name": "left eyeball",
+      "color": [
+        163,
+        191,
+        218
+      ]
+    },
+    "4028": {
+      "id": 4028,
+      "name": "right eyeball",
+      "color": [
+        163,
+        191,
+        218
+      ]
+    },
+    "4030": {
+      "id": 4030,
+      "name": "uvula",
+      "color": [
+        180,
+        75,
+        20
+      ]
+    },
+    "4031": {
+      "id": 4031,
+      "name": "left tensor veli palatini",
+      "color": [
+        165,
+        85,
+        25
+      ]
+    },
+    "4032": {
+      "id": 4032,
+      "name": "right tensor veli palatini",
+      "color": [
+        165,
+        85,
+        25
+      ]
+    },
+    "4033": {
+      "id": 4033,
+      "name": "left palatoglossus",
+      "color": [
+        210,
+        85,
+        25
+      ]
+    },
+    "4034": {
+      "id": 4034,
+      "name": "right palatoglossus",
+      "color": [
+        210,
+        85,
+        25
+      ]
+    },
+    "4035": {
+      "id": 4035,
+      "name": "left levator veli palatini",
+      "color": [
+        235,
+        85,
+        25
+      ]
+    },
+    "4036": {
+      "id": 4036,
+      "name": "right levator veli palatini",
+      "color": [
+        235,
+        85,
+        25
+      ]
+    },
+    "4037": {
+      "id": 4037,
+      "name": "left palatopharyngeus",
+      "color": [
+        198,
+        85,
+        25
+      ]
+    },
+    "4038": {
+      "id": 4038,
+      "name": "right palatopharyngeus",
+      "color": [
+        198,
+        85,
+        25
+      ]
+    },
+    "4041": {
+      "id": 4041,
+      "name": "left zygomaticus major",
+      "color": [
+        200,
+        125,
+        125
+      ]
+    },
+    "4042": {
+      "id": 4042,
+      "name": "right zygomaticus major",
+      "color": [
+        200,
+        125,
+        125
+      ]
+    },
+    "4043": {
+      "id": 4043,
+      "name": "left nasalis",
+      "color": [
+        220,
+        125,
+        125
+      ]
+    },
+    "4044": {
+      "id": 4044,
+      "name": "right nasalis",
+      "color": [
+        220,
+        125,
+        125
+      ]
+    },
+    "4045": {
+      "id": 4045,
+      "name": "left levator labii superioris",
+      "color": [
+        210,
+        125,
+        125
+      ]
+    },
+    "4046": {
+      "id": 4046,
+      "name": "right levator labii superioris",
+      "color": [
+        210,
+        125,
+        125
+      ]
+    },
+    "4047": {
+      "id": 4047,
+      "name": "left buccinator",
+      "color": [
+        190,
+        125,
+        125
+      ]
+    },
+    "4048": {
+      "id": 4048,
+      "name": "right buccinator",
+      "color": [
+        190,
+        125,
+        125
+      ]
+    },
+    "4050": {
+      "id": 4050,
+      "name": "tongue",
+      "color": [
+        166,
+        84,
+        94
+      ]
+    },
+    "4051": {
+      "id": 4051,
+      "name": "left hyoglossus",
+      "color": [
+        180,
+        115,
+        115
+      ]
+    },
+    "4052": {
+      "id": 4052,
+      "name": "right hyoglossus",
+      "color": [
+        180,
+        115,
+        115
+      ]
+    },
+    "4060": {
+      "id": 4060,
+      "name": "middle constrictor",
+      "color": [
+        150,
+        70,
+        70
+      ]
+    },
+    "4061": {
+      "id": 4061,
+      "name": "left stylopharyngeus",
+      "color": [
+        180,
+        70,
+        70
+      ]
+    },
+    "4062": {
+      "id": 4062,
+      "name": "right stylopharyngeus",
+      "color": [
+        180,
+        70,
+        70
+      ]
+    },
+    "4071": {
+      "id": 4071,
+      "name": "left rectus capitis posterior minor",
+      "color": [
+        145,
+        80,
+        100
+      ]
+    },
+    "4072": {
+      "id": 4072,
+      "name": "right rectus capitis posterior minor",
+      "color": [
+        145,
+        80,
+        100
+      ]
+    },
+    "4073": {
+      "id": 4073,
+      "name": "left longissimus capitis",
+      "color": [
+        200,
+        100,
+        80
+      ]
+    },
+    "4074": {
+      "id": 4074,
+      "name": "right longissimus capitis",
+      "color": [
+        200,
+        100,
+        80
+      ]
+    },
+    "4075": {
+      "id": 4075,
+      "name": "left semispinalis capitis",
+      "color": [
+        255,
+        100,
+        80
+      ]
+    },
+    "4076": {
+      "id": 4076,
+      "name": "right semispinalis capitis",
+      "color": [
+        255,
+        100,
+        80
+      ]
+    },
+    "4077": {
+      "id": 4077,
+      "name": "left longus colli",
+      "color": [
+        215,
+        100,
+        80
+      ]
+    },
+    "4078": {
+      "id": 4078,
+      "name": "right longus colli",
+      "color": [
+        215,
+        100,
+        80
+      ]
+    },
+    "4079": {
+      "id": 4079,
+      "name": "left superior oblique capitis",
+      "color": [
+        200,
+        80,
+        100
+      ]
+    },
+    "4080": {
+      "id": 4080,
+      "name": "right superior oblique capitis",
+      "color": [
+        200,
+        80,
+        100
+      ]
+    },
+    "4081": {
+      "id": 4081,
+      "name": "left stylohyoid",
+      "color": [
+        175,
+        80,
+        100
+      ]
+    },
+    "4082": {
+      "id": 4082,
+      "name": "right stylohyoid",
+      "color": [
+        175,
+        80,
+        100
+      ]
+    },
+    "4083": {
+      "id": 4083,
+      "name": "left anterior rectus capitis",
+      "color": [
+        215,
+        100,
+        80
+      ]
+    },
+    "4084": {
+      "id": 4084,
+      "name": "right anterior rectus capitis",
+      "color": [
+        215,
+        100,
+        80
+      ]
+    },
+    "4085": {
+      "id": 4085,
+      "name": "left trapezius",
+      "color": [
+        155,
+        80,
+        100
+      ]
+    },
+    "4086": {
+      "id": 4086,
+      "name": "right trapezius",
+      "color": [
+        155,
+        80,
+        100
+      ]
+    },
+    "4087": {
+      "id": 4087,
+      "name": "left longus capitis",
+      "color": [
+        210,
+        80,
+        100
+      ]
+    },
+    "4088": {
+      "id": 4088,
+      "name": "right longus capitis",
+      "color": [
+        210,
+        80,
+        100
+      ]
+    },
+    "4089": {
+      "id": 4089,
+      "name": "left sternocleidomastoid",
+      "color": [
+        160,
+        80,
+        100
+      ]
+    },
+    "4090": {
+      "id": 4090,
+      "name": "right sternocleidomastoid",
+      "color": [
+        160,
+        80,
+        100
+      ]
+    },
+    "4091": {
+      "id": 4091,
+      "name": "left middle scalenus",
+      "color": [
+        165,
+        80,
+        100
+      ]
+    },
+    "4092": {
+      "id": 4092,
+      "name": "right middle scalenus",
+      "color": [
+        165,
+        80,
+        100
+      ]
+    },
+    "4093": {
+      "id": 4093,
+      "name": "left digastric",
+      "color": [
+        170,
+        80,
+        100
+      ]
+    },
+    "4094": {
+      "id": 4094,
+      "name": "right digastric",
+      "color": [
+        170,
+        80,
+        100
+      ]
+    },
+    "4095": {
+      "id": 4095,
+      "name": "left splenius capitis",
+      "color": [
+        180,
+        80,
+        100
+      ]
+    },
+    "4096": {
+      "id": 4096,
+      "name": "right splenius capitis",
+      "color": [
+        180,
+        80,
+        100
+      ]
+    },
+    "4097": {
+      "id": 4097,
+      "name": "left inferior oblique capitis",
+      "color": [
+        185,
+        80,
+        100
+      ]
+    },
+    "4098": {
+      "id": 4098,
+      "name": "right inferior oblique capitis",
+      "color": [
+        185,
+        80,
+        100
+      ]
+    },
+    "4099": {
+      "id": 4099,
+      "name": "left rectus capitis posterior major",
+      "color": [
+        215,
+        80,
+        100
+      ]
+    },
+    "4100": {
+      "id": 4100,
+      "name": "right rectus capitis posterior major",
+      "color": [
+        215,
+        80,
+        100
+      ]
+    },
+    "5001": {
+      "id": 5001,
+      "name": "left calcarine sulcus",
+      "color": [
+        126,
+        128,
+        9
+      ]
+    },
+    "5002": {
+      "id": 5002,
+      "name": "right calcarine sulcus",
+      "color": [
+        126,
+        128,
+        9
+      ]
+    },
+    "5003": {
+      "id": 5003,
+      "name": "left central sulcus",
+      "color": [
+        233,
+        227,
+        27
+      ]
+    },
+    "5004": {
+      "id": 5004,
+      "name": "right central sulcus",
+      "color": [
+        233,
+        227,
+        27
+      ]
+    },
+    "5005": {
+      "id": 5005,
+      "name": "left cingulate sulcus",
+      "color": [
+        38,
+        210,
+        26
+      ]
+    },
+    "5006": {
+      "id": 5006,
+      "name": "right cingulate sulcus",
+      "color": [
+        38,
+        210,
+        26
+      ]
+    },
+    "5007": {
+      "id": 5007,
+      "name": "left collateral sulcus",
+      "color": [
+        50,
+        227,
+        221
+      ]
+    },
+    "5008": {
+      "id": 5008,
+      "name": "right collateral sulcus",
+      "color": [
+        50,
+        227,
+        221
+      ]
+    },
+    "5009": {
+      "id": 5009,
+      "name": "left inferior frontal sulcus",
+      "color": [
+        241,
+        88,
+        66
+      ]
+    },
+    "5010": {
+      "id": 5010,
+      "name": "right inferior frontal sulcus",
+      "color": [
+        241,
+        88,
+        66
+      ]
+    },
+    "5011": {
+      "id": 5011,
+      "name": "left intraparietal sulcus",
+      "color": [
+        149,
+        124,
+        161
+      ]
+    },
+    "5012": {
+      "id": 5012,
+      "name": "right intraparietal sulcus",
+      "color": [
+        149,
+        124,
+        161
+      ]
+    },
+    "5013": {
+      "id": 5013,
+      "name": "left parieto-occipital sulcus",
+      "color": [
+        37,
+        123,
+        227
+      ]
+    },
+    "5014": {
+      "id": 5014,
+      "name": "right parieto-occipital sulcus",
+      "color": [
+        37,
+        123,
+        227
+      ]
+    },
+    "5015": {
+      "id": 5015,
+      "name": "left postcentral sulcus",
+      "color": [
+        204,
+        84,
+        204
+      ]
+    },
+    "5016": {
+      "id": 5016,
+      "name": "right postcentral sulcus",
+      "color": [
+        204,
+        84,
+        204
+      ]
+    },
+    "5017": {
+      "id": 5017,
+      "name": "left precentral sulcus",
+      "color": [
+        228,
+        152,
+        129
+      ]
+    },
+    "5018": {
+      "id": 5018,
+      "name": "right precentral sulcus",
+      "color": [
+        228,
+        152,
+        129
+      ]
+    },
+    "5019": {
+      "id": 5019,
+      "name": "left superior frontal sulcus",
+      "color": [
+        250,
+        240,
+        220
+      ]
+    },
+    "5020": {
+      "id": 5020,
+      "name": "right superior frontal sulcus",
+      "color": [
+        250,
+        240,
+        220
+      ]
+    },
+    "5021": {
+      "id": 5021,
+      "name": "left superior temporal sulcus",
+      "color": [
+        113,
+        128,
+        150
+      ]
+    },
+    "5022": {
+      "id": 5022,
+      "name": "right superior temporal sulcus",
+      "color": [
+        113,
+        128,
+        150
+      ]
+    }
+  }
+}

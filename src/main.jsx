@@ -334,7 +334,7 @@ function App() {
           setVolume(saved.volume);
           if (saved.settings) setSettings(saved.settings);
           else if (saved.volume.id === "slicer-tumor") setSettings((s) => ({...s, window: 90, level: 45}));
-          setSpatial((s) => ({...s, threshold: saved.volume.id === "slicer-tumor" ? 10 : 30}));
+          setSpatial((s) => ({...s, mode: saved.volume.atlas ? "atlas" : "solid", cut: !saved.volume.atlas, region: null, hemisphere: "both", atlasIsolate: false, threshold: saved.volume.id === "slicer-tumor" ? 10 : 30}));
           setPosition(saved.position);
           setEvents(saved.events || []);
           setRevision((r) => r + 1);
@@ -422,6 +422,15 @@ function App() {
       record("Manually edited proposal mask");
     }
   }
+  function selectAtlasRegion(id) {
+    const region = volume.atlas?.regions.find((r) => r.id === Number(id));
+    setSpatial((s) => ({...s, region: region?.id || null}));
+    if (region?.centroid) {
+      const [x,y,z] = region.centroid;
+      setPosition({axial:z, coronal:y, sagittal:x});
+      setPoint(null);
+    }
+  }
   function growSeed() {
     if (!point) return;
     try {
@@ -451,7 +460,7 @@ function App() {
   }
   function restore() {
     const v = phantom();
-    setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0}));
+    setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0, mode: "solid", region: null, cut: true, atlasIsolate: false}));
     setVolume(v);
     setPosition({ axial: 50, coronal: 47, sagittal: 48 });
     setHistory([]);
@@ -471,10 +480,10 @@ function App() {
     setLoadingStudy(true);
     try {
       const v = await loadResearchSample(sample);
-      setSettings((s) => ({...s, window: sample === "slicer-tumor" ? 90 : 210, level: sample === "slicer-tumor" ? 45 : 105}));
+      setSettings((s) => ({...s, window: sample === "spl-atlas" ? 100 : sample === "slicer-tumor" ? 90 : 210, level: sample === "spl-atlas" ? 50 : sample === "slicer-tumor" ? 45 : 105}));
       setVolume(v);
       setPosition(Object.fromEntries(axes.map((a) => [a, Math.floor(sliceCount(v, a) / 2)])));
-      setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0, threshold: sample === "slicer-tumor" ? 10 : 30}));
+      setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0, threshold: sample === "slicer-tumor" ? 10 : 30, mode: v.atlas ? "atlas" : "solid", cut: !v.atlas, region: null, hemisphere: "both", atlasIsolate: false}));
       setAxis("axial");
       setHistory([]);
       setFuture([]);
@@ -513,7 +522,7 @@ function App() {
         setRevision((r) => r + 1);
         setToast("Reference mask loaded. All nonzero labels are combined.");
       } else {
-        setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0}));
+        setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0, mode: "solid", region: null, cut: true, atlasIsolate: false}));
         setVolume(v);
         setPosition(
           Object.fromEntries(
@@ -637,6 +646,7 @@ function App() {
             context: {
               synthetic: volume.synthetic,
               caseContext: volume.caseContext,
+              selectedAtlasStructure: volume.atlas?.regions.find((r) => r.id === spatial.region)?.name || null,
               dims: volume.dims,
               axis,
               position,
@@ -777,7 +787,7 @@ function App() {
         privacy={privacy}
         setPrivacy={setPrivacy}
         setTheme={setTheme}
-        onHeadSelect={() => (volume.bundled ? setOverview(false) : openMni())}
+        onHeadSelect={() => (volume.atlas ? setOverview(false) : openMni("spl-atlas"))}
         loading={loadingStudy}
         hasStudy={volume.bundled}
         onResume={() => setOverview(false)}
@@ -931,6 +941,18 @@ function App() {
           >
             <Plus size={15} /> Open local volume
           </button>
+          {volume.atlas && <div className="atlas-browser">
+            <div className="panel-eyebrow">ANATOMY · {volume.atlas.regions.length} STRUCTURES</div>
+            <select aria-label="Atlas structure" value={spatial.region || ""} onChange={(e) => selectAtlasRegion(e.target.value)}>
+              <option value="">Explore structures</option>
+              {["Cortex", "Deep structures", "Ventricles", "White matter", "Cerebellum"].map((group) => <optgroup key={group} label={group}>{volume.atlas.regions.filter((r) => r.group === group).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</optgroup>)}
+            </select>
+            <select aria-label="Context hemisphere" value={spatial.hemisphere || "both"} onChange={(e) => setSpatial((s) => ({...s, hemisphere:e.target.value}))}><option value="both">Both hemispheres</option><option value="left">Left hemisphere</option><option value="right">Right hemisphere</option></select>
+            <label><input type="checkbox" checked={!!spatial.atlasIsolate} disabled={!spatial.region} onChange={(e) => setSpatial((s) => ({...s, atlasIsolate:e.target.checked}))} /> Isolate selected structure</label>
+            <label><input type="checkbox" checked={!!spatial.color} onChange={(e) => setSpatial((s) => ({...s, color:e.target.checked}))} /> Atlas colors</label>
+            {spatial.region && <p className="atlas-selected">{volume.atlas.regions.find((r) => r.id === spatial.region)?.name}</p>}
+            <a href="/data/spl-atlas/README.md" target="_blank" rel="noreferrer">Atlas source & attribution ↗</a>
+          </div>}
           <div className="sidebar-section">
             <div className="panel-eyebrow">
               ANNOTATIONS <span>02</span>
@@ -1142,7 +1164,7 @@ function App() {
               <div className="viewport-heading">
                 <span className="axis-dot spatial" />
                 <strong>{bodyContext ? "Body context" : "Head context"}</strong>
-                <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}><option value="solid">Solid</option><option value="context">Context</option></select>
+                <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}>{volume.atlas && <option value="atlas">Anatomy</option>}<option value="solid">Solid</option><option value="context">Context</option></select>
                 <IconButton
                   icon={Box}
                   label={
@@ -1166,6 +1188,7 @@ function App() {
                 <Scene
                   spatial={spatial}
                   displaySettings={settings}
+                  onAtlasSelect={selectAtlasRegion}
                   bodyContext={bodyContext}
                   privacy={privacy}
                   volume={volume}
@@ -1184,14 +1207,14 @@ function App() {
                     ? "Synthetic anatomy"
                     : bodyContext
                       ? "Generic body placement · illustrative"
-                      : spatial.mode === "solid" ? "Intensity volume · research view" : "Intensity surface · approximate"}
+                      : spatial.mode === "atlas" ? "Source anatomical surfaces · SPL/NAC" : spatial.mode === "solid" ? "Intensity volume · research view" : "Intensity surface · approximate"}
                 </span>
-                <span className="scene-caption mono">{spatial.mode === "solid" ? "Free cut plane" : `${cap(axis)} plane`}</span>
+                <span className="scene-caption mono">{spatial.mode === "solid" || spatial.mode === "atlas" ? (spatial.cut ? "Free cut plane" : "Whole anatomy") : `${cap(axis)} plane`}</span>
               </div>
-              {spatial.mode === "solid" && <div className="cut-controls">
+              {(spatial.mode === "solid" || spatial.mode === "atlas") && <div className="cut-controls">
                 <label><input type="checkbox" checked={spatial.cut} onChange={(e) => setSpatial((s) => ({...s, cut: e.target.checked}))} /> Cut plane</label>
                 {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -.7, .7, .01] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => setSpatial((s) => ({...s, [key]: +e.target.value}))} /></label>)}
-                <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>
+                {spatial.mode === "solid" && <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>}
                 {volume.tissues && <label><input type="checkbox" checked={spatial.color} onChange={(e) => setSpatial((s) => ({...s, color: e.target.checked}))} /> Tissue colors</label>}
                 <button onClick={() => setSpatial((s) => ({...s, pitch: 0, yaw: 0, offset: 0, isolate: "all"}))}>Reset cut</button>
               </div>}
@@ -1214,7 +1237,7 @@ function App() {
                 onSlice={changeSlice}
                 selected={axis === a}
                 onSelect={setAxis}
-                settings={{...settings, tissueColors: spatial.color}}
+                settings={{...settings, tissueColors: spatial.color, atlasRegion: spatial.region, atlasColors: spatial.color}}
                 tool={tool}
                 onPaint={paint}
                 onEnd={endStroke}

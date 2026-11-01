@@ -44,3 +44,14 @@ test-results/
 !public/data/research/*.nii.gz
 !public/data/research/*.md
 !public/data/research/*LICENSE.txt
+
+# Reviewed pinned SPL/NAC atlas derivatives
+!public/data/spl-atlas/
+!public/data/spl-atlas/t1.nii.gz
+!public/data/spl-atlas/labels.u16.gz
+!public/data/spl-atlas/surfaces.bin.gz
+!public/data/spl-atlas/atlas.json
+!public/data/spl-atlas/source-checksums.json
+!public/data/spl-atlas/README.md
+!public/data/spl-atlas/LICENSE.txt
+!public/data/spl-atlas/preview.png
