@@ -61,7 +61,8 @@ app.post("/api/assistant", async (req, res) => {
         .json({ error: "Ask a question under 2,000 characters." });
     const r = await client().chat.completions.create({
       model: process.env.META_MODEL || "muse-spark-1.3-contributor",
-      max_completion_tokens: 700,
+      max_completion_tokens: 1500,
+      reasoning_effort: "low",
       messages: [
         {
           role: "system",
@@ -115,6 +116,7 @@ app.post("/api/assistant", async (req, res) => {
         }
       })
       .filter(Boolean);
+    if (!m?.content && !calls.length) throw new Error("No usable model output");
     res.json({
       text:
         m?.content ||
