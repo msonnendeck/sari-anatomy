@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { slicePixels } from "./volume.mjs";
+import HumanBody from "./HumanBody.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
   const d = v.dims,
@@ -217,7 +218,11 @@ export default function Scene(props) {
   return (
     <Boundary>
       <Canvas
-        camera={{ position: [3, 2.1, 4.2], fov: 40 }}
+        key={props.bodyContext ? "body" : "head"}
+        camera={{
+          position: props.bodyContext ? [4, 1, 8.8] : [3, 2.1, 4.2],
+          fov: 40,
+        }}
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true }}
       >
@@ -232,16 +237,25 @@ export default function Scene(props) {
           intensity={1.5}
           color="#91acdf"
         />
-        <Anatomy {...props} />
+        {props.bodyContext ? (
+          <React.Suspense fallback={null}>
+            <HumanBody opacity={0.2} selected />
+            <group position={[0, 2.14, -0.02]} scale={0.18}>
+              <Anatomy {...props} />
+            </group>
+          </React.Suspense>
+        ) : (
+          <Anatomy {...props} />
+        )}
         <gridHelper
           args={[6, 24, "#34494c", "#233239"]}
-          position={[0, -1.65, 0]}
+          position={[0, props.bodyContext ? -2.55 : -1.65, 0]}
         />
         <OrbitControls
           makeDefault
           enablePan={false}
-          minDistance={3}
-          maxDistance={9}
+          minDistance={props.bodyContext ? 5 : 3}
+          maxDistance={props.bodyContext ? 12 : 9}
           autoRotate={props.rotate}
           autoRotateSpeed={0.4}
         />

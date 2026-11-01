@@ -1,7 +1,7 @@
 # SARI
 
 **Spatial Anatomy Research Interface**  
-*Anatomy in context.*
+_Anatomy in context._
 
 A web-based research workbench linking image slices, editable annotations, computed mask comparisons, and 3D spatial context.
 
@@ -39,9 +39,21 @@ The server binds to loopback only. Set `PORT` if 5187 is occupied. This is a sin
 - Explicit offline workspace commands when Meta is disconnected. These are deterministic commands, not simulated model replies.
 - Server-side Muse Spark navigation tool calling and SAM 3.1 point-prompt segmentation endpoints, disabled by default.
 
-## Included study
+## Included research data and body-first workflow
 
-The default study is a **procedurally generated 96³ T1-like brain phantom**, with a procedural reference mask and a deliberately perturbed proposal mask. It is not a real MRI, a clinically realistic simulation, an expert annotation, or model-generated output. The display is intended to exercise the workflow without patient data or third-party dataset distribution. All example overlap scores are computed from these synthetic masks.
+SARI opens on an interactive **BodyParts3D reference human body**. Click the head or choose **Head & brain** to load the **MNI ICBM152 2009c symmetric T1 MRI template** and its supplied whole-brain extraction mask. This template is an average derived from real MRI scans, not an individual patient scan. The bundled 2 mm derivatives retain the RAS-aligned grid and source copyright notice. The proposal starts empty; no model accuracy score is fabricated.
+
+The workspace's **Show full-body context** control places the study at the head of the generic body. This placement is illustrative, not patient-specific registration: the body and MRI come from different reference sources. Imported volumes remain in native voxel axes and must not be assumed to be anatomically aligned.
+
+The body mesh retains its original anatomical geometry; a separate opaque cloud covers the pelvis. Thorax/heart and neck/thyroid are shown only as future regions, not available studies. BodyParts3D attribution and the MRI source details are available through **Data & attribution** and the bundled notices.
+
+The original procedural 96³ T1-like brain phantom remains available as **Try synthetic study**. Its reference and deliberately perturbed proposal are synthetic, not expert annotations or model output.
+
+Source records and permissions:
+
+- [MNI template and transformation details](public/data/mni152/README.md), including the original [COPYING](public/data/mni152/COPYING).
+- [BodyParts3D attribution and adaptations](public/models/ATTRIBUTION.md).
+- Reproducible preparation scripts: `scripts/prepare-mni.mjs` and `scripts/prepare-body.mjs`.
 
 ## Connect Meta
 
@@ -61,16 +73,17 @@ Restart the server. The UI should show **Muse Spark connected** when the server 
 - API keys stay on the server; never use a `VITE_` prefix for secrets. No `.env` file belongs in Git.
 - Free-credit / Contributor terms may allow content to be used for product improvement or training. Dataset permission must cover the intended processing; public availability alone does not establish permission.
 
-The initial implementation was built and tested **without a Meta key**. Live Muse and SAM behavior, medical-image performance, credit deductions, and model availability have not been verified. No paid model calls were made during that verification.
+Initial offline implementation used no Meta key. Subsequently, account authentication, Muse Spark availability, SAM availability in the model catalog, and a live Muse navigation-tool response were verified. Live SAM segmentation, medical-image performance, and billing deductions remain unverified. No additional model requests were needed to integrate the bundled MRI and body assets.
 
 ## Try the workflow
 
-1. Open the synthetic study and select **Review largest difference**.
-2. Inspect the mint proposal and amber reference outline.
-3. Choose **Paint proposal mask** or **Erase proposal mask**, then draw on a slice.
-4. Observe the updated numeric overlap and 3D mask. Undo and redo the edit.
-5. Ask **Compare annotation overlap** or **Show the reference outline**.
-6. Export the research record. Reload to verify the current study is retained locally.
+1. On the body overview, click the head to open the real MNI template. Use **Show full-body context** to view its contextual head placement.
+2. For the prepared disagreement demonstration, choose **Try synthetic study** from the overview, then select **Review largest difference**.
+3. Inspect the mint proposal and amber reference outline.
+4. Choose **Paint proposal mask** or **Erase proposal mask**, then draw on a slice.
+5. Observe the updated numeric overlap and 3D mask. Undo and redo the edit.
+6. Ask **Compare annotation overlap** or **Show the reference outline**.
+7. Export the research record. Reload to verify the current study is retained locally.
 
 ## Local data and limitations
 
@@ -83,7 +96,7 @@ Imported data stays in the browser unless the user explicitly requests a SAM sli
 - At most ten in-session undo states are retained; undo history is not persisted.
 - AI generation, slice upload, and large imports can take time. Local file parsing is currently on the main thread.
 - The assistant is a bounded single-step tool caller, not yet a multi-turn autonomous research agent.
-- Real dataset selection, expert annotation review, reference-case retrieval, clinical evaluation, and live Meta feasibility testing remain outstanding.
+- Expert annotation review, additional reference cases, clinical evaluation, patient-specific registration, and live SAM feasibility testing remain outstanding. The supplied whole-brain mask is not ventricular ground truth; comparisons are meaningful only when proposal and reference target the same structure.
 
 ## Broader vision
 
@@ -114,4 +127,4 @@ The tests check known overlap values, worst-slice selection, deterministic phant
 - Visual workflow reference: [OHIF viewport documentation](https://docs.ohif.org/user-guide/viewer/viewport/). No OHIF code or images are included.
 - Meta integration references: [models](https://dev.meta.ai/docs/models), [media segmentation](https://dev.meta.ai/docs/media-segmentation), [SAM client libraries](https://dev.meta.ai/docs/sam/client-libraries).
 
-No third-party medical dataset or anatomical asset is distributed. The separately downloaded legal-agent workshop is not incorporated into this repository. All SARI application code in this repository was created during the hackathon.
+The attributed MNI template derivatives and adapted BodyParts3D reference skin mesh are bundled under the source permissions documented above. The separately downloaded legal-agent workshop is not incorporated into this repository. All SARI application code in this repository was created during the hackathon.

@@ -1710,3 +1710,633 @@ kbd {
 .study-art {
   flex-shrink: 0;
 }
+/* Body-first study selection */
+.body-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+.body-header {
+  height: 86px;
+  padding: 0 38px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+.body-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--mint);
+}
+.body-brand-mark {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1;
+}
+.body-brand > span:last-child {
+  font-size: 27px;
+  letter-spacing: 5px;
+  font-weight: 550;
+}
+.body-brand small {
+  display: block;
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.body-header-label {
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 1.8px;
+  color: var(--faint);
+  margin-left: 70px;
+}
+.body-header-right {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto;
+}
+.body-layout {
+  display: grid;
+  grid-template-columns: 310px minmax(300px, 1fr) 290px;
+  gap: 20px;
+  padding: 0 6%;
+  flex: 1;
+  min-height: 660px;
+  height: calc(100vh - 140px);
+  max-height: 1000px;
+  align-items: center;
+}
+.body-intro {
+  z-index: 2;
+  padding: 25px 0;
+}
+.body-intro > .panel-eyebrow {
+  font-size: 9px;
+  color: var(--mint);
+  letter-spacing: 1.4px;
+}
+.body-intro h1 {
+  font-size: 42px;
+  font-weight: 450;
+  letter-spacing: -2px;
+  line-height: 1.22;
+  margin: 25px 0 20px;
+}
+.body-intro h1 em {
+  font-style: normal;
+  color: var(--muted);
+}
+.body-intro > p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.body-region-list {
+  margin-top: 35px;
+  display: grid;
+  gap: 9px;
+}
+.body-region {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 13px;
+  padding: 16px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  width: 100%;
+  background: var(--panel);
+  min-height: 73px;
+}
+.body-region.enabled {
+  background: linear-gradient(110deg, var(--mint-soft), var(--panel));
+  border-color: color-mix(in srgb, var(--mint) 45%, var(--border));
+}
+.body-region.enabled:hover {
+  border-color: var(--mint);
+  box-shadow: 0 0 22px #80cfb908;
+}
+.body-region > .region-icon {
+  width: 32px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--mint);
+}
+.body-region > span:nth-child(2) {
+  flex: 1;
+}
+.body-region strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.body-region small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.body-region > svg {
+  color: var(--mint);
+}
+.body-region.future {
+  background: transparent;
+  opacity: 0.48;
+  border-style: dashed;
+}
+.future-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--faint);
+  margin-right: 5px;
+}
+.body-region.future > .region-icon {
+  color: var(--muted);
+}
+.body-alt-actions {
+  display: flex;
+  gap: 18px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.body-alt-actions button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: var(--muted);
+  padding: 0;
+}
+.body-alt-actions button:hover {
+  color: var(--mint);
+}
+.body-stage {
+  position: relative;
+  height: 100%;
+  min-height: 620px;
+  isolation: isolate;
+  align-self: stretch;
+}
+.body-stage
+  > div:not(.body-stage-grid):not(.body-stage-controls):not(.body-coordinate) {
+  height: 100% !important;
+}
+.body-stage-grid {
+  position: absolute;
+  inset: 8% -12% 4%;
+  background: radial-gradient(ellipse at center, #5c9d8b10, transparent 65%);
+  z-index: -1;
+  pointer-events: none;
+}
+.body-stage-grid:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 46px 46px;
+  opacity: 0.17;
+  mask-image: radial-gradient(ellipse, #000, transparent 65%);
+}
+.head-callout {
+  position: absolute;
+  top: 14%;
+  right: -5px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 5px;
+  padding: 10px 11px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font:
+    8px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.8px;
+  z-index: 3;
+  color: var(--mint);
+}
+.head-callout:before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 55px;
+  height: 1px;
+  background: var(--mint);
+  opacity: 0.6;
+}
+.head-callout:after {
+  content: "";
+  position: absolute;
+  right: calc(100% + 55px);
+  top: calc(50% - 2px);
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: var(--mint);
+}
+.head-hover .head-callout {
+  border-color: var(--mint);
+}
+.body-stage-controls {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  color: var(--muted);
+}
+.body-stage-controls > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 8px;
+}
+.body-coordinate {
+  position: absolute;
+  right: 12px;
+  bottom: 33px;
+  width: 30px;
+  height: 32px;
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+}
+.body-coordinate i {
+  display: block;
+  height: 22px;
+  width: 1px;
+  background: var(--faint);
+  position: absolute;
+  left: 14px;
+  top: 5px;
+}
+.body-coordinate i:after {
+  content: "";
+  position: absolute;
+  width: 23px;
+  height: 1px;
+  background: var(--faint);
+  top: 15px;
+  left: -9px;
+  transform: rotate(-25deg);
+}
+.body-coordinate > span {
+  position: absolute;
+  top: -3px;
+  left: 12px;
+  color: var(--mint);
+}
+.body-coordinate b {
+  position: absolute;
+  bottom: -4px;
+  left: -1px;
+  font-weight: 400;
+}
+.body-coordinate em {
+  position: absolute;
+  bottom: 1px;
+  right: -3px;
+  font-style: normal;
+}
+.body-study-card {
+  padding: 23px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  z-index: 2;
+}
+.body-study-card > .panel-eyebrow {
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.mri-thumbnail {
+  height: 146px;
+  margin: 20px 0;
+  background: #070c11;
+  border: 1px solid #27343b;
+  border-radius: 7px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.mri-thumbnail img {
+  height: 96%;
+  width: auto;
+  image-rendering: auto;
+  opacity: 0.94;
+}
+.mri-thumbnail > span {
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  font:
+    6px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 1px;
+  color: #94acae;
+  background: #070c11a0;
+  padding: 3px 5px;
+}
+.body-study-heading {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.template-label {
+  font:
+    6px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+.body-study-card h2 {
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
+  font-weight: 450;
+  margin: 17px 0 11px;
+}
+.body-study-card > p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.body-study-facts {
+  display: grid;
+  gap: 11px;
+  border-top: 1px solid var(--border);
+  padding-top: 17px;
+  margin-top: 20px;
+  font-size: 9px;
+}
+.body-study-facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 7px;
+}
+.body-study-facts span {
+  color: var(--muted);
+}
+.body-study-facts strong {
+  font-weight: 450;
+}
+.body-open-study {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--mint);
+  color: var(--bg);
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 23px;
+}
+.body-resume {
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 15px auto 0;
+  color: var(--mint);
+}
+.body-placement-note {
+  display: block;
+  font-size: 8px;
+  color: var(--faint);
+  line-height: 1.8;
+  margin-top: 15px;
+  text-align: center;
+}
+.body-footer {
+  height: 54px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 38px;
+  font-size: 8px;
+  color: var(--muted);
+  gap: 15px;
+}
+.body-footer > span:first-child {
+  display: flex;
+  align-items: center;
+}
+.body-footer > span:nth-child(2) {
+  color: var(--faint);
+}
+.body-footer > button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 8px;
+}
+.overview-loading {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+@media (min-width: 1700px) {
+  .body-layout {
+    grid-template-columns: 350px minmax(400px, 1fr) 330px;
+    padding: 0 8%;
+  }
+  .body-intro h1 {
+    font-size: 50px;
+  }
+  .body-study-card {
+    padding: 28px;
+  }
+  .mri-thumbnail {
+    height: 180px;
+  }
+  .body-region {
+    padding: 20px 15px;
+  }
+  .head-callout {
+    right: 8%;
+  }
+}
+@media (max-width: 1150px) {
+  .body-layout {
+    padding: 0 3%;
+    grid-template-columns: 260px minmax(250px, 1fr) 250px;
+    gap: 12px;
+  }
+  .body-intro h1 {
+    font-size: 35px;
+  }
+  .body-study-card {
+    padding: 18px;
+  }
+  .body-study-card h2 {
+    font-size: 22px;
+  }
+  .head-callout {
+    right: -15px;
+    font-size: 7px;
+    padding: 8px;
+  }
+  .head-callout:before {
+    width: 20px;
+  }
+  .head-callout:after {
+    right: calc(100% + 20px);
+  }
+  .body-header-label {
+    margin-left: 45px;
+    font-size: 8px;
+  }
+  .body-region small {
+    font-size: 8px;
+  }
+}
+@media (max-width: 850px) {
+  .body-layout {
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+    max-height: none;
+    padding: 25px;
+    min-height: 0;
+  }
+  .body-intro {
+    grid-column: 1;
+    padding: 15px 0;
+  }
+  .body-stage {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 580px;
+  }
+  .body-study-card {
+    grid-column: 1/3;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    column-gap: 25px;
+    margin-bottom: 20px;
+  }
+  .body-study-card > .panel-eyebrow {
+    grid-column: 1/3;
+  }
+  .body-study-card .mri-thumbnail {
+    grid-column: 1;
+    grid-row: 2/8;
+    height: 230px;
+    margin: 15px 0;
+  }
+  .body-study-heading {
+    margin-top: 15px;
+  }
+  .body-study-card h2 {
+    font-size: 22px;
+    margin: 10px 0;
+  }
+  .body-study-card h2 br {
+    display: none;
+  }
+  .body-study-card .body-open-study {
+    margin-top: 12px;
+  }
+  .body-placement-note {
+    grid-column: 1/3;
+    text-align: left;
+  }
+  .body-header-label {
+    display: none;
+  }
+  .body-footer > span:nth-child(2) {
+    display: none;
+  }
+  .head-callout {
+    right: 0;
+    top: 16%;
+  }
+  .body-stage-controls {
+    gap: 8px;
+  }
+  .body-stage-controls > span {
+    font-size: 7px;
+  }
+  .body-coordinate {
+    display: none;
+  }
+}
+@media (max-width: 550px) {
+  .body-header {
+    height: 73px;
+    padding: 0 20px;
+  }
+  .body-layout {
+    padding: 25px 20px;
+    grid-template-columns: 1fr;
+  }
+  .body-intro {
+    grid-row: 1;
+  }
+  .body-intro h1 {
+    font-size: 39px;
+  }
+  .body-intro > p {
+    font-size: 12px;
+  }
+  .body-region-list {
+    margin-top: 25px;
+  }
+  .body-stage {
+    grid-column: 1;
+    grid-row: 2;
+    height: 580px;
+  }
+  .body-study-card {
+    grid-column: 1;
+    display: block;
+  }
+  .body-study-card .mri-thumbnail {
+    height: 180px;
+  }
+  .body-study-card .mri-thumbnail img {
+    height: 96%;
+  }
+  .body-study-heading {
+    margin-top: 0;
+  }
+  .body-header-right .research-tag {
+    display: none;
+  }
+  .body-footer {
+    padding: 0 20px;
+    font-size: 7px;
+  }
+  .head-callout {
+    right: 12px;
+    top: 14%;
+  }
+  .body-study-card h2 {
+    margin-top: 18px;
+  }
+  .body-study-card h2 br {
+    display: block;
+  }
+}

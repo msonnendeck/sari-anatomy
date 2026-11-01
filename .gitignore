@@ -37,3 +37,4 @@ test-results/
 !public/data/mni152/COPYING
 !public/data/mni152/t1.nii.gz
 !public/data/mni152/brain-mask.nii.gz
+!public/data/mni152/preview.png

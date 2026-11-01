@@ -41,6 +41,7 @@ import {
   X,
 } from "lucide-react";
 const Scene = React.lazy(() => import("./Scene.jsx"));
+const BodyOverview = React.lazy(() => import("./BodyOverview.jsx"));
 import { loadSession, saveSession } from "./storage.mjs";
 import {
   phantom,
@@ -313,7 +314,9 @@ function App() {
     [samBusy, setSamBusy] = useState(false),
     [consent, setConsent] = useState(false),
     [hydrated, setHydrated] = useState(false),
-    [loadingStudy, setLoadingStudy] = useState(false);
+    [loadingStudy, setLoadingStudy] = useState(false),
+    [overview, setOverview] = useState(true),
+    [bodyContext, setBodyContext] = useState(false);
   useEffect(() => {
     loadSession()
       .then((saved) => {
@@ -431,6 +434,7 @@ function App() {
     setRevision((r) => r + 1);
     setModal(null);
     setToast("Synthetic study restored.");
+    setOverview(false);
   }
   async function openMni() {
     setLoadingStudy(true);
@@ -448,6 +452,7 @@ function App() {
       setZoom(1);
       setRevision((r) => r + 1);
       setModal(null);
+      setOverview(false);
       setToast(
         "MNI152 MRI template loaded. No AI proposal has been generated.",
       );
@@ -489,6 +494,7 @@ function App() {
         setConsent(false);
         setRevision((r) => r + 1);
         setModal(null);
+        setOverview(false);
         setToast(
           "Volume loaded locally. Native voxel axes; no anatomical reorientation.",
         );
@@ -516,7 +522,9 @@ function App() {
       },
       maskProvenance: volume.synthetic
         ? "Procedural reference and deliberately perturbed proposal; subsequent edits recorded below"
-        : "User-supplied reference / manual or SAM proposal",
+        : volume.bundled
+          ? "MNI supplied whole-brain extraction mask; proposal starts empty; subsequent edits recorded below"
+          : "User-supplied reference / manual or SAM proposal",
       metrics: { ...metrics, slices: metrics.slices },
       position,
       events,
@@ -598,12 +606,21 @@ function App() {
               axis,
               position,
               metrics: {
-                dice: metrics.dice,
-                difference: metrics.difference,
+                dice: metrics.countA && metrics.countB ? metrics.dice : null,
+                difference:
+                  metrics.countA && metrics.countB ? metrics.difference : null,
                 worstAxialSlice: metrics.worst,
                 maxSliceDifference: metrics.max,
               },
               referenceAvailable: metrics.countA > 0,
+              proposalAvailable: metrics.countB > 0,
+              referenceKind:
+                volume.referenceKind || "user-defined binary reference",
+              studyKind: volume.bundled
+                ? "population-average MRI template"
+                : volume.synthetic
+                  ? "synthetic phantom"
+                  : "local research volume",
             },
           }),
         });
@@ -716,7 +733,34 @@ function App() {
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, [axis, position, volume, history, future]);
-  return (
+  return overview ? (
+    <React.Suspense
+      fallback={<div className="overview-loading">Preparing SARI…</div>}
+    >
+      <BodyOverview
+        theme={theme}
+        setTheme={setTheme}
+        onHeadSelect={() => (volume.bundled ? setOverview(false) : openMni())}
+        loading={loadingStudy}
+        hasStudy={volume.bundled}
+        onResume={() => setOverview(false)}
+        onPhantom={restore}
+        onLocal={() => file.current.click()}
+      />
+      <input
+        type="file"
+        ref={file}
+        accept=".nii,.gz"
+        hidden
+        onChange={(e) => load(e)}
+      />
+      {toast && (
+        <div className="toast" role="status">
+          {toast}
+        </div>
+      )}
+    </React.Suspense>
+  ) : (
     <div className="app">
       <input
         type="file"
@@ -771,8 +815,8 @@ function App() {
           />
           <IconButton
             icon={Box}
-            label="3D anatomy settings"
-            onClick={() => setTab("display")}
+            label="Body overview"
+            onClick={() => setOverview(true)}
           />
           <IconButton
             icon={Waypoints}
@@ -1053,8 +1097,16 @@ function App() {
             <section className="scene-card">
               <div className="viewport-heading">
                 <span className="axis-dot spatial" />
-                <strong>Spatial context</strong>
+                <strong>{bodyContext ? "Body context" : "Head context"}</strong>
                 <span className="scene-badge">3D</span>
+                <IconButton
+                  icon={Box}
+                  label={
+                    bodyContext ? "Focus on head" : "Show full-body context"
+                  }
+                  active={bodyContext}
+                  onClick={() => setBodyContext((b) => !b)}
+                />
                 <IconButton
                   icon={RotateCcw}
                   label="Toggle slow 3D rotation"
@@ -1068,6 +1120,7 @@ function App() {
                 }
               >
                 <Scene
+                  bodyContext={bodyContext}
                   volume={volume}
                   slice={position[axis]}
                   axis={axis}
@@ -1082,7 +1135,9 @@ function App() {
                 <span className="scene-caption">
                   {volume.synthetic
                     ? "Synthetic anatomy"
-                    : "Intensity surface · approximate"}
+                    : bodyContext
+                      ? "Generic body placement · illustrative"
+                      : "Intensity surface · approximate"}
                 </span>
                 <span className="scene-caption mono">{cap(axis)} plane</span>
               </div>
