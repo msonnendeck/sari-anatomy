@@ -3,7 +3,9 @@
 **Spatial Anatomy Research Interface**  
 _Anatomy in context._
 
-A web-based research workbench linking image slices, editable annotations, computed mask comparisons, and 3D spatial context.
+A web-based research workbench for medical imaging professionals, researchers, and medical students. SARI assists exploration and analysis of medical visual data by linking image slices, editable research annotations, computed mask comparisons, and 3D spatial context.
+
+AI-generated regions are draft research proposals for expert review. SARI is not a patient-facing diagnostic or medical-advice service; professional use does not imply clinical validation.
 
 **Research use only. Not clinically validated. Not for diagnosis, treatment, or medical advice.**
 
