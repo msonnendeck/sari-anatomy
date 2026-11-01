@@ -55,6 +55,7 @@ import {
 } from "./volume.mjs";
 import { readVolume } from "./nifti.mjs";
 import { loadMniTemplate } from "./datasets.mjs";
+import SliceFilmstrip from "./SliceFilmstrip.jsx";
 import "./style.css";
 const axes = ["axial", "coronal", "sagittal"];
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
@@ -284,6 +285,8 @@ function App() {
     sagittal: 48,
   });
   const [axis, setAxis] = useState("axial");
+  const [layout, setLayout] = useState(() => localStorage.getItem("sari-layout") === "grid" ? "grid" : "anatomy");
+  useEffect(() => { localStorage.setItem("sari-layout", layout); }, [layout]);
   const [revision, setRevision] = useState(0);
   const [settings, setSettings] = useState({
     window: 210,
@@ -983,7 +986,7 @@ function App() {
             <small>Research use · Not clinically validated</small>
           </div>
         </aside>
-        <main className="main">
+        <main className={`main layout-${layout}`}>
           <div className="study-header">
             <div>
               <div className="breadcrumbs">
@@ -1010,10 +1013,15 @@ function App() {
                     : "Native voxel coordinates · anatomical orientation not inferred."}
               </p>
             </div>
+            <div className="study-actions">
+            <div className="layout-switch" role="group" aria-label="Workspace layout">
+              {["anatomy", "grid"].map((value) => <button key={value} aria-pressed={layout === value} onClick={() => setLayout(value)}>{value === "anatomy" ? "Anatomy" : "Four views"}</button>)}
+            </div>
             <button className="button secondary" onClick={exportSession}>
               <ArrowDownToLine size={15} />
               <span>Export review</span>
             </button>
+            </div>
           </div>
           <div className="toolbar">
             <div className="tool-group">
@@ -1175,6 +1183,7 @@ function App() {
               />
             ))}
           </div>
+          <SliceFilmstrip volume={volume} axis={axis} slice={position[axis]} onAxis={setAxis} onSlice={(s) => changeSlice(axis, s)} settings={settings} />
           <footer className="workspace-footer">
             <span>
               <span className="status-dot" /> Views synchronized{" "}

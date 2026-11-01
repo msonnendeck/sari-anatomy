@@ -128,3 +128,7 @@ The tests check known overlap values, worst-slice selection, deterministic phant
 - Meta integration references: [models](https://dev.meta.ai/docs/models), [media segmentation](https://dev.meta.ai/docs/media-segmentation), [SAM client libraries](https://dev.meta.ai/docs/sam/client-libraries).
 
 The attributed MNI template derivatives and adapted BodyParts3D reference skin mesh are bundled under the source permissions documented above. The separately downloaded legal-agent workshop is not incorporated into this repository. All SARI application code in this repository was created during the hackathon.
+
+### Workspace layouts
+
+Choose **Anatomy** for a large spatial view beside the three scan planes, or **Four views** for the original balanced grid. The choice is remembered locally. The bottom filmstrip shows sampled intensity previews of the active plane; click a thumbnail or use the continuous slider to navigate every slice. The current slice is always included and highlighted. Window and level settings also update the previews. Both layouts support light and dark themes.
