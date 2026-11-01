@@ -229,3 +229,9 @@ A click in a translucent volume picks the first threshold-passing foreground vox
 along the viewing ray (subject to the current cut and isolation mask); it does not
 infer which deeper structure the user intends. Orthogonal slice clicks specify a
 voxel directly. Point markers remain visible through surfaces for orientation.
+
+## Spatial inspection workspace
+
+Use **Expand 3D view** in the spatial viewer header to inspect anatomy at workspace size. Return restores the existing Anatomy or Four views layout with the same camera and annotations. **Fit to visible content** and **Reset camera** recover framing after zoom or rendering-mode changes. Cut-plane and isolation settings are in the collapsible **3D inspector** above the canvases.
+
+Drag the workspace dividers or focus one and use arrow keys to resize panels. The rail toggles the study library and assistant. On narrow desktop widths the assistant stays alongside the images; below mobile widths it becomes a drawer. See [Chrome verification](docs/spatial-inspection-verification-2026-11-01.md).

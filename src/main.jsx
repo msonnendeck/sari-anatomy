@@ -60,6 +60,7 @@ import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
+import {eventPresentation,studyHelp} from "./review-presentation.mjs";
 import WorkspaceResize from "./WorkspaceResize.jsx";
 import EvidenceDialog from "./EvidenceDialog.jsx";
 import RoiDialog,{captureRoiFrame} from "./RoiDialog.jsx";
@@ -1110,12 +1111,13 @@ function App() {
               <FileUp size={13} /> Import reference mask
             </button>
           </div>
-          {volume.roiProvenance && <details className="roi-history"><summary>Last guided ROI · {volume.roiProvenance.frames.length} planes</summary><p>{volume.roiProvenance.target}</p><p>{volume.roiProvenance.summary}</p><p>{volume.roiProvenance.limitations}</p><small>{volume.roiProvenance.conflicts} intersection conflicts excluded. Sampled planes only. Subsequent edits are recorded in Activity.</small></details>}
+          {volume.roiProvenance && <details className="roi-history"><summary>Last guided ROI · {volume.roiProvenance.frames.length} planes</summary><p>{volume.roiProvenance.target}</p><p>{volume.roiProvenance.summary}</p><p>{volume.roiProvenance.limitations}</p><strong>Intersecting sampled masks</strong><p>{volume.roiProvenance.conflicts} conflicting voxels / {volume.roiProvenance.compared} compared; conflicts excluded.</p><small>Sampled planes only. This compares predictions with one another, not with the reference. Subsequent edits are recorded in Activity.</small></details>}
           <div className="review-card">
-            <div className="panel-eyebrow">CURRENT SLICE · 2D DICE</div>
+            <div className="panel-eyebrow">PROPOSAL / REFERENCE · CURRENT SLICE</div>
+            {volume.roiProvenance && <small className="coverage-label">Last guided run: sampled planes only</small>}
             <div className="score">{sliceAgreement.reference && sliceAgreement.proposal ? `${(sliceAgreement.dice*100).toFixed(1)}%` : "—"}</div>
-            <div className="score-meta">{cap(axis)} {position[axis]+1} · source / proposal agreement</div>
-            <div className="panel-eyebrow">WHOLE VOLUME</div>
+            <div className="score-meta">{cap(axis)} {position[axis]+1} · 2D Dice overlap</div>
+            <div className="panel-eyebrow">WHOLE-VOLUME OVERLAP</div>
             <div className="score">
               {metrics.countA && metrics.countB ? (
                 <>
@@ -1139,6 +1141,7 @@ function App() {
                 ? `${metrics.difference.toLocaleString()} differing voxels`
                 : "Add a proposal to compare"}
             </div>
+            <small className="coverage-label">Overlap is not confidence or independent model accuracy.</small>
             <button onClick={worst}>
               Review largest difference <ArrowRight size={14} />
             </button>
@@ -1188,6 +1191,11 @@ function App() {
               <span>Export review</span>
             </button>
             </div>
+          </div>
+          <div className="research-context" aria-label="Research target context">
+            <span>Selected anatomy <strong>{volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || "None"}</strong></span>
+            <span>Reference <strong>{volume.referenceLabel || (metrics.countA?"Imported mask":"None")}</strong></span>
+            <span>Proposal <strong>{metrics.countB?(volume.roiProvenance?.target || "Editable mask"):"None"}</strong></span>
           </div>
           <div className="toolbar">
             <div className="tool-group">
@@ -1246,7 +1254,7 @@ function App() {
               />
             </div>
             <div className="toolbar-right">
-              <button className="quiet-button" disabled={!point} onClick={growSeed} title="Replace proposal with connected voxels within ±12 intensity of the seed"><Crosshair size={14} /><span>Grow region</span></button>
+              <button className="quiet-button" aria-label="Grow region" disabled={!point} onClick={growSeed} title="Replace proposal with connected voxels within ±12 intensity of the seed"><Crosshair size={14} /><span>Grow region</span></button>
               <button
                 className="quiet-button" aria-label="Display" title="Display"
                 onClick={() => {setTab("display");setAssistantCollapsed(false);}}
@@ -1254,9 +1262,9 @@ function App() {
                 <SlidersHorizontal size={14} />
                 <span>Display</span>
               </button>
-              <button className="quiet-button" disabled={samBusy||busy} onClick={openRoi}><Focus size={14}/> Guided ROI</button>
+              <button className="quiet-button" aria-label="Guided ROI" title="Guided ROI" disabled={samBusy||busy} onClick={openRoi}><Focus size={14}/> Guided ROI</button>
               <button
-                className="sam-button"
+                className="sam-button" aria-label="SAM proposal" title="SAM proposal"
                 onClick={segment}
                 disabled={samBusy}
               >
@@ -1442,6 +1450,7 @@ function App() {
                 {status.enabled ? "Muse Spark connected" : "Local exploration"}
                 <ChevronRight size={12} />
               </button>
+              <div className="assistant-target">Selected anatomy: <strong>{volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || "None"}</strong></div>
               <button className="quiet-button" disabled={!status.enabled} onClick={()=>setEvidenceOpen(true)}><Layers size={14}/> Explore literature</button>
               <div className="assistant-messages">
                 {!messages.length ? (
@@ -1635,7 +1644,8 @@ function App() {
                   <div className="event" key={i}>
                     <span className="status-dot" />
                     <div>
-                      {e.text}
+                      <span>{eventPresentation(e.text,volume.atlas?.regions).title}</span>
+                      {eventPresentation(e.text,volume.atlas?.regions).details && <details className="event-details"><summary>Technical record</summary><pre>{e.text}</pre></details>}
                       <small>
                         {new Date(e.time).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -1667,7 +1677,7 @@ function App() {
           </button>
         </div>
       )}
-      {evidenceOpen && <EvidenceDialog region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
+      {evidenceOpen && <EvidenceDialog initialResult={volume.literatureSearches?.at(-1)} region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
       {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (
         <div className="modal-backdrop" onClick={() => setModal(null)}>
@@ -1803,10 +1813,10 @@ function App() {
                   <span>Computed across axial slices</span>
                 </div>
                 <p className="fine-print">
-                  The included phantom and both masks are procedurally
-                  generated, not patient data or AI output. Dice is an overlap
-                  metric, not clinical validity. Research only. No diagnosis,
-                  treatment, or medical advice.
+                  {studyHelp(volume)}
+                </p>
+                <p className="fine-print">
+                  Dice measures proposal-versus-reference overlap. Intersection conflicts compare sampled predictions with one another. Neither is confidence or clinical accuracy. Research only; no diagnosis, treatment, or medical advice.
                 </p>
               </>
             )}
