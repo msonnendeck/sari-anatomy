@@ -60,6 +60,7 @@ import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
+import EvidenceDialog from "./EvidenceDialog.jsx";
 import RoiDialog,{captureRoiFrame} from "./RoiDialog.jsx";
 import {seedViews} from "./roi.mjs";
 import StudyPreview from "./StudyPreview.jsx";
@@ -315,6 +316,7 @@ function App() {
     [rotate, setRotate] = useState(false),
     [tab, setTab] = useState("assistant");
   const [roiJob,setRoiJob]=useState(null);
+  const [evidenceOpen,setEvidenceOpen]=useState(false);
   const latestRevision=useRef(revision);latestRevision.current=revision;
   const [messages, setMessages] = useState([]),
     [input, setInput] = useState(""),
@@ -498,6 +500,7 @@ function App() {
     setFuture((f) => [...f, volume.proposal.slice()]);
     volume.proposal.set(history.at(-1));
     setHistory((h) => h.slice(0, -1));
+    record("Undid proposal edit; last generation record retained as history");
     setRevision((r) => r + 1);
   }
   function redo() {
@@ -505,6 +508,7 @@ function App() {
     setHistory((h) => [...h, volume.proposal.slice()]);
     volume.proposal.set(future.at(-1));
     setFuture((f) => f.slice(0, -1));
+    record("Redid proposal edit");
     setRevision((r) => r + 1);
   }
   function restore() {
@@ -613,6 +617,7 @@ function App() {
         orientation: volume.orientation,
       },
       roiProvenance: volume.roiProvenance || null,
+      literatureSearches: volume.literatureSearches || [],
       maskProvenance: volume.synthetic
         ? "Procedural reference and deliberately perturbed proposal; subsequent edits recorded below"
         : volume.bundled
@@ -1096,6 +1101,7 @@ function App() {
               <FileUp size={13} /> Import reference mask
             </button>
           </div>
+          {volume.roiProvenance && <details className="roi-history"><summary>Last guided ROI · {volume.roiProvenance.frames.length} planes</summary><p>{volume.roiProvenance.target}</p><p>{volume.roiProvenance.summary}</p><p>{volume.roiProvenance.limitations}</p><small>{volume.roiProvenance.conflicts} intersection conflicts excluded. Sampled planes only. Subsequent edits are recorded in Activity.</small></details>}
           <div className="review-card">
             <div className="panel-eyebrow">CURRENT SLICE · 2D DICE</div>
             <div className="score">{sliceAgreement.reference && sliceAgreement.proposal ? `${(sliceAgreement.dice*100).toFixed(1)}%` : "—"}</div>
@@ -1416,6 +1422,7 @@ function App() {
                 {status.enabled ? "Muse Spark connected" : "Local exploration"}
                 <ChevronRight size={12} />
               </button>
+              <button className="quiet-button" disabled={!status.enabled} onClick={()=>setEvidenceOpen(true)}><Layers size={14}/> Explore literature</button>
               <div className="assistant-messages">
                 {!messages.length ? (
                   <div className="empty-conversation">
@@ -1640,6 +1647,7 @@ function App() {
           </button>
         </div>
       )}
+      {evidenceOpen && <EvidenceDialog region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
       {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (
         <div className="modal-backdrop" onClick={() => setModal(null)}>

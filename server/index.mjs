@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import {installEvidenceRoute} from "./evidence.mjs";
 import {installRoiRoutes} from "./roi-api.mjs";
 import { expandMask } from "./sam-mask.mjs";
 import { validAction, conversationHistory } from "../src/assistant-actions.mjs";
@@ -240,6 +241,7 @@ app.post("/api/segment", async (req, res) => {
       });
   }
 });
+installEvidenceRoute(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 installRoiRoutes(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 app.use((err, req, res, next) =>
   res.status(400).json({ error: "Invalid request body." }),

@@ -2420,3 +2420,9 @@ kbd {
 .roi-rationale p {font-size:13px;}.roi-rationale small {color:var(--muted);}
 .roi-dialog .button {margin:10px 8px 0 0;}
 @media(max-width:650px){.roi-views{grid-template-columns:1fr;}.roi-views svg{height:150px;}}
+.roi-label textarea {background:var(--surface);color:var(--text);border:1px solid var(--border);padding:10px;border-radius:7px;resize:vertical;}
+.evidence-text {white-space:pre-wrap;font-size:14px;line-height:1.7;}
+.evidence-text a,.roi-rationale a {color:var(--mint);}
+.roi-rationale li {font-size:13px;line-height:1.6;margin:8px 0;}
+.roi-history {font-size:12px;line-height:1.6;border-top:1px solid var(--border);padding:14px 0;color:var(--muted);}
+.roi-history summary {cursor:pointer;color:var(--text);}

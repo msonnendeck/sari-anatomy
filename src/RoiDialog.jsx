@@ -26,7 +26,7 @@ export default function RoiDialog({job,onClose,onApply}) {
   try{
    const r=await fetch('/api/roi-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frames,target})});const data=await r.json();if(!r.ok)throw new Error(data.error);
    if(!live.current)return;
-   setPlan({...data.plan,model:data.model});setEdited(false);
+   setPlan({...data.plan,model:data.model,inputPrompts:frames.map(({image,...f})=>f)});setEdited(false);
    setFrames(old=>old.map(f=>({...f,box:data.plan.views.find(v=>v.axis===f.axis).box})));setResult(null);
   }catch(e){if(live.current)setError(e.message);}finally{if(live.current)setBusy('');}
  }
@@ -41,7 +41,7 @@ export default function RoiDialog({job,onClose,onApply}) {
    if(data.frames?.length!==inputs.length||data.frames.some((f,i)=>f.axis!==inputs[i].axis||f.slice!==inputs[i].slice))throw new Error('ROI response did not match the requested planes.');
    const merged=mergeRoi(job.volume,data.frames);
    if(!merged.voxels)throw new Error('No ROI voxels returned. Adjust prompts and retry.');
-   setResult({...merged,provenance:{target,seed:job.seed,summary:plan.summary,limitations:plan.limitations,museModel:plan.model,samModel:'sam-3.1',humanEditedPrompts:edited,source:'Human-selected seed/boxes; Muse image-grounded suggestions; SAM masks; cross-plane consensus at intersections',coverage:'Sampled planes only; no interpolation or inferred full organ',frames:inputs.map(({image,...f})=>({...f,reason:plan.views.find(v=>v.axis===f.axis)?.reason,propagated:f.axis==='axial'&&f.slice!==base.slice})),conflicts:merged.conflicts,compared:merged.compared,createdAt:new Date().toISOString()}});
+   setResult({...merged,provenance:{target,seed:job.seed,summary:plan.summary,limitations:plan.limitations,museModel:plan.model,samModel:'sam-3.1',humanEditedPrompts:edited,humanInput:plan.inputPrompts,museSuggestions:plan.views,source:'Human-selected seed/boxes; Muse image-grounded suggestions; SAM masks; cross-plane consensus at intersections',coverage:'Sampled planes only; no interpolation or inferred full organ',frames:inputs.map(({image,...f})=>({...f,reason:plan.views.find(v=>v.axis===f.axis)?.reason,propagated:f.axis==='axial'&&f.slice!==base.slice})),conflicts:merged.conflicts,compared:merged.compared,createdAt:new Date().toISOString()}});
   }catch(e){if(live.current)setError(e.message);}finally{if(live.current)setBusy('');}
  }
  const valid=frames.every(f=>validBox(f.box,f.width,f.height,f.point));

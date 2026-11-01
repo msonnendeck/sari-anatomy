@@ -5,7 +5,7 @@ export function validFrame(f) {
 }
 export async function samFrame(client,f) {
  const {buildObjectPrompt,parseImageStream,recordsOfKind,decodeMaskToRaster}=await import('@meta-sam/parser');
- const prompt=buildObjectPrompt({size:{width:f.width,height:f.height},objects:[{id:1,prompts:[{box:f.box},{points:[f.point]}]}]});
+ const prompt=buildObjectPrompt({size:{width:f.width,height:f.height},objects:[{id:1,prompts:[{box:f.box,points:[f.point]}]}]});
  const events=await client.responses.create({model:'sam-3.1',input:[{type:'message',role:'user',content:[{type:'input_text',text:prompt},{type:'input_image',image_url:f.image}]}],stream:true});
  const result=await parseImageStream(events).finalResult;
  if(result.outcome.status!=='completed')throw new Error('SAM response incomplete.');

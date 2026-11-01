@@ -34,7 +34,7 @@ export default function SolidVolume({ volume, spatial, revision, displaySettings
     eye: { value: new THREE.Vector3() }, plane: { value: new THREE.Vector4() },
     cut: { value: true }, isolate: { value: false }, threshold: { value: .12 },
     palette:{value:palette}, composite:{value:false}, gain:{value:1}, contrast:{value:1}, densityScale:{value:.15}, steps:{value:480}, jitter:{value:0},
-    colored: { value: false }, windowRange: { value: new THREE.Vector2() },
+    proposalTint:{value:false}, colored: { value: false }, windowRange: { value: new THREE.Vector2() },
   }), [image, labels, mask, palette]);
   useEffect(() => () => image.dispose(), [image]);
   useEffect(() => () => labels.dispose(), [labels]);
@@ -55,6 +55,7 @@ export default function SolidVolume({ volume, spatial, revision, displaySettings
     active.cut.value = spatial.cut;
     active.isolate.value = spatial.isolate !== "all";
     active.threshold.value = spatial.threshold / 255;
+    active.proposalTint.value=spatial.isolate==="proposal";
     active.colored.value = spatial.color && !!volume.tissues;
     active.windowRange.value.set(((displaySettings?.level ?? 105) - (displaySettings?.window ?? 210) / 2) / 255, (displaySettings?.window ?? 210) / 255);
   });
@@ -71,7 +72,7 @@ export default function SolidVolume({ volume, spatial, revision, displaySettings
         uniform sampler2D palette; uniform bool composite; uniform float gain; uniform float contrast; uniform float densityScale; uniform float steps; uniform float jitter;
         uniform sampler3D image; uniform sampler3D labels; uniform sampler3D mask;
         uniform vec3 eye; uniform vec4 plane; uniform bool cut; uniform bool isolate;
-        uniform float threshold; uniform bool colored; uniform vec2 windowRange; varying vec3 local;
+        uniform float threshold; uniform bool colored; uniform bool proposalTint; uniform vec2 windowRange; varying vec3 local;
         // Object x/y/z correspond to voxel x/z/-y, matching the orthogonal views.
         vec3 voxel(vec3 p){return vec3(p.x+.5,.5-p.z,p.y+.5);}
         float density(vec3 p){return texture(image,voxel(p)).r;}
@@ -123,6 +124,7 @@ export default function SolidVolume({ volume, spatial, revision, displaySettings
             vec3 tint=tissue>2.5 ? vec3(.43,.73,.91) : tissue>1.5 ? vec3(.86,.66,.43) : tissue>.5 ? vec3(.72,.49,.78) : vec3(.62,.67,.68);
             color=tint*(.35+.65*value)*light;
           }
+          if(proposalTint) color=mix(color,vec3(.35,.85,.70)*light,.7);
           gl_FragColor=vec4(color,1.);
           }
           // Write the actual first-hit depth, rather than the back of the box.

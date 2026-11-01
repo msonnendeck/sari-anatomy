@@ -29,3 +29,8 @@ test('server rejects out-of-image boxes, missing seed, oversized media and unsup
  assert.equal(validFrame({...f,point:{x:-1,y:0}}),false);
  assert.equal(validFrame({...f,image:'https://example.com/image.png'}),false);
 });
+test('box and point are combined into one SAM prompt entry for a frame',async()=>{
+ const {buildObjectPrompt}=await import('@meta-sam/parser');
+ const prompt=buildObjectPrompt({size:{width:20,height:20},objects:[{id:1,prompts:[{box:{left:1,top:1,right:10,bottom:10},points:[{x:5,y:5}]}]}]});
+ assert.match(prompt,/box;/);assert.match(prompt,/point;/);
+});
