@@ -61,6 +61,7 @@ import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } fro
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
 import {eventPresentation,studyHelp} from "./review-presentation.mjs";
+import RegionImagesDialog from "./RegionImagesDialog.jsx";
 import WorkspaceResize from "./WorkspaceResize.jsx";
 import EvidenceDialog from "./EvidenceDialog.jsx";
 import RoiDialog,{captureRoiFrame} from "./RoiDialog.jsx";
@@ -299,6 +300,7 @@ function App() {
   const [spatial, setSpatial] = useState({mode: "solid", cut: true, pitch: 0, yaw: 0, offset: 0, threshold: 30, isolate: "all", color: false});
   const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
   useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
+  const [includeRegionImages,setIncludeRegionImages]=useState(false),[imageQuestion,setImageQuestion]=useState(null);
   const [workspaceFocus,setWorkspaceFocus]=useState(false),[focusTools,setFocusTools]=useState(false);
   const [focus3d,setFocus3d]=useState(false),[libraryCollapsed,setLibraryCollapsed]=useState(()=>window.innerWidth<1200),[assistantCollapsed,setAssistantCollapsed]=useState(false);
   const [libraryWidth,setLibraryWidth]=useState(230),[assistantWidth,setAssistantWidth]=useState(294),[sceneShare,setSceneShare]=useState(60),[rowShare,setRowShare]=useState(50);
@@ -706,10 +708,14 @@ function App() {
     setPoint(slicePoint(volume,nextAxis,xyz));
     if(actions.length) setOverview(false);
   }
-  async function ask(text = input) {
+  async function ask(text = input, media = null) {
     if (!text.trim() || busy) return;
+    if(includeRegionImages && !media){
+      if(!status.enabled){setModal("connection");return;}
+      setImageQuestion({text,volume,position:{...position}});return;
+    }
     setInput("");
-    setMessages((m) => [...m, { role: "user", text }]);
+    setMessages((m) => [...m, { role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }]);
     setBusy(true);
     try {
       if (status.enabled) {
@@ -718,9 +724,11 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: text,
+            media,
             history: messages.filter(m => m.source !== "Connection error"),
             context: {
               synthetic: volume.synthetic,
+              imageGeometry: media ? {spacing:volume.spacing,affine:volume.affine,orientation:volume.orientation,anatomicalAxes:!!volume.anatomicalAxes,pixelMapping:{axial:"columns +I, rows -J, fixed K",coronal:"columns +I, rows -K, fixed J",sagittal:"columns +J, rows -K, fixed I"}} : undefined,
               atlasRegions: volume.atlas?.regions.map(({id,name})=>({id,name})),
               view: {mode:spatial.mode,hemisphere:spatial.hemisphere,isolate:spatial.atlasIsolate,cut:spatial.cut},
               caseContext: volume.caseContext,
@@ -757,6 +765,7 @@ function App() {
           { role: "assistant", text: data.text, source: data.model },
         ]);
         record(`Muse action: ${JSON.stringify(data.actions)}`);
+        if(media) record(`Asked Muse with six reviewed region images; focus ${media.selectionBasis}; anchor ${media.anchor.join(",")}; ${media.frames.map(f=>`${f.axis}:${f.slice}`).join(" ")}`);
       } else {
         let answer = localAction(text);
         setMessages((m) => [
@@ -1489,7 +1498,7 @@ function App() {
                     </button>
                     <div className="assistant-note">
                       {status.enabled
-                        ? "Navigation uses metadata. Guided ROI shares reviewed images with Muse and SAM."
+                        ? "Questions use metadata by default. You can review and attach region images; Guided ROI also shares approved images."
                         : "Offline commands navigate the workspace. Connect Meta for model-powered assistance."}
                     </div>
                   </div>
@@ -1503,6 +1512,7 @@ function App() {
                             ? "MUSE SPARK"
                             : m.source}
                       </span>
+                      {m.imageContext && <small className="image-message-note">6 reviewed images · {m.imageContext.selectionBasis} focus</small>}
                       <p>{m.text}</p>
                     </div>
                   ))
@@ -1514,6 +1524,7 @@ function App() {
                   </div>
                 )}
               </div>
+              <label className="image-question-toggle"><input type="checkbox" checked={includeRegionImages} disabled={busy} onChange={e=>setIncludeRegionImages(e.target.checked)}/> Include region images · review before sending</label>
               <form
                 className="composer"
                 onSubmit={(e) => {
@@ -1691,6 +1702,7 @@ function App() {
           </button>
         </div>
       )}
+      {imageQuestion && <RegionImagesDialog volume={imageQuestion.volume} position={imageQuestion.position} question={imageQuestion.text} onClose={()=>setImageQuestion(null)} onSend={media=>{if(activeVolume.current!==imageQuestion.volume){setToast("Study changed; review the images again.");setImageQuestion(null);return;}const text=imageQuestion.text;setImageQuestion(null);ask(text,media);}}/>}
       {evidenceOpen && <EvidenceDialog initialResult={volume.literatureSearches?.at(-1)} region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
       {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (

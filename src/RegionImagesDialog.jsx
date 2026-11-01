@@ -1,0 +1,14 @@
+import React,{useMemo,useState} from 'react';import {X} from 'lucide-react';
+import {proposalAnchor,captureRegionImages} from './region-images.mjs';
+export default function RegionImagesDialog({volume,position,question,onClose,onSend}){
+ const hasProposal=volume.proposal.some(Boolean),[basis,setBasis]=useState(hasProposal?'proposal':'crosshair'),[consent,setConsent]=useState(false);
+ const context=useMemo(()=>{const anchor=basis==='proposal'?proposalAnchor(volume):[position.sagittal,position.coronal,position.axial];return{anchor,selectionBasis:basis,frames:captureRegionImages(volume,anchor)};},[volume,basis,position]);
+ return <div className="modal-backdrop"><section className="modal roi-dialog" role="dialog" aria-modal="true" aria-labelledby="region-images-title"><button className="icon-button modal-close" aria-label="Cancel image question" onClick={onClose}><X size={18}/></button>
+ <span className="panel-eyebrow">MUSE · VISUAL RESEARCH CONTEXT</span><h2 id="region-images-title">Share this region with Muse?</h2><p>{question}</p>
+ <label className="roi-label">Image focus<select aria-label="Question image focus" value={basis} onChange={e=>{setBasis(e.target.value);setConsent(false);}}>{hasProposal&&<option value="proposal">Marked proposal · representative interior point</option>}<option value="crosshair">Current crosshair and slices</option></select></label>
+ <div className="roi-views">{context.frames.map(f=><div key={f.axis}><strong>{f.axis} · slice {f.slice+1}</strong><img alt={`${f.axis} grayscale context`} src={f.clean}/><img alt={`${f.axis} marked region context`} src={f.marked}/><small>{f.proposalPixels} marked pixels on this plane</small></div>)}</div>
+ <p className="fine-print">Six PNG images: three grayscale views and three matching views with mint proposal highlights and a blue focus point. These are sampled cross-sections, not the full volume. Overlays are annotations, not tissue colors.</p>
+ <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>I have permission to send these reviewed images, the question and workspace context to Meta. Free-credit terms may permit product improvement use.</label>
+ <button className="button primary" disabled={!consent} onClick={()=>onSend(context)}>Send question with images</button><p className="fine-print">Any visually suggested anatomical identity remains uncertain until reviewed. Research and education only.</p>
+ </section></div>;
+}
