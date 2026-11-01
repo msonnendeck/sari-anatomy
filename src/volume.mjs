@@ -105,6 +105,11 @@ export function sliceSize(v, axis) {
       ? [v.dims[0], v.dims[2]]
       : [v.dims[1], v.dims[2]];
 }
+export function sliceAspect(v, axis) {
+  const [w, h] = sliceSize(v, axis);
+  const [a, b] = axis === "axial" ? [0, 1] : axis === "coronal" ? [0, 2] : [1, 2];
+  return w * v.spacing[a] / (h * v.spacing[b]);
+}
 export function voxelAt(v, axis, u, w, s) {
   const d = v.dims;
   return axis === "axial"
@@ -144,6 +149,7 @@ export function slicePixels(
     overlay = true,
     reference = true,
     opacity = 0.55,
+    tissueColors = false,
   } = {},
 ) {
   const [width, height] = sliceSize(v, axis);
@@ -158,6 +164,10 @@ export function slicePixels(
         Math.min(255, ((v.data[i] - (level - window / 2)) * 255) / window),
       );
       let color = [val, val, val];
+      if (tissueColors && v.tissues?.[i]) {
+        const tint = [[0,0,0], [184,125,199], [219,168,110], [110,186,232]][v.tissues[i]];
+        color = tint.map((c) => c * .65 + val * .35);
+      }
       if (overlay && v.proposal?.[i])
         color = color.map(
           (a, j) => a * (1 - opacity) + [86, 207, 183][j] * opacity,

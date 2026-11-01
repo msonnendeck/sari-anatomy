@@ -147,7 +147,7 @@ export default function BodyOverview({
             <directionalLight position={[0, -2, 5]} intensity={0.6} />
             <React.Suspense fallback={null}>
               <HumanBody
-                opacity={0.92}
+                opacity={1}
                 onHeadSelect={onHeadSelect}
                 onHeadHover={setHover}
                 selected={hover || hasStudy}
@@ -312,7 +312,7 @@ export default function BodyOverview({
             </p>
             <p>
               BodyParts3D, © The Database Center for Life Science. Adapted
-              reference skin mesh with neutral groin coverage. See bundled
+              reference skin mesh with optional privacy pixelation. See bundled
               attribution for current CC BY 4.0 permission and the archived CC
               BY-SA 2.1 Japan notice.
             </p>
@@ -330,6 +330,7 @@ export default function BodyOverview({
             >
               MRI source & transformations <ArrowUpRight size={12} />
             </a>
+            <a className="text-button" href="/data/research/README.md" target="_blank" rel="noreferrer">Additional research samples <ArrowUpRight size={12} /></a>
             <a
               className="text-button"
               href="/models/ATTRIBUTION.md"

@@ -48,14 +48,16 @@ import {
   compareMasks,
   slicePixels,
   sliceSize,
+  sliceAspect,
   sliceCount,
   voxelAt,
   index3,
   paintMask,
 } from "./volume.mjs";
 import { readVolume } from "./nifti.mjs";
-import { loadMniTemplate } from "./datasets.mjs";
+import { loadResearchSample, researchSamples } from "./datasets.mjs";
 import SliceFilmstrip from "./SliceFilmstrip.jsx";
+import { growRegion } from "./regions.mjs";
 import "./style.css";
 const axes = ["axial", "coronal", "sagittal"];
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
@@ -111,6 +113,7 @@ function Slice({
   const canvas = useRef(),
     painting = useRef(false);
   const [w, h] = sliceSize(volume, axis);
+  const physicalAspect = sliceAspect(volume, axis);
   useEffect(() => {
     const c = canvas.current;
     const { rgba, width, height } = slicePixels(volume, axis, slice, settings);
@@ -214,9 +217,10 @@ function Slice({
         <div
           className="canvas-wrap"
           style={{
-            width: `${78 * zoom}%`,
-            maxWidth: `${78 * zoom}%`,
-            aspectRatio: `${w}/${h}`,
+            width: `min(${78 * zoom}%, ${90 * zoom * physicalAspect}cqh)`,
+            maxWidth: "none",
+            maxHeight: "none",
+            aspectRatio: physicalAspect,
           }}
         >
           <canvas
@@ -253,7 +257,7 @@ function Slice({
           {volume.synthetic
             ? "T1 · SYNTHETIC"
             : volume.bundled
-              ? "T1 · MNI152"
+              ? "RESEARCH MRI"
               : "NIFTI · NATIVE AXES"}
         </div>
         <div className="cross-center" aria-hidden="true">
@@ -285,6 +289,7 @@ function App() {
     sagittal: 48,
   });
   const [axis, setAxis] = useState("axial");
+  const [spatial, setSpatial] = useState({mode: "solid", cut: true, pitch: 0, yaw: 0, offset: 0, threshold: 30, isolate: "all", color: false});
   const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
   useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
   const [layout, setLayout] = useState(() => localStorage.getItem("sari-layout") === "grid" ? "grid" : "anatomy");
@@ -327,6 +332,9 @@ function App() {
       .then((saved) => {
         if (saved?.volume?.data instanceof Uint8Array) {
           setVolume(saved.volume);
+          if (saved.settings) setSettings(saved.settings);
+          else if (saved.volume.id === "slicer-tumor") setSettings((s) => ({...s, window: 90, level: 45}));
+          setSpatial((s) => ({...s, threshold: saved.volume.id === "slicer-tumor" ? 10 : 30}));
           setPosition(saved.position);
           setEvents(saved.events || []);
           setRevision((r) => r + 1);
@@ -339,7 +347,7 @@ function App() {
     if (!hydrated) return;
     const t = setTimeout(
       () =>
-        saveSession({ volume, position, events }).catch(() =>
+        saveSession({ volume, position, events, settings }).catch(() =>
           setToast(
             "Browser storage is unavailable. Export your review to keep it.",
           ),
@@ -347,7 +355,7 @@ function App() {
       800,
     );
     return () => clearTimeout(t);
-  }, [hydrated, volume, position, events, revision]);
+  }, [hydrated, volume, position, events, revision, settings]);
   const file = useRef(),
     maskFile = useRef(),
     beforeStroke = useRef(null);
@@ -355,6 +363,9 @@ function App() {
     () => compareMasks(volume.reference, volume.proposal, volume.dims),
     [volume, revision],
   );
+  useEffect(() => {
+    if (spatial.isolate === "proposal" && !metrics.countB) setSpatial((s) => ({...s, isolate: "all"}));
+  }, [metrics.countB, spatial.isolate]);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("sari-theme", theme);
@@ -411,6 +422,19 @@ function App() {
       record("Manually edited proposal mask");
     }
   }
+  function growSeed() {
+    if (!point) return;
+    try {
+      const result = growRegion(volume, voxelAt(volume, point.axis, point.x, point.y, point.slice));
+      remember();
+      volume.proposal.set(result.mask);
+      setRevision((r) => r + 1);
+      setSpatial((s) => ({...s, mode: "solid", isolate: "proposal"}));
+      setSettings((s) => ({...s, overlay: true}));
+      record(`Local intensity region: ${result.count} voxels, tolerance ±12${result.capped ? "; capped at safety limit" : ""}`);
+      setToast(`${result.count.toLocaleString()} voxels isolated${result.capped ? " (size limit reached; partial region)" : ""}. Intensity-based selection, not an anatomical label.`);
+    } catch (e) { setToast(e.message); }
+  }
   function undo() {
     if (!history.length) return;
     setFuture((f) => [...f, volume.proposal.slice()]);
@@ -427,6 +451,7 @@ function App() {
   }
   function restore() {
     const v = phantom();
+    setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0}));
     setVolume(v);
     setPosition({ axial: 50, coronal: 47, sagittal: 48 });
     setHistory([]);
@@ -441,12 +466,15 @@ function App() {
     setToast("Synthetic study restored.");
     setOverview(false);
   }
-  async function openMni() {
+  async function openMni(sample = "mni-t1") {
+    if (typeof sample !== "string") sample = "mni-t1";
     setLoadingStudy(true);
     try {
-      const v = await loadMniTemplate();
+      const v = await loadResearchSample(sample);
+      setSettings((s) => ({...s, window: sample === "slicer-tumor" ? 90 : 210, level: sample === "slicer-tumor" ? 45 : 105}));
       setVolume(v);
-      setPosition({ axial: 50, coronal: 66, sagittal: 48 });
+      setPosition(Object.fromEntries(axes.map((a) => [a, Math.floor(sliceCount(v, a) / 2)])));
+      setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0, threshold: sample === "slicer-tumor" ? 10 : 30}));
       setAxis("axial");
       setHistory([]);
       setFuture([]);
@@ -459,7 +487,7 @@ function App() {
       setModal(null);
       setOverview(false);
       setToast(
-        "MNI152 MRI template loaded. No AI proposal has been generated.",
+        `${v.name} loaded. No AI proposal has been generated.`,
       );
     } catch (e) {
       setToast(e.message);
@@ -485,6 +513,7 @@ function App() {
         setRevision((r) => r + 1);
         setToast("Reference mask loaded. All nonzero labels are combined.");
       } else {
+        setSpatial((s) => ({...s, isolate: "all", color: false, pitch: 0, yaw: 0, offset: 0}));
         setVolume(v);
         setPosition(
           Object.fromEntries(
@@ -528,7 +557,7 @@ function App() {
       maskProvenance: volume.synthetic
         ? "Procedural reference and deliberately perturbed proposal; subsequent edits recorded below"
         : volume.bundled
-          ? "MNI supplied whole-brain extraction mask; proposal starts empty; subsequent edits recorded below"
+          ? `${volume.referenceKind || "No reference supplied"}; proposal starts empty; local/manual/SAM edits recorded below`
           : "User-supplied reference / manual or SAM proposal",
       metrics: { ...metrics, slices: metrics.slices },
       position,
@@ -607,6 +636,7 @@ function App() {
             message: text,
             context: {
               synthetic: volume.synthetic,
+              caseContext: volume.caseContext,
               dims: volume.dims,
               axis,
               position,
@@ -621,7 +651,7 @@ function App() {
               proposalAvailable: metrics.countB > 0,
               referenceKind:
                 volume.referenceKind || "user-defined binary reference",
-              studyKind: volume.bundled
+              studyKind: volume.id === "slicer-tumor" ? "source-labeled tumor teaching sample; subtype not supplied" : volume.bundled
                 ? "population-average MRI template"
                 : volume.synthetic
                   ? "synthetic phantom"
@@ -869,7 +899,7 @@ function App() {
                 {volume.synthetic
                   ? "Brain · T1-like · Demo study"
                   : volume.bundled
-                    ? "Brain · T1 · MNI152 template"
+                    ? volume.series
                     : "NIfTI · Native voxel axes"}
               </small>
             </div>
@@ -882,7 +912,7 @@ function App() {
             <div>
               <span>Spacing</span>
               <span className="mono">
-                {volume.spacing.map((x) => x.toFixed(1)).join(" × ")}
+                {volume.spacing.map((x) => Number(x.toFixed(2))).join(" × ")}
               </span>
             </div>
             <div>
@@ -894,6 +924,7 @@ function App() {
               </span>
             </div>
           </div>
+          {volume.id === "slicer-tumor" && <p className="case-context">{volume.caseContext}</p>}
           <button
             className="import-button"
             onClick={() => file.current.click()}
@@ -1005,15 +1036,15 @@ function App() {
                   {volume.synthetic
                     ? "SYN-001"
                     : volume.bundled
-                      ? "MNI-152"
+                      ? "RESEARCH"
                       : "LOCAL"}
                 </span>
               </h1>
-              <p>
+              <p title={volume.caseContext}>
                 {volume.synthetic
                   ? "A spatial workspace for annotation review."
                   : volume.bundled
-                    ? "Population-average MRI · 2 mm · McGill University"
+                    ? volume.series
                     : "Native voxel coordinates · anatomical orientation not inferred."}
               </p>
             </div>
@@ -1084,6 +1115,7 @@ function App() {
               />
             </div>
             <div className="toolbar-right">
+              <button className="quiet-button" disabled={!point} onClick={growSeed} title="Replace proposal with connected voxels within ±12 intensity of the seed"><Crosshair size={14} /><span>Grow region</span></button>
               <button
                 className="quiet-button"
                 onClick={() => setTab("display")}
@@ -1110,7 +1142,7 @@ function App() {
               <div className="viewport-heading">
                 <span className="axis-dot spatial" />
                 <strong>{bodyContext ? "Body context" : "Head context"}</strong>
-                <span className="scene-badge">3D</span>
+                <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}><option value="solid">Solid</option><option value="context">Context</option></select>
                 <IconButton
                   icon={Box}
                   label={
@@ -1132,6 +1164,8 @@ function App() {
                 }
               >
                 <Scene
+                  spatial={spatial}
+                  displaySettings={settings}
                   bodyContext={bodyContext}
                   privacy={privacy}
                   volume={volume}
@@ -1150,10 +1184,17 @@ function App() {
                     ? "Synthetic anatomy"
                     : bodyContext
                       ? "Generic body placement · illustrative"
-                      : "Intensity surface · approximate"}
+                      : spatial.mode === "solid" ? "Intensity volume · research view" : "Intensity surface · approximate"}
                 </span>
-                <span className="scene-caption mono">{cap(axis)} plane</span>
+                <span className="scene-caption mono">{spatial.mode === "solid" ? "Free cut plane" : `${cap(axis)} plane`}</span>
               </div>
+              {spatial.mode === "solid" && <div className="cut-controls">
+                <label><input type="checkbox" checked={spatial.cut} onChange={(e) => setSpatial((s) => ({...s, cut: e.target.checked}))} /> Cut plane</label>
+                {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -.7, .7, .01] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => setSpatial((s) => ({...s, [key]: +e.target.value}))} /></label>)}
+                <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>
+                {volume.tissues && <label><input type="checkbox" checked={spatial.color} onChange={(e) => setSpatial((s) => ({...s, color: e.target.checked}))} /> Tissue colors</label>}
+                <button onClick={() => setSpatial((s) => ({...s, pitch: 0, yaw: 0, offset: 0, isolate: "all"}))}>Reset cut</button>
+              </div>}
               <div className="orbit-note">
                 <Compass size={12} /> Drag to orbit · scroll to zoom
               </div>
@@ -1173,7 +1214,7 @@ function App() {
                 onSlice={changeSlice}
                 selected={axis === a}
                 onSelect={setAxis}
-                settings={settings}
+                settings={{...settings, tissueColors: spatial.color}}
                 tool={tool}
                 onPaint={paint}
                 onEnd={endStroke}
@@ -1339,6 +1380,7 @@ function App() {
               <span className="panel-eyebrow">VIEW SETTINGS</span>
               <label className="privacy-toggle"><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /> Privacy pixelation</label>
               <h3>Make room for detail.</h3>
+              <label>Solid background threshold <span className="mono">{spatial.threshold}</span><input aria-label="Solid background threshold" type="range" min="5" max="150" value={spatial.threshold} onChange={(e) => setSpatial((s) => ({...s, threshold: +e.target.value}))} /></label>
               <label>
                 Window <span className="mono">{settings.window}</span>
                 <input
@@ -1492,27 +1534,12 @@ function App() {
             {modal === "study" ? (
               <>
                 <p>
-                  Start with the synthetic phantom or open a local 3D NIfTI
-                  volume. Imported files remain in your browser.
+                  Choose a research sample or open a local 3D NIfTI volume. The tumor case is source-labeled; no tumor subtype or lesion mask is supplied.
                 </p>
-                <button
-                  className="study-option"
-                  onClick={openMni}
-                  disabled={loadingStudy}
-                >
-                  {loadingStudy ? (
-                    <Loader2 size={24} className="spin" />
-                  ) : (
-                    <ScanLine size={24} />
-                  )}
-                  <span>
-                    <strong>MNI152 brain MRI</strong>
-                    <small>
-                      Real scan-derived average · T1 · 2 mm · McGill
-                    </small>
-                  </span>
-                  <ArrowRight size={17} />
-                </button>
+                {researchSamples.map((sample) => <button key={sample.id} className="study-option" onClick={() => openMni(sample.id)} disabled={loadingStudy}>
+                  {loadingStudy ? <Loader2 size={24} className="spin" /> : <ScanLine size={24} />}
+                  <span><strong>{sample.title}</strong><small>{sample.detail}</small></span><ArrowRight size={17} />
+                </button>)}
                 <button className="study-option" onClick={restore}>
                   <ScanLine size={24} />
                   <span>

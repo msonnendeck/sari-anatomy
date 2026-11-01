@@ -47,3 +47,18 @@ test("bundled human mesh has valid indices and normalized body height", () => {
   for (let i = 0; i < ni; i++)
     assert.ok(b.readUInt32LE(8 + np * 4 + i * 4) < np / 3);
 });
+test("research samples retain high-resolution grids, RAS alignment and tissue classes", async () => {
+  const read = (name) => readVolume(new File([readFileSync(`public/data/research/${name}.nii.gz`)], `${name}.nii.gz`));
+  const hi = await read('mni-t1-1mm');
+  assert.deepEqual(hi.dims, [193,229,193]);
+  assert.deepEqual(hi.spacing, [1,1,1]);
+  const t2 = await read('mni-t2-2mm'), tissue = await read('mni-tissues');
+  assert.deepEqual(t2.affine, tissue.affine);
+  assert.deepEqual(tissue.dims, [97,115,97]);
+  assert.deepEqual([...new Set(tissue.data)].sort((a,b)=>a-b), [0,85,170,255]);
+  const tumor = await read('slicer-tumor');
+  assert.deepEqual(tumor.dims, [256,256,112]);
+  assert.deepEqual(tumor.spacing, [.9375,.9375,Math.fround(1.4)]);
+  assert.ok(tumor.affine[0][0] > 0 && tumor.affine[1][1] > 0);
+  assert.ok(tumor.reference.every(v => v === 0));
+});

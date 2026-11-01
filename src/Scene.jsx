@@ -5,6 +5,7 @@ import { OrbitControls } from "@react-three/drei";
 import { slicePixels } from "./volume.mjs";
 import HumanBody from "./HumanBody.jsx";
 import PrivacyPixelation from "./PrivacyPixelation.jsx";
+import SolidVolume from "./SolidVolume.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
   const d = v.dims,
@@ -108,6 +109,8 @@ function Anatomy({
   showReference,
   brainOpacity,
   revision,
+  spatial,
+  displaySettings,
 }) {
   const brain = useMemo(
     () =>
@@ -122,12 +125,15 @@ function Anatomy({
     () => surface(volume, volume.proposal, 1),
     [volume, revision],
   );
-  const ref = useMemo(() => surface(volume, volume.reference, 1), [volume]);
+  const ref = useMemo(() => surface(volume, volume.reference, 1), [volume, revision]);
   const tex = useMemo(() => {
     const { rgba, width, height } = slicePixels(volume, axis, slice, {
       overlay: false,
       reference: false,
     });
+    for (let i = 0; i < width * height; i++) {
+      if (rgba[i * 4] < 15) rgba[i * 4 + 3] = 0;
+    }
     const t = new THREE.DataTexture(rgba, width, height);
     t.needsUpdate = true;
     t.flipY = true;
@@ -155,6 +161,7 @@ function Anatomy({
     rot = [0, Math.PI / 2, 0];
     size = [d[1] * sp[1] * s, d[2] * sp[2] * s];
   }
+  if (spatial?.mode === "solid") return <SolidVolume volume={volume} spatial={spatial} revision={revision} displaySettings={displaySettings} />;
   return (
     <group rotation={[0, 0, 0]}>
       <mesh geometry={brain}>
@@ -162,10 +169,10 @@ function Anatomy({
           color="#9aadaf"
           roughness={0.56}
           metalness={0.08}
-          transparent
+          alphaHash
           opacity={brainOpacity}
-          depthWrite={false}
-          side={THREE.DoubleSide}
+          depthWrite
+          side={THREE.FrontSide}
         />
       </mesh>
       {showMask && (
@@ -193,8 +200,8 @@ function Anatomy({
         <meshBasicMaterial
           map={tex}
           side={THREE.DoubleSide}
-          transparent
-          opacity={0.76}
+          alphaTest={0.5}
+          depthWrite
         />
       </mesh>
     </group>
@@ -249,10 +256,6 @@ export default function Scene(props) {
         ) : (
           <Anatomy {...props} />
         )}
-        <gridHelper
-          args={[6, 24, "#34494c", "#233239"]}
-          position={[0, props.bodyContext ? -2.55 : -1.65, 0]}
-        />
         <OrbitControls
           makeDefault
           enablePan={false}

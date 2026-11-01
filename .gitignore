@@ -38,3 +38,9 @@ test-results/
 !public/data/mni152/t1.nii.gz
 !public/data/mni152/brain-mask.nii.gz
 !public/data/mni152/preview.png
+
+# Reviewed public research derivatives (source notices in the same directory)
+!public/data/research/
+!public/data/research/*.nii.gz
+!public/data/research/*.md
+!public/data/research/*LICENSE.txt

@@ -2406,3 +2406,15 @@ kbd {
 .privacy-button[aria-pressed="true"] { color: var(--mint); background: var(--mint-soft); }
 .display-panel .privacy-toggle { display: flex; align-items: center; gap: 10px; }
 .display-panel .privacy-toggle input { width: auto; margin: 0; accent-color: var(--mint); }
+.spatial-select { margin-left: 6px; font-size: 9px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); }
+.cut-controls { position: absolute; z-index: 3; left: 12px; right: 12px; bottom: 35px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px 12px; opacity: .95; }
+.cut-controls label { display: flex; gap: 5px; align-items: center; font-size: 9px; color: var(--muted); }
+.cut-controls input[type="range"] { width: 65px; accent-color: var(--mint); }
+.cut-controls input[type="checkbox"] { accent-color: var(--mint); }
+.cut-controls select, .cut-controls button { font-size: 9px; border: 1px solid var(--border); color: var(--text); background: var(--surface); border-radius: 5px; padding: 4px 6px; }
+.case-context { font-size: 10px; line-height: 1.6; color: var(--muted); border-left: 2px solid var(--amber); padding-left: 9px; margin: 12px 0; }
+.slice-image { container-type: size; }
+.canvas-wrap canvas { object-fit: fill; }
+.study-header > div:first-child { min-width: 0; }
+.study-header h1 { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.study-actions { flex-shrink: 0; }

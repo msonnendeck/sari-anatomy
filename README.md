@@ -132,3 +132,26 @@ The attributed MNI template derivatives and adapted BodyParts3D reference skin m
 ### Workspace layouts
 
 Choose **Anatomy** for a large spatial view beside the three scan planes, or **Four views** for the original balanced grid. The choice is remembered locally. The bottom filmstrip shows sampled intensity previews of the active plane; click a thumbnail or use the continuous slider to navigate every slice. The current slice is always included and highlighted. Window and level settings also update the previews. Both layouts support light and dark themes.
+
+### Solid volume and regions
+
+**Solid** is an opaque first-hit voxel volume renderer with a freely oriented
+cutaway. Tilt/Rotate/Depth controls set the clipping plane independently of the
+three orthogonal slices; turn Cut plane off for the whole volume. Black/low-intensity
+background is excluded using the adjustable Solid background threshold in Display.
+This is an intensity rendering, not a validated tissue segmentation. **Context**
+retains the orthogonal slice plane and approximate intensity surface; alpha-hashed
+coverage and depth-tested cutout slices avoid alpha-blend sorting reversals.
+
+Isolate the reference or proposal mask, or CSF/gray matter/white matter on the
+2 mm McGill samples. **Tissue colors** uses the supplied atlas probability maps,
+not natural color or a lesion prediction. Purple=CSF, amber=gray matter, blue=white
+matter. Select a scan seed and **Grow region** to replace the proposal with a
+six-connected intensity selection (±12 on normalized uint8 intensities). This is
+undoable, not an anatomical classifier, and is capped at 400,000 voxels with an
+explicit partial-region notice. These operations run locally without model calls.
+
+The study chooser also offers original-grid 1 mm MNI T1, 2 mm T2 and the
+3D Slicer MRBrainTumor1 teaching case. See [research sample provenance](public/data/research/README.md)
+for transformations, source checksums and licensing. The tumor name is supplied
+by the source; no subtype, pathology confirmation or lesion ground truth is included.

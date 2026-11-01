@@ -36,9 +36,10 @@ export default function HumanBody({
     color: "#90a8aa",
     roughness: 0.57,
     metalness: 0.12,
-    transparent: opacity < 1,
+    transparent: false,
+    alphaHash: opacity < 1,
     opacity,
-    depthWrite: opacity >= 1,
+    depthWrite: true,
   };
   return (
     <group>
