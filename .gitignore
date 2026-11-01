@@ -29,3 +29,11 @@ workspace/
 playwright-report/
 test-results/
 *.log
+
+# Reviewed, licensed bundled research sample only
+!public/data/
+!public/data/mni152/
+!public/data/mni152/README.md
+!public/data/mni152/COPYING
+!public/data/mni152/t1.nii.gz
+!public/data/mni152/brain-mask.nii.gz
