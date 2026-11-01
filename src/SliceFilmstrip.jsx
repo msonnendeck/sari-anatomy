@@ -2,17 +2,17 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { slicePixels, sliceCount } from "./volume.mjs";
 
 // Previews show intensity data only so annotation edits do not redraw the strip.
-function Thumbnail({ volume, axis, slice, windowWidth, level }) {
+function Thumbnail({ volume, axis, slice, windowWidth, level, gain, contrast, colorMap }) {
   const ref = useRef();
   useEffect(() => {
     const { rgba, width, height } = slicePixels(volume, axis, slice, {
-      window: windowWidth, level, overlay: false, reference: false,
+      window: windowWidth, level, gain, contrast, colorMap, overlay: false, reference: false,
     });
     const c = ref.current;
     c.width = width;
     c.height = height;
     c.getContext("2d").putImageData(new ImageData(rgba, width, height), 0, 0);
-  }, [volume, axis, slice, windowWidth, level]);
+  }, [volume, axis, slice, windowWidth, level, gain, contrast, colorMap]);
   return <canvas ref={ref} aria-hidden="true" />;
 }
 const Preview = React.memo(Thumbnail);
@@ -41,7 +41,7 @@ export default function SliceFilmstrip({ volume, axis, slice, onAxis, onSlice, s
     </div>
     <div className="filmstrip-frames" ref={strip}>
       {indices.map((n) => <button key={`${axis}-${n}`} aria-label={`Go to ${axis} slice ${n + 1}`} aria-current={n === nearest ? "true" : undefined} onClick={() => onSlice(n)}>
-        <Preview volume={volume} axis={axis} slice={n} windowWidth={settings.window} level={settings.level} />
+        <Preview volume={volume} axis={axis} slice={n} windowWidth={settings.window} level={settings.level} gain={settings.gain} contrast={settings.contrast} colorMap={settings.colorMap} />
         <span>{n + 1}</span>
       </button>)}
     </div>

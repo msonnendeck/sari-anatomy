@@ -56,6 +56,8 @@ import {
 } from "./volume.mjs";
 import { readVolume } from "./nifti.mjs";
 import { loadResearchSample, researchSamples } from "./datasets.mjs";
+import { displayDefaults } from "./display.mjs";
+import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
 import SliceFilmstrip from "./SliceFilmstrip.jsx";
 import { growRegion } from "./regions.mjs";
 import "./style.css";
@@ -109,11 +111,15 @@ function Slice({
   setPoint,
   revision,
   zoom,
+  position,
+  spatial,
 }) {
   const canvas = useRef(),
     painting = useRef(false);
   const [w, h] = sliceSize(volume, axis);
   const physicalAspect = sliceAspect(volume, axis);
+  const cursor = slicePoint(volume, axis, [position.sagittal, position.coronal, position.axial]);
+  const intersection = spatial.cut && spatial.mode !== "context" ? cutIntersection(volume, axis, slice, spatial) : null;
   useEffect(() => {
     const c = canvas.current;
     const { rgba, width, height } = slicePixels(volume, axis, slice, settings);
@@ -241,17 +247,13 @@ function Slice({
               onEnd();
             }}
           />
-          {point?.axis === axis && point?.slice === slice && (
-            <span
-              className="seed"
-              style={{
-                left: `${((point.x + 0.5) / w) * 100}%`,
-                top: `${((point.y + 0.5) / h) * 100}%`,
-              }}
-            >
-              <Crosshair size={24} />
-            </span>
-          )}
+          <svg className="slice-guides" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {intersection?.coplanar && <rect className="cut-trace" x=".5" y=".5" width="99" height="99" fill="none" />}
+            {intersection?.points && <line className="cut-trace" x1={intersection.points[0][0]*100} y1={intersection.points[0][1]*100} x2={intersection.points[1][0]*100} y2={intersection.points[1][1]*100} />}
+            <line className="cursor-trace" x1={(cursor.x+.5)/w*100} x2={(cursor.x+.5)/w*100} y1="0" y2="100" />
+            <line className="cursor-trace" y1={(cursor.y+.5)/h*100} y2={(cursor.y+.5)/h*100} x1="0" x2="100" />
+          </svg>
+          <span className="seed linked-seed" style={{left:`${(cursor.x+.5)/w*100}%`,top:`${(cursor.y+.5)/h*100}%`}}><span /></span>
         </div>
         <div className="scan-caption mono">
           {volume.synthetic
@@ -260,10 +262,7 @@ function Slice({
               ? "RESEARCH MRI"
               : "NIFTI · NATIVE AXES"}
         </div>
-        <div className="cross-center" aria-hidden="true">
-          <span />
-          <span />
-        </div>
+
       </div>
       <div className="slice-slider">
         <input
@@ -296,6 +295,7 @@ function App() {
   useEffect(() => { localStorage.setItem("sari-layout", layout); }, [layout]);
   const [revision, setRevision] = useState(0);
   const [settings, setSettings] = useState({
+    ...displayDefaults,
     window: 210,
     level: 105,
     overlay: true,
@@ -332,7 +332,7 @@ function App() {
       .then((saved) => {
         if (saved?.volume?.data instanceof Uint8Array) {
           setVolume(saved.volume);
-          if (saved.settings) setSettings(saved.settings);
+          if (saved.settings) setSettings({...displayDefaults, ...saved.settings});
           else if (saved.volume.id === "slicer-tumor") setSettings((s) => ({...s, window: 90, level: 45}));
           setSpatial((s) => ({...s, mode: saved.volume.atlas ? "atlas" : "solid", cut: !saved.volume.atlas, region: null, hemisphere: "both", atlasIsolate: false, threshold: saved.volume.id === "slicer-tumor" ? 10 : 30}));
           setPosition(saved.position);
@@ -381,13 +381,33 @@ function App() {
     const t = setTimeout(() => setToast(""), 4200);
     return () => clearTimeout(t);
   }, [toast]);
+  useEffect(() => {
+    setSpatial((s) => ({...s,offset:planeOffset(volume,[position.sagittal,position.coronal,position.axial],s)}));
+  }, [volume.id]);
   function record(text) {
     setEvents((e) =>
       [{ text, time: new Date().toISOString() }, ...e].slice(0, 100),
     );
   }
+  function navigate(xyz, seedAxis = null) {
+    setPosition({sagittal:xyz[0],coronal:xyz[1],axial:xyz[2]});
+    if (seedAxis) setPoint(slicePoint(volume,seedAxis,xyz));
+    if (spatial.linked !== false) setSpatial((s) => ({...s,offset:planeOffset(volume,xyz,s)}));
+  }
   function changeSlice(a, s) {
-    setPosition((p) => ({ ...p, [a]: s }));
+    const next={...position,[a]:s};
+    navigate([next.sagittal,next.coronal,next.axial],point?a:null);
+  }
+  function changeCut(patch) {
+    const next={...spatial,...patch};
+    const range=cutRange(volume,next);
+    next.offset=Math.max(-range,Math.min(range,next.offset));
+    setSpatial(next);
+    if(next.linked !== false && next.cut) {
+      const xyz=anchorOnPlane(volume,[position.sagittal,position.coronal,position.axial],next);
+      setPosition({sagittal:xyz[0],coronal:xyz[1],axial:xyz[2]});
+      if(point)setPoint(slicePoint(volume,axis,xyz));
+    }
   }
   function worst() {
     if (!metrics.countA || !metrics.countB) {
@@ -422,12 +442,12 @@ function App() {
       record("Manually edited proposal mask");
     }
   }
-  function selectAtlasRegion(id) {
+  function selectAtlasRegion(id, clickedVoxel = null) {
     const region = volume.atlas?.regions.find((r) => r.id === Number(id));
     setSpatial((s) => ({...s, region: region?.id || null}));
     if (region?.centroid) {
-      const [x,y,z] = region.centroid;
-      setPosition({axial:z, coronal:y, sagittal:x});
+      const [x,y,z] = clickedVoxel || region.centroid;
+      navigate([x,y,z]);
       setPoint(null);
     }
   }
@@ -1160,11 +1180,11 @@ function App() {
             </div>
           </div>
           <div className="viewer-grid">
-            <section className="scene-card">
+            <section className="scene-card" style={settings.background === "black" ? {background:"#05080c"} : settings.background === "white" ? {background:"#f4f3ee"} : undefined}>
               <div className="viewport-heading">
                 <span className="axis-dot spatial" />
                 <strong>{bodyContext ? "Body context" : "Head context"}</strong>
-                <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}>{volume.atlas && <option value="atlas">Anatomy</option>}<option value="solid">Solid</option><option value="context">Context</option></select>
+                <select className="spatial-select" aria-label="3D rendering mode" value={spatial.mode} onChange={(e) => setSpatial((s) => ({...s, mode: e.target.value}))}>{volume.atlas && <option value="atlas">Anatomy</option>}<option value="solid">Solid</option><option value="volume">Volume</option><option value="context">Context</option></select>
                 <IconButton
                   icon={Box}
                   label={
@@ -1188,6 +1208,8 @@ function App() {
                 <Scene
                   spatial={spatial}
                   displaySettings={settings}
+                  position={position}
+                  onVoxelSelect={(xyz) => navigate(xyz,axis)}
                   onAtlasSelect={selectAtlasRegion}
                   bodyContext={bodyContext}
                   privacy={privacy}
@@ -1207,16 +1229,21 @@ function App() {
                     ? "Synthetic anatomy"
                     : bodyContext
                       ? "Generic body placement · illustrative"
-                      : spatial.mode === "atlas" ? "Source anatomical surfaces · SPL/NAC" : spatial.mode === "solid" ? "Intensity volume · research view" : "Intensity surface · approximate"}
+                      : spatial.mode === "atlas" ? "Source anatomical surfaces · SPL/NAC" : (spatial.mode === "solid" || spatial.mode === "volume") ? "Intensity volume · research view" : "Intensity surface · approximate"}
                 </span>
-                <span className="scene-caption mono">{spatial.mode === "solid" || spatial.mode === "atlas" ? (spatial.cut ? "Free cut plane" : "Whole anatomy") : `${cap(axis)} plane`}</span>
+                <span className="scene-caption mono">{spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume" ? (spatial.cut ? "Free cut plane" : "Whole anatomy") : `${cap(axis)} plane`}</span>
               </div>
-              {(spatial.mode === "solid" || spatial.mode === "atlas") && <div className="cut-controls">
-                <label><input type="checkbox" checked={spatial.cut} onChange={(e) => setSpatial((s) => ({...s, cut: e.target.checked}))} /> Cut plane</label>
-                {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -.7, .7, .01] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => setSpatial((s) => ({...s, [key]: +e.target.value}))} /></label>)}
-                {spatial.mode === "solid" && <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>}
+              {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <div className="cut-controls">
+                <label><input type="checkbox" checked={spatial.cut} onChange={(e) => changeCut({cut:e.target.checked})} /> Cut plane</label>
+                <label><input type="checkbox" checked={spatial.linked !== false} onChange={(e) => changeCut({linked:e.target.checked})} /> Link views</label>
+                <select aria-label="Cut plane orientation" value={spatial.pitch===90&&spatial.yaw===0?"axial":spatial.pitch===0&&spatial.yaw===90?"sagittal":spatial.pitch===0&&spatial.yaw===0?"coronal":"free"} onChange={(e)=>{
+                  const angles={axial:{pitch:90,yaw:0},coronal:{pitch:0,yaw:0},sagittal:{pitch:0,yaw:90}}[e.target.value];
+                  if(angles)changeCut({...angles,offset:planeOffset(volume,[position.sagittal,position.coronal,position.axial],angles)});
+                }}><option value="free" disabled>Oblique</option><option value="axial">Axial</option><option value="coronal">Coronal</option><option value="sagittal">Sagittal</option></select>
+                {[ ["pitch", "Tilt", -90, 90, 1], ["yaw", "Rotate", -180, 180, 1], ["offset", "Depth", -Math.floor(cutRange(volume,spatial)*1000)/1000, Math.floor(cutRange(volume,spatial)*1000)/1000, .001] ].map(([key, label, min, max, step]) => <label key={key}>{label}<input aria-label={`Cut plane ${label.toLowerCase()}`} type="range" min={min} max={max} step={step} value={spatial[key]} onChange={(e) => changeCut({[key]:+e.target.value})} /></label>)}
+                {(spatial.mode === "solid" || spatial.mode === "volume") && <select aria-label="Isolate 3D region" value={spatial.isolate} onChange={(e) => setSpatial((s) => ({...s, isolate: e.target.value}))}><option value="all">Whole volume</option><option value="reference" disabled={!metrics.countA}>Reference only</option><option value="proposal" disabled={!metrics.countB}>Proposal only</option>{volume.tissues && <><option value="tissue-1">CSF only</option><option value="tissue-2">Gray matter only</option><option value="tissue-3">White matter only</option></>}</select>}
                 {volume.tissues && <label><input type="checkbox" checked={spatial.color} onChange={(e) => setSpatial((s) => ({...s, color: e.target.checked}))} /> Tissue colors</label>}
-                <button onClick={() => setSpatial((s) => ({...s, pitch: 0, yaw: 0, offset: 0, isolate: "all"}))}>Reset cut</button>
+                <button onClick={() => changeCut({pitch:0,yaw:0,offset:0,isolate:"all"})}>Reset cut</button>
               </div>}
               <div className="orbit-note">
                 <Compass size={12} /> Drag to orbit · scroll to zoom
@@ -1242,10 +1269,10 @@ function App() {
                 onPaint={paint}
                 onEnd={endStroke}
                 point={point}
+                position={position}
+                spatial={spatial}
                 setPoint={(p) => {
-                  setPoint(p);
-                  const [x, y, z] = voxelAt(volume, p.axis, p.x, p.y, p.slice);
-                  setPosition({ axial: z, coronal: y, sagittal: x });
+                  navigate(voxelAt(volume,p.axis,p.x,p.y,p.slice),p.axis);
                 }}
                 revision={revision}
                 zoom={zoom}
@@ -1255,7 +1282,8 @@ function App() {
           <SliceFilmstrip volume={volume} axis={axis} slice={position[axis]} onAxis={setAxis} onSlice={(s) => changeSlice(axis, s)} settings={settings} />
           <footer className="workspace-footer">
             <span>
-              <span className="status-dot" /> Views synchronized{" "}
+              <span className="status-dot" /> {spatial.linked === false ? "Independent cut" : "Linked views"}{" "}
+              {spatial.cut && spatial.mode !== "context" && <span className="cut-key" title="Amber dashed line: 3D cut plane intersection"> · Cut trace</span>}
               <span className="footer-divider">/</span>{" "}
               <span className="mono">
                 {cap(axis)} {position[axis] + 1}
@@ -1403,6 +1431,14 @@ function App() {
               <span className="panel-eyebrow">VIEW SETTINGS</span>
               <label className="privacy-toggle"><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /> Privacy pixelation</label>
               <h3>Make room for detail.</h3>
+              <label>Color map<select aria-label="Intensity color map" value={settings.colorMap??"gray"} onChange={(e)=>setSettings((s)=>({...s,colorMap:e.target.value}))}><option value="gray">Grayscale</option><option value="ice">Ice · intensity colors</option><option value="amber">Amber · intensity colors</option></select></label>
+              {[["gain","Intensity",.25,4,.05],["contrast","Contrast",.3,3,.05]].map(([key,label,min,max,step])=><label key={key}>{label}<span className="mono">{(settings[key]??1).toFixed(2)}</span><input aria-label={label} type="range" min={min} max={max} step={step} value={settings[key]??1} onChange={(e)=>setSettings((s)=>({...s,[key]:+e.target.value}))} /></label>)}
+              <label>3D view<select aria-label="Display rendering mode" value={spatial.mode} onChange={(e)=>setSpatial((s)=>({...s,mode:e.target.value}))}>{volume.atlas&&<option value="atlas">Anatomy surfaces</option>}<option value="solid">Solid cutaway</option><option value="volume">Translucent volume</option><option value="context">Slice context</option></select></label>
+              {spatial.mode==="volume"&&<label>Volume opacity<span className="mono">{Math.round((settings.volumeOpacity??.15)*100)}%</span><input aria-label="Volume opacity" type="range" min=".02" max="1" step=".01" value={settings.volumeOpacity??.15} onChange={(e)=>setSettings((s)=>({...s,volumeOpacity:+e.target.value}))} /></label>}
+              {(spatial.mode==="solid"||spatial.mode==="volume")&&<label>Ray quality<select aria-label="Ray quality" value={settings.quality??"balanced"} onChange={(e)=>setSettings((s)=>({...s,quality:e.target.value}))}><option value="fast">Fast</option><option value="balanced">Balanced</option><option value="fine">Fine</option></select></label>}
+              {spatial.mode==="volume"&&<label>Ray jitter<span className="mono">{Math.round((settings.jitter??0)*100)}%</span><input aria-label="Ray jitter" type="range" min="0" max="1" step=".05" value={settings.jitter??0} onChange={(e)=>setSettings((s)=>({...s,jitter:+e.target.value}))} /></label>}
+              <label>3D background<select aria-label="3D background" value={settings.background??"theme"} onChange={(e)=>setSettings((s)=>({...s,background:e.target.value}))}><option value="theme">Follow theme</option><option value="black">Black</option><option value="white">White</option></select></label>
+
               <label>Solid background threshold <span className="mono">{spatial.threshold}</span><input aria-label="Solid background threshold" type="range" min="5" max="150" value={spatial.threshold} onChange={(e) => setSpatial((s) => ({...s, threshold: +e.target.value}))} /></label>
               <label>
                 Window <span className="mono">{settings.window}</span>
@@ -1447,7 +1483,7 @@ function App() {
                   }
                 />
               </label>
-              <label>
+              {spatial.mode === "context" && <label>
                 3D anatomy opacity{" "}
                 <span className="mono">{Math.round(brainOpacity * 100)}%</span>
                 <input
@@ -1459,7 +1495,7 @@ function App() {
                   value={brainOpacity}
                   onChange={(e) => setBrainOpacity(+e.target.value)}
                 />
-              </label>
+              </label>}
               <label>
                 Brush radius <span className="mono">{brush} vx</span>
                 <input
@@ -1475,8 +1511,9 @@ function App() {
                 className="button secondary"
                 onClick={() => {
                   setSettings({
-                    window: 210,
-                    level: 105,
+                    ...displayDefaults,
+                    window: volume.atlas ? 100 : volume.id === "slicer-tumor" ? 90 : 210,
+                    level: volume.atlas ? 50 : volume.id === "slicer-tumor" ? 45 : 105,
                     overlay: true,
                     reference: true,
                     opacity: 0.55,

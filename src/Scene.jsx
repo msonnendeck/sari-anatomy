@@ -6,6 +6,8 @@ import { slicePixels } from "./volume.mjs";
 import HumanBody from "./HumanBody.jsx";
 import PrivacyPixelation from "./PrivacyPixelation.jsx";
 import SolidVolume from "./SolidVolume.jsx";
+import NavigationMarker from "./NavigationMarker.jsx";
+import { sceneToVoxel } from "./navigation.mjs";
 import AtlasAnatomy from "./AtlasAnatomy.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
@@ -112,6 +114,7 @@ function VoxelAnatomy({
   revision,
   spatial,
   displaySettings,
+  onVoxelSelect,
 }) {
   const brain = useMemo(
     () =>
@@ -196,7 +199,7 @@ function VoxelAnatomy({
           />
         </mesh>
       )}
-      <mesh position={pos} rotation={rot}>
+      <mesh position={pos} rotation={rot} onClick={(e) => {if(e.delta>4)return;e.stopPropagation();const p=e.object.parent.worldToLocal(e.point.clone());onVoxelSelect?.(sceneToVoxel(volume,p.toArray()));}}>
         <planeGeometry args={size} />
         <meshBasicMaterial
           map={tex}
@@ -210,7 +213,7 @@ function VoxelAnatomy({
 }
 function Anatomy(props) {
   if (props.spatial.mode === "atlas" && props.volume.atlas) return <React.Suspense fallback={null}><AtlasAnatomy {...props} /></React.Suspense>;
-  if (props.spatial.mode === "solid") return <SolidVolume {...props} />;
+  if (props.spatial.mode === "solid" || props.spatial.mode === "volume") return <SolidVolume {...props} />;
   return <VoxelAnatomy {...props} />;
 }
 class Boundary extends React.Component {
@@ -256,11 +259,11 @@ export default function Scene(props) {
           <React.Suspense fallback={null}>
             <HumanBody opacity={0.2} selected />
             <group position={[0, 2.14, -0.02]} scale={0.18}>
-              <Anatomy {...props} />
+              <Anatomy {...props} /><NavigationMarker {...props} />
             </group>
           </React.Suspense>
         ) : (
-          <Anatomy {...props} />
+          <><Anatomy {...props} /><NavigationMarker {...props} /></>
         )}
         <OrbitControls
           makeDefault

@@ -1,3 +1,4 @@
+import { intensityColor } from "./display.mjs";
 export const index3 = (x, y, z, d) => x + d[0] * (y + d[1] * z);
 export function phantom(size = 96) {
   const dims = [size, size, size],
@@ -152,6 +153,7 @@ export function slicePixels(
     tissueColors = false,
     atlasRegion = null,
     atlasColors = false,
+    gain = 1, contrast = 1, colorMap = "gray",
   } = {},
 ) {
   const [width, height] = sliceSize(v, axis);
@@ -165,7 +167,7 @@ export function slicePixels(
         0,
         Math.min(255, ((v.data[i] - (level - window / 2)) * 255) / window),
       );
-      let color = [val, val, val];
+      let color = intensityColor(v.data[i], {window,level,gain,contrast,colorMap});
       if (tissueColors && v.tissues?.[i]) {
         const tint = [[0,0,0], [184,125,199], [219,168,110], [110,186,232]][v.tissues[i]];
         color = tint.map((c) => c * .65 + val * .35);

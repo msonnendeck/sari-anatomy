@@ -2424,3 +2424,10 @@ kbd {
 .atlas-browser input { accent-color: var(--mint); }
 .atlas-browser a { font-size: 9px; color: var(--muted); }
 .atlas-selected { font-size: 12px; color: var(--mint); line-height: 1.5; }
+.slice-guides { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.slice-guides line, .slice-guides rect { vector-effect: non-scaling-stroke; }
+.cursor-trace { stroke: #79c5f0; stroke-width: .8; opacity: .65; }
+.cut-trace { stroke: #f2bb71; stroke-width: 1.3; stroke-dasharray: 5 4; }
+.linked-seed { pointer-events: none; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #d6efff; box-shadow: 0 0 0 2px #439ed588; }
+.display-panel select { display: block; margin-top: 8px; width: 100%; padding: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 11px; }
+.cut-key { color: var(--amber); }

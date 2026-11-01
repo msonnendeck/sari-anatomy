@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
+import { sceneToVoxel } from "./navigation.mjs";
 let pending;
 function loadSurfaces() {
   return pending ||= fetch("/data/spl-atlas/surfaces.bin.gz").then(async (r) => {
@@ -63,7 +64,7 @@ export default function AtlasAnatomy({ volume, spatial, onAtlasSelect }) {
       // Inner white-matter shells obscure deep structures; expose them on selection.
       if (r.group === "White matter" && !selected) return null;
       const color = selected ? "#70b8ed" : spatial.color ? new THREE.Color(...r.color.map((n) => n/255)).convertSRGBToLinear() : r.group === "Cortex" ? "#d0cdc1" : new THREE.Color(...r.color.map((n) => n/255)).convertSRGBToLinear();
-      return <mesh key={r.id} geometry={geometries[i]} onClick={(e) => {e.stopPropagation(); onAtlasSelect?.(r.id);}}>
+      return <mesh key={r.id} geometry={geometries[i]} onClick={(e) => {if(e.delta>4)return;e.stopPropagation();const p=root.current.worldToLocal(e.point.clone());onAtlasSelect?.(r.id,sceneToVoxel(volume,p.toArray()));}}>
         <meshStandardMaterial color={color} roughness={.68} metalness={.02} emissive={selected ? "#173b57" : "#000000"} emissiveIntensity={.2} clippingPlanes={spatial.cut ? [plane] : []} side={THREE.DoubleSide} />
       </mesh>;
     })}

@@ -185,3 +185,33 @@ to imported scans or the generic whole body. See [atlas provenance and license](
 The current demo targets the M1 MacBook. A mobile-optimized atlas is not claimed.
 The atlas files were converted offline from NRRD/VTK; direct local-file import
 continues to accept scalar NIfTI only.
+
+### Linked navigation and image appearance
+
+The blue cursor is one voxel location shared by all three orthogonal scans and
+3D. Clicking a scan or a 3D source surface/volume navigates to that location;
+selecting an atlas region navigates to its source label centroid. All three scans
+show crosshairs, and the 3D marker is deliberately drawn through occluding anatomy
+as a navigation overlay. It is not an additional anatomical structure.
+
+With **Link views** enabled, moving or rotating the cut plane moves the shared
+anchor to the nearest point on that plane within the volume; orthogonal scans
+show the nearest voxel-center slices through that anchor. Amber dashed traces
+show the actual oblique plane's intersection with each orthogonal view. An angled
+plane is not itself an axial/coronal/sagittal slice. Presets align it to one of the
+three axes. Moving a slice or selecting a point/region also moves the linked plane
+through the shared location. Uncheck Link views to explore the cut independently.
+
+Display adds intensity gain, contrast, grayscale/Ice/Amber color maps, 3D background,
+ray quality and a **Translucent volume** rendering mode. This mode composites
+samples front-to-back within each ray, with adjustable volume opacity and optional
+stable pixel-based jitter; it does not use mesh alpha sorting to reveal internal
+voxels. Intensity maps are display palettes, not natural color, tissue classification
+or diagnostic evidence. MRI values are normalized intensities, not Hounsfield units.
+Fine quality uses more ray samples and can reduce frame rate. No new model calls
+or patient uploads are required by these controls. Local display settings persist.
+
+A click in a translucent volume picks the first threshold-passing foreground voxel
+along the viewing ray (subject to the current cut and isolation mask); it does not
+infer which deeper structure the user intends. Orthogonal slice clicks specify a
+voxel directly. Point markers remain visible through surfaces for orientation.
