@@ -70,7 +70,7 @@ PORT=5187
 
 Restart the server. The UI should show **Muse Spark connected** when the server is configured. This status checks configuration, not API validity, model entitlement, or credit balance. Live calls still require appropriate Meta account access. Verify the model variant and credit coverage in your own account before enabling calls.
 
-- **Muse Spark** receives the current question, voxel dimensions, slice position, and computed annotation metrics. It does not receive scan pixels in assistant requests. It proposes an ordered plan of up to six validated, reversible navigation actions: select a source atlas region, isolate it, change rendering mode or hemisphere, position an oblique cut, select an axis/slice, or reveal masks. The last eight conversational messages are supplied for follow-up context. This is bounded navigation, not an autonomous diagnostic agent.
+- **Muse Spark** receives the current question, voxel dimensions, slice position, and computed annotation metrics. The navigation assistant does not receive scan pixels. The separate **Guided ROI** workflow shares three selected images with Muse only after explicit review and consent. It proposes an ordered plan of up to six validated, reversible navigation actions: select a source atlas region, isolate it, change rendering mode or hemisphere, position an oblique cut, select an axis/slice, or reveal masks. The last eight conversational messages are supplied for follow-up context. This is bounded navigation, not an autonomous diagnostic agent.
 - **SAM 3.1** receives only the selected rendered grayscale slice and a selected foreground point, after the user confirms sharing rights. Its returned mask replaces the proposal on that slice only. This is not volumetric segmentation or medical validation.
 - API keys stay on the server; never use a `VITE_` prefix for secrets. No `.env` file belongs in Git.
 - Free-credit / Contributor terms may allow content to be used for product improvement or training. Dataset permission must cover the intended processing; public availability alone does not establish permission.
@@ -89,9 +89,19 @@ Initial offline implementation used no Meta key. Subsequently, account authentic
 
 SAM is not guaranteed to reproduce source atlas boundaries. The demo should show human review rather than imply automatic correctness. A single-slice proposal compared to a complete 3D structure naturally has low whole-volume Dice.
 
+## Guided ROI and literature exploration
+
+Select a point in a slice or 3D, then choose **Guided ROI**. Draw/edit a box in each preview and enter a research target. After consent, Muse receives three grayscale images plus the shared seed and boxes, and suggests prompts with a rationale. Review and edit those boxes, choose three planes or add 2–6 neighboring axial slices, and approve SAM processing. A second review shows returned voxel counts and cross-plane disagreements before **Apply draft ROI** replaces the proposal.
+
+Reconstruction uses observed sampled masks only; disagreements at intersecting planes are excluded and unsampled voxels remain empty. The isolated proposal is tinted mint. This is a sparse 3D research annotation, not a complete organ reconstruction. Neighboring slices reuse the reviewed axial box/seed as a provisional prompt, not validated tracking. The pipeline uses 1 Muse request plus 3–9 SAM requests; live latency and cost vary. If any request fails, no partial masks are applied.
+
+**Explore literature** opens a separate researcher-reviewed text search. Muse uses Meta search grounding and returns source annotations; SARI requires an actual completed search and source-linked text, otherwise displays an error. Results are literature context, not scan interpretation or a diagnosis. Open original papers to verify applicability, study quality, and limitations; search coverage is not systematic. Only the query is shared. The last ten searches, links, timestamps and ROI generation provenance are retained in the local research record and export. A citation annotation confirms a linked source was returned, not that its claims have been independently clinically validated.
+
+See [guided workflow verification](docs/guided-roi-verification-2026-11-01.md).
+
 ## Local data and limitations
 
-Imported data stays in the browser unless the user explicitly requests a SAM slice upload. Session data is retained in this browser's IndexedDB; use browser site-data controls to remove it or restore the synthetic study to replace the current saved volume. Export before clearing browser data.
+Imported data stays in the browser unless the user explicitly approves a SAM slice upload or the Guided ROI workflow (three images to Muse and the reviewed sampled images to SAM). Literature search sends only the reviewed text query to Meta/search services, never scan images. Session data is retained in this browser's IndexedDB; use browser site-data controls to remove it or restore the synthetic study to replace the current saved volume. Export before clearing browser data.
 
 - Scalar 3D NIfTI only; no DICOM, 4D series, PACS, or video import yet.
 - Imported volumes retain native voxel axes. They are **not** anatomically reoriented, atlas-registered, or aligned with a body. The UI labels these as I/J/K rather than asserting anatomical orientation.
@@ -99,7 +109,7 @@ Imported data stays in the browser unless the user explicitly requests a SAM sli
 - Reference import requires matching dimensions and spatial transforms. All nonzero labels are combined into one binary mask.
 - At most ten in-session undo states are retained; undo history is not persisted.
 - AI generation, slice upload, and large imports can take time. Local file parsing is currently on the main thread.
-- The assistant plans bounded workspace actions with conversational context. It cannot autonomously segment, retrieve reference cases, or make clinical judgments.
+- The navigation assistant plans bounded workspace actions. Guided ROI provides separately reviewed multi-image Muse prompts and sampled SAM masks. Literature search retrieves source-linked research context, not matched patient cases or clinical judgments.
 - Expert annotation review, additional reference cases, clinical evaluation, patient-specific registration, remain outstanding. The supplied whole-brain mask is not ventricular ground truth; comparisons are meaningful only when proposal and reference target the same structure.
 
 ## Broader vision

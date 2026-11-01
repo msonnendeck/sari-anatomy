@@ -1,9 +1,10 @@
 import React,{useState,useRef} from 'react';import {X,Loader2} from 'lucide-react';
+function formatted(text){return text.split(/(\*\*[^*]+\*\*)/g).map((part,i)=>part.startsWith('**')?<strong key={i}>{part.slice(2,-2)}</strong>:part.replace(/^\* /gm,'• '));}
 function CitedText({block}){
  const points=[0,block.text.length,...block.citations.flatMap(c=>[c.start,c.end])].sort((a,b)=>a-b).filter((n,i,a)=>i===0||n!==a[i-1]);
  return <p className="evidence-text">{points.slice(0,-1).map((start,i)=>{
   const end=points[i+1],sources=block.citations.filter(c=>c.start<=start&&c.end>=end),text=block.text.slice(start,end);
-  return <React.Fragment key={start}>{text}{sources.map(c=><a key={`${c.url}:${c.end}`} href={c.url} target="_blank" rel="noreferrer" aria-label={`Source: ${c.title}`} title={c.title}> ↗</a>)}</React.Fragment>;
+  return <React.Fragment key={start}>{formatted(text)}{sources.map(c=><a key={`${c.url}:${c.end}`} href={c.url} target="_blank" rel="noreferrer" aria-label={`Source: ${c.title}`} title={c.title}> ↗</a>)}</React.Fragment>;
  })}</p>;
 }
 export default function EvidenceDialog({region,onClose,onSave}){

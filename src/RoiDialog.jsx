@@ -24,7 +24,7 @@ export default function RoiDialog({job,onClose,onApply}) {
  async function suggest(){
   setBusy('Muse is inspecting three views…');setError('');
   try{
-   const r=await fetch('/api/roi-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frames,target})});const data=await r.json();if(!r.ok)throw new Error(data.error);
+   const r=await fetch('/api/roi-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frames,target,geometry:{dims:job.volume.dims,spacing:job.volume.spacing,orientation:job.volume.orientation,anatomicalAxes:!!job.volume.anatomicalAxes,seed:job.seed}})});const data=await r.json();if(!r.ok)throw new Error(data.error);
    if(!live.current)return;
    setPlan({...data.plan,model:data.model,inputPrompts:frames.map(({image,...f})=>f)});setEdited(false);
    setFrames(old=>old.map(f=>({...f,box:data.plan.views.find(v=>v.axis===f.axis).box})));setResult(null);
@@ -49,6 +49,7 @@ export default function RoiDialog({job,onClose,onApply}) {
   <button className="icon-button modal-close" aria-label="Close ROI review" onClick={onClose}><X size={18}/></button>
   <span className="panel-eyebrow">HUMAN → MUSE → SAM</span><h2 id="roi-title">Shape a research region.</h2>
   <label className="roi-label">Research target<input aria-label="Research target" maxLength={300} value={target} disabled={!!busy||!!plan} onChange={e=>setTarget(e.target.value)}/></label>
+  {!job.volume.anatomicalAxes && !job.volume.synthetic && <p className="fine-print">Native voxel planes: anatomical orientation has not been verified.</p>}
   <p className="fine-print">Draw a box in each view. The shared seed stays inside. Boxes guide a proposal; they do not establish anatomical identity.</p>
   <div className="roi-views">{frames.map(f=><div key={f.axis}><strong>{f.axis} · {f.slice+1}</strong><svg aria-label={`${f.axis} ROI prompt preview`} viewBox={`0 0 ${f.width} ${f.height}`} onPointerDown={e=>!busy&&draw(e,f,true)} onPointerMove={e=>!busy&&draw(e,f,false)} onPointerUp={()=>{drag.current=null;}} onPointerCancel={()=>{drag.current=null;}}>
    <image href={f.image} width={f.width} height={f.height}/><rect {...{x:f.box.left,y:f.box.top,width:f.box.right-f.box.left,height:f.box.bottom-f.box.top}} fill="#90ddca22" stroke="#90ddca" strokeWidth="2"/><circle cx={f.point.x} cy={f.point.y} r="3" fill="#ffce82"/>

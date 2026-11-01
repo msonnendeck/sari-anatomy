@@ -1446,7 +1446,7 @@ function App() {
                     </button>
                     <div className="assistant-note">
                       {status.enabled
-                        ? "Muse receives workspace metrics. Scan images are shared only when you request a SAM proposal."
+                        ? "Navigation uses metadata. Guided ROI shares reviewed images with Muse and SAM."
                         : "Offline commands navigate the workspace. Connect Meta for model-powered assistance."}
                     </div>
                   </div>

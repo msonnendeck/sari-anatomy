@@ -33,3 +33,7 @@ Three perpendicular cross-sections constrain only a sparse part of a volume. Mul
 ## Alternative worth exploring later
 
 Muse can potentially inspect a multi-image bundle and propose region prompts, while SAM supplies pixel masks and SARI handles geometry. This is a separate multimodal integration from the current metadata-only Muse assistant. Rotating between axial/coronal/sagittal images is not equivalent to neighboring frames in a video; video tracking should not be assumed to solve cross-plane registration.
+
+## Implementation update — November 1, 2026
+
+The Guided ROI workflow now implements human boxes, three-image Muse prompt review, 3–9 separate SAM slice requests, cross-plane conflict checks, sampled-mask reconstruction, isolation, and exported generation provenance. A five-plane public-atlas run was applied live. No interpolation fills missing volume. A separate text-only literature explorer uses Meta search grounding with returned citation annotations. See [verification](guided-roi-verification-2026-11-01.md).
