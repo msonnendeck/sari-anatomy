@@ -24,3 +24,8 @@ workspace/
 *.nrrd
 *.mha
 *.mhd
+
+# Browser QA and local exports
+playwright-report/
+test-results/
+*.log
