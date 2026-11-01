@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import {installRoiRoutes} from "./roi-api.mjs";
 import { expandMask } from "./sam-mask.mjs";
 import { validAction, conversationHistory } from "../src/assistant-actions.mjs";
 import OpenAI from "openai";
@@ -19,7 +20,7 @@ const allowedOrigins = new Set([...allowedAuthorities].map((h) => `http://${h}`)
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const app = express();
 app.disable("x-powered-by");
-app.use(express.json({ limit: "5mb" }));
+app.use(express.json({ limit: "12mb" }));
 const ready = () =>
   process.env.META_ENABLED === "true" && !!process.env.MODEL_API_KEY;
 app.use("/api", (req, res, next) => {
@@ -239,6 +240,7 @@ app.post("/api/segment", async (req, res) => {
       });
   }
 });
+installRoiRoutes(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 app.use((err, req, res, next) =>
   res.status(400).json({ error: "Invalid request body." }),
 );

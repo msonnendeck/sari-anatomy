@@ -60,6 +60,8 @@ import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
 import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
 import { validAction } from "./assistant-actions.mjs";
+import RoiDialog,{captureRoiFrame} from "./RoiDialog.jsx";
+import {seedViews} from "./roi.mjs";
 import StudyPreview from "./StudyPreview.jsx";
 import SliceFilmstrip from "./SliceFilmstrip.jsx";
 import { growRegion } from "./regions.mjs";
@@ -312,6 +314,8 @@ function App() {
     [brainOpacity, setBrainOpacity] = useState(0.18),
     [rotate, setRotate] = useState(false),
     [tab, setTab] = useState("assistant");
+  const [roiJob,setRoiJob]=useState(null);
+  const latestRevision=useRef(revision);latestRevision.current=revision;
   const [messages, setMessages] = useState([]),
     [input, setInput] = useState(""),
     [busy, setBusy] = useState(false),
@@ -608,6 +612,7 @@ function App() {
         units: volume.units,
         orientation: volume.orientation,
       },
+      roiProvenance: volume.roiProvenance || null,
       maskProvenance: volume.synthetic
         ? "Procedural reference and deliberately perturbed proposal; subsequent edits recorded below"
         : volume.bundled
@@ -756,6 +761,23 @@ function App() {
     } finally {
       setBusy(false);
     }
+  }
+  function openRoi() {
+    if(!point){setToast("Select a point in a slice or the 3D view first.");return;}
+    if(!status.enabled){setModal("connection");return;}
+    const seed=voxelAt(volume,point.axis,point.x,point.y,point.slice);
+    try {
+      const frames=seedViews(volume,seed).map(f=>captureRoiFrame(volume,f));
+      setRoiJob({volume,revision,seed,frames,target:volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || "Selected research region"});
+    }catch(e){setToast(e.message);}
+  }
+  function applyRoi(result) {
+    if(activeVolume.current!==roiJob.volume || latestRevision.current!==roiJob.revision){setToast("Workspace changed. Start a new ROI review; existing proposal preserved.");setRoiJob(null);return;}
+    remember();volume.proposal.set(result.mask);volume.roiProvenance=result.provenance;
+    setRevision(r=>r+1);setSettings(s=>({...s,overlay:true}));
+    setSpatial(s=>({...s,mode:"solid",isolate:"proposal",cut:false,atlasIsolate:false}));
+    record(`Reviewed ROI applied: ${JSON.stringify(result.provenance)}`);
+    setRoiJob(null);setToast("Draft ROI applied. Inspect the sampled planes before using.");
   }
   async function segment() {
     if (!point) {
@@ -1216,6 +1238,7 @@ function App() {
                 <SlidersHorizontal size={14} />
                 <span>Display</span>
               </button>
+              <button className="quiet-button" disabled={samBusy||busy} onClick={openRoi}><Focus size={14}/> Guided ROI</button>
               <button
                 className="sam-button"
                 onClick={segment}
@@ -1617,6 +1640,7 @@ function App() {
           </button>
         </div>
       )}
+      {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (
         <div className="modal-backdrop" onClick={() => setModal(null)}>
           <section
