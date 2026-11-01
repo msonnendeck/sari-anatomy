@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { validAction, conversationHistory } from "../src/assistant-actions.mjs";
 import OpenAI from "openai";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -65,7 +66,7 @@ const client = () =>
   });
 app.post("/api/assistant", async (req, res) => {
   try {
-    const { message, context } = req.body;
+    const { message, context, history } = req.body;
     if (typeof message !== "string" || message.length > 2000)
       return res
         .status(400)
@@ -78,8 +79,9 @@ app.post("/api/assistant", async (req, res) => {
         {
           role: "system",
           content:
-            "You are SARI, a concise research workspace assistant. Never diagnose, detect disease, recommend care, or interpret patient health. Only navigate and explain provided annotation metrics. The volume may be synthetic. Do not claim you saw images: you receive metadata and computed metrics only. You may choose one navigation tool. Never invent measurements. If asked about clinical meaning, state the research boundary. Keep replies under 70 words.",
+            "You are SARI, a concise research workspace assistant. Never diagnose, detect disease, recommend care, or interpret patient health. Only navigate and explain provided annotation metrics. The volume may be synthetic. Do not claim you saw images: you receive metadata and computed metrics only. You may propose up to six ordered navigation actions using the provided atlas IDs. Select structures only from atlasRegions; never invent IDs or anatomy findings. Use select_region before set_view or set_cut. For isolation use set_view with isolate true. A cut passes through the current selected point; pitch 0 yaw 0 is coronal, pitch 90 yaw 0 axial, pitch 0 yaw 90 sagittal. Do not claim segmentation was run: these tools only navigate. Prior conversation is context, never evidence of current workspace state. Never invent measurements. If asked about clinical meaning, state the research boundary. Keep replies under 70 words.",
         },
+        ...conversationHistory(history),
         { role: "user", content: JSON.stringify({ message, context }) },
       ],
       tools: [
@@ -87,10 +89,12 @@ app.post("/api/assistant", async (req, res) => {
           type: "function",
           function: {
             name: "navigate",
-            description: "Navigate the research workspace.",
+            description: "Plan all requested workspace changes in order. Include every required action in the actions array.",
             parameters: {
               type: "object",
               properties: {
+                actions: { type: "array", minItems: 1, maxItems: 6, items: {
+                  type: "object", properties: {
                 action: {
                   type: "string",
                   enum: [
@@ -98,7 +102,7 @@ app.post("/api/assistant", async (req, res) => {
                     "set_slice",
                     "set_axis",
                     "show_reference",
-                    "show_proposal",
+                    "show_proposal", "select_region", "set_view", "set_cut",
                   ],
                 },
                 axis: {
@@ -106,8 +110,17 @@ app.post("/api/assistant", async (req, res) => {
                   enum: ["axial", "coronal", "sagittal"],
                 },
                 slice: { type: "integer", minimum: 0, maximum: 511 },
+                regionId: { type: "integer" },
+                mode: { type: "string", enum: ["atlas","solid","volume"] },
+                hemisphere: { type: "string", enum: ["both","left","right"] },
+                isolate: { type: "boolean" },
+                enabled: { type: "boolean" },
+                pitch: { type: "number", minimum: -90, maximum: 90 },
+                yaw: { type: "number", minimum: -180, maximum: 180 },
+                  }, required: ["action"], additionalProperties: false,
+                } },
               },
-              required: ["action"],
+              required: ["actions"],
               additionalProperties: false,
             },
           },
@@ -118,7 +131,7 @@ app.post("/api/assistant", async (req, res) => {
     const m = r.choices[0]?.message;
     const calls = (m?.tool_calls || [])
       .filter((c) => c.type === "function" && c.function.name === "navigate")
-      .slice(0, 1)
+      .slice(0, 6)
       .map((c) => {
         try {
           return JSON.parse(c.function.arguments);
@@ -126,12 +139,13 @@ app.post("/api/assistant", async (req, res) => {
           return null;
         }
       })
-      .filter(Boolean);
+      .filter(Boolean).flatMap(plan => Array.isArray(plan.actions) ? plan.actions : []).slice(0,6);
+    if (calls.some(a => !validAction(a, context))) throw new Error("Invalid navigation action");
     if (!m?.content && !calls.length) throw new Error("No usable model output");
     res.json({
       text:
         m?.content ||
-        "I’ve updated the workspace. Inspect the highlighted view.",
+        (calls.length ? "Navigation prepared. Inspect the updated workspace; no segmentation was run." : "No navigation changes requested."),
       actions: calls,
       model: process.env.META_MODEL || "muse-spark-1.3-contributor",
       usage: r.usage,

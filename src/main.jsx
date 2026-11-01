@@ -58,6 +58,8 @@ import { readVolume } from "./nifti.mjs";
 import { loadResearchSample, researchSamples } from "./datasets.mjs";
 import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
+import { atlasReference, binaryOverlap } from "./atlas-reference.mjs";
+import { validAction } from "./assistant-actions.mjs";
 import StudyPreview from "./StudyPreview.jsx";
 import SliceFilmstrip from "./SliceFilmstrip.jsx";
 import { growRegion } from "./regions.mjs";
@@ -452,6 +454,18 @@ function App() {
       setPoint(null);
     }
   }
+  function useAtlasReference() {
+    try {
+      const {mask,seed,region}=atlasReference(volume,spatial.region);
+      volume.reference=mask;
+      volume.referenceLabel=region.name;
+      volume.referenceKind=`Source atlas label ${region.id}: ${region.name}; resampled source annotation, not model output`;
+      navigate(seed,axis);setRevision(r=>r+1);
+      setSettings(s=>({...s,reference:true}));
+      record(`Comparison target set to source atlas label ${region.id}: ${region.name}`);
+      setToast("Source annotation selected as reference. Seed placed inside the structure.");
+    } catch(e){setToast(e.message);}
+  }
   function growSeed() {
     if (!point) return;
     try {
@@ -634,23 +648,33 @@ function App() {
       return "SARI supports research annotation review. It does not assess health, detect disease, or provide diagnosis or treatment advice.";
     return "Offline controls support “largest disagreement”, “compare masks”, “show reference”, or selecting an axial, coronal, or sagittal view. Connect Meta to ask Muse open-ended workspace questions.";
   }
-  function applyAction(a) {
-    if (a.action === "worst_difference") worst();
-    else if (a.action === "set_axis" && axes.includes(a.axis)) setAxis(a.axis);
-    else if (
-      a.action === "set_slice" &&
-      axes.includes(a.axis) &&
-      Number.isInteger(a.slice)
-    ) {
-      setAxis(a.axis);
-      changeSlice(
-        a.axis,
-        Math.max(0, Math.min(sliceCount(volume, a.axis) - 1, a.slice)),
-      );
-    } else if (a.action === "show_reference")
-      setSettings((s) => ({ ...s, reference: true }));
-    else if (a.action === "show_proposal")
-      setSettings((s) => ({ ...s, overlay: true }));
+  function applyActions(actions) {
+    const context = {dims:volume.dims,atlasRegions:volume.atlas?.regions};
+    if (!Array.isArray(actions) || actions.some(a => !validAction(a,context))) throw new Error("Invalid navigation response; workspace preserved.");
+    let nextSpatial={...spatial}, nextPosition={...position}, nextAxis=axis;
+    for (const a of actions) {
+      if (a.action === "select_region") {
+        const region=volume.atlas.regions.find(r=>r.id===a.regionId);
+        nextSpatial.region=region.id;
+        const [x,y,z]=region.centroid.map(Math.round);
+        nextPosition={sagittal:x,coronal:y,axial:z};
+      } else if (a.action === "set_view") {
+        Object.assign(nextSpatial,{mode:a.mode,hemisphere:a.hemisphere || nextSpatial.hemisphere,atlasIsolate:a.isolate});
+      } else if (a.action === "set_cut") {
+        Object.assign(nextSpatial,{cut:a.enabled,pitch:a.pitch,yaw:a.yaw,linked:true});
+      } else if (a.action === "set_axis") nextAxis=a.axis;
+      else if (a.action === "set_slice") {nextAxis=a.axis;nextPosition[a.axis]=a.slice;}
+      else if (a.action === "worst_difference") {
+        if (!metrics.countA || !metrics.countB || !metrics.difference) throw new Error("Two differing masks are needed for comparison.");
+        nextAxis="axial";nextPosition.axial=metrics.worst;
+      } else if (a.action === "show_reference") setSettings(s=>({...s,reference:true}));
+      else if (a.action === "show_proposal") setSettings(s=>({...s,overlay:true}));
+    }
+    const xyz=[nextPosition.sagittal,nextPosition.coronal,nextPosition.axial];
+    nextSpatial.offset=planeOffset(volume,xyz,nextSpatial);
+    setSpatial(nextSpatial);setPosition(nextPosition);setAxis(nextAxis);
+    setPoint(slicePoint(volume,nextAxis,xyz));
+    if(actions.length) setOverview(false);
   }
   async function ask(text = input) {
     if (!text.trim() || busy) return;
@@ -664,8 +688,11 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: text,
+            history: messages.filter(m => m.source !== "Connection error"),
             context: {
               synthetic: volume.synthetic,
+              atlasRegions: volume.atlas?.regions.map(({id,name})=>({id,name})),
+              view: {mode:spatial.mode,hemisphere:spatial.hemisphere,isolate:spatial.atlasIsolate,cut:spatial.cut},
               caseContext: volume.caseContext,
               selectedAtlasStructure: volume.atlas?.regions.find((r) => r.id === spatial.region)?.name || null,
               dims: volume.dims,
@@ -692,7 +719,7 @@ function App() {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        data.actions.forEach(applyAction);
+        applyActions(data.actions);
         setMessages((m) => [
           ...m,
           { role: "assistant", text: data.text, source: data.model },
@@ -767,6 +794,10 @@ function App() {
             : 0;
         }
       setRevision((r) => r + 1);
+      const referenceSlice=new Uint8Array(width*height);
+      for(let y=0;y<height;y++)for(let x=0;x<width;x++) referenceSlice[x+y*width]=volume.reference[index3(...voxelAt(volume,captured.axis,x,y,captured.slice),volume.dims)];
+      const agreement=binaryOverlap(referenceSlice,data.mask);
+      record(`SAM slice comparison: ${JSON.stringify(agreement)}; target: ${volume.referenceKind}; 2D agreement only, not clinical accuracy`);
       record(
         `SAM 3.1 proposal on ${captured.axis} slice ${captured.slice + 1}; point ${captured.x},${captured.y}`,
       );
@@ -972,6 +1003,7 @@ function App() {
             <select aria-label="Context hemisphere" value={spatial.hemisphere || "both"} onChange={(e) => setSpatial((s) => ({...s, hemisphere:e.target.value}))}><option value="both">Both hemispheres</option><option value="left">Left hemisphere</option><option value="right">Right hemisphere</option></select>
             <label><input type="checkbox" checked={!!spatial.atlasIsolate} disabled={!spatial.region} onChange={(e) => setSpatial((s) => ({...s, atlasIsolate:e.target.checked}))} /> Isolate selected structure</label>
             <label><input type="checkbox" checked={!!spatial.color} onChange={(e) => setSpatial((s) => ({...s, color:e.target.checked}))} /> Atlas colors</label>
+            <button className="quiet-button" disabled={!spatial.region || samBusy} onClick={useAtlasReference}>Use structure as reference</button>
             {spatial.region && <p className="atlas-selected">{volume.atlas.regions.find((r) => r.id === spatial.region)?.name}</p>}
             <a href="/data/spl-atlas/README.md" target="_blank" rel="noreferrer">Atlas source & attribution ↗</a>
           </div>}
@@ -1349,10 +1381,10 @@ function App() {
                   <div className="empty-conversation">
                     <span className="panel-eyebrow">START WITH A QUESTION</span>
                     <button
-                      onClick={() => ask("Show the largest disagreement")}
+                      onClick={() => ask(volume.atlas ? "Show the left hippocampus, isolate it in anatomy view, and select the coronal view." : "Show the largest disagreement")}
                     >
                       <Crosshair size={15} />
-                      <span>Where do the masks disagree?</span>
+                      <span>{volume.atlas ? "Explore the left hippocampus" : "Where do the masks disagree?"}</span>
                       <ArrowUp size={13} />
                     </button>
                     <button onClick={() => ask("Compare the masks")}>
