@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { slicePixels } from "./volume.mjs";
 import HumanBody from "./HumanBody.jsx";
+import PrivacyPixelation from "./PrivacyPixelation.jsx";
 function surface(v, mask, step = 2) {
   const verts = [];
   const d = v.dims,
@@ -226,6 +227,7 @@ export default function Scene(props) {
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true }}
       >
+        {props.bodyContext && props.privacy && <PrivacyPixelation />}
         <ambientLight intensity={1.3} />
         <directionalLight
           position={[4, 5, 3]}

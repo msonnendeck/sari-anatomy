@@ -17,8 +17,11 @@ import {
   X,
 } from "lucide-react";
 import HumanBody from "./HumanBody.jsx";
+import PrivacyPixelation from "./PrivacyPixelation.jsx";
 export default function BodyOverview({
   theme,
+  privacy,
+  setPrivacy,
   setTheme,
   onHeadSelect,
   loading,
@@ -41,6 +44,7 @@ export default function BodyOverview({
         </div>
         <span className="body-header-label">SPATIAL RESEARCH INTERFACE</span>
         <div className="body-header-right">
+          <button className="privacy-button" aria-pressed={privacy} onClick={() => setPrivacy(!privacy)}>Privacy pixelation {privacy ? "on" : "off"}</button>
           <span className="research-tag">
             <span />
             RESEARCH ONLY
@@ -128,6 +132,7 @@ export default function BodyOverview({
             dpr={[1, 1.7]}
             gl={{ antialias: true, alpha: true }}
           >
+            {privacy && <PrivacyPixelation />}
             <ambientLight intensity={1.3} />
             <directionalLight
               position={[3, 5, 5]}

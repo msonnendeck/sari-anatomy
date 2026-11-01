@@ -285,6 +285,8 @@ function App() {
     sagittal: 48,
   });
   const [axis, setAxis] = useState("axial");
+  const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
+  useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
   const [layout, setLayout] = useState(() => localStorage.getItem("sari-layout") === "grid" ? "grid" : "anatomy");
   useEffect(() => { localStorage.setItem("sari-layout", layout); }, [layout]);
   const [revision, setRevision] = useState(0);
@@ -742,6 +744,8 @@ function App() {
     >
       <BodyOverview
         theme={theme}
+        privacy={privacy}
+        setPrivacy={setPrivacy}
         setTheme={setTheme}
         onHeadSelect={() => (volume.bundled ? setOverview(false) : openMni())}
         loading={loadingStudy}
@@ -1129,6 +1133,7 @@ function App() {
               >
                 <Scene
                   bodyContext={bodyContext}
+                  privacy={privacy}
                   volume={volume}
                   slice={position[axis]}
                   axis={axis}
@@ -1332,6 +1337,7 @@ function App() {
           ) : tab === "display" ? (
             <div className="display-panel">
               <span className="panel-eyebrow">VIEW SETTINGS</span>
+              <label className="privacy-toggle"><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /> Privacy pixelation</label>
               <h3>Make room for detail.</h3>
               <label>
                 Window <span className="mono">{settings.window}</span>

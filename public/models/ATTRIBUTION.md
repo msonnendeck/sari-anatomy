@@ -12,6 +12,6 @@ The downloaded OBJ itself additionally contains the older CC Attribution-Share A
 Original embedded notice:
 “The license for this database is specified in the Creative Commons Attribution-Share Alike 2.1 Japan. If you use data from this database, please be sure attribute this database as follows: BodyParts3D, (c) The Database Center for Life Science licensed under CC Attribution-Share Alike 2.1 Japan.”
 
-SARI adaptations: coordinate normalization, axis conversion, vertex deduplication, binary compression, and no anatomical surface removal or flattening. Every original triangle is retained; a separate opaque cloud cover hides the pelvis in the interface. The model is an adult reference surface, not a patient scan or subject-specific registration target. It is not an anatomical measurement tool.
+SARI adaptations: coordinate normalization, axis conversion, vertex deduplication, binary compression, and no anatomical surface removal or flattening. Every original triangle is retained; an optional screen-space pixelation filter covers the pelvis without changing the mesh. The model is an adult reference surface, not a patient scan or subject-specific registration target. It is not an anatomical measurement tool.
 
 Preparation: `node scripts/prepare-body.mjs /path/to/FJ2810.obj`.

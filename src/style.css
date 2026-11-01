@@ -2402,3 +2402,7 @@ kbd {
   .layout-anatomy .breadcrumbs { margin-bottom: 6px; }
   .layout-anatomy .scene-card .scene-overlay { top: 39px; }
 }
+.privacy-button { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 20px; padding: 8px 12px; font-size: 11px; }
+.privacy-button[aria-pressed="true"] { color: var(--mint); background: var(--mint-soft); }
+.display-panel .privacy-toggle { display: flex; align-items: center; gap: 10px; }
+.display-panel .privacy-toggle input { width: auto; margin: 0; accent-color: var(--mint); }

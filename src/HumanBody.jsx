@@ -60,49 +60,6 @@ export default function HumanBody({
       >
         <meshStandardMaterial {...material} />
       </mesh>
-      <group position={[0, -0.13, 0.02]}>
-        {[
-          [
-            [0, 0, 0],
-            [0.45, 0.29, 0.43],
-          ],
-          [
-            [-0.28, 0.04, 0],
-            [0.23, 0.21, 0.36],
-          ],
-          [
-            [0.28, 0.04, 0],
-            [0.23, 0.21, 0.36],
-          ],
-          [
-            [-0.16, -0.18, 0.09],
-            [0.28, 0.19, 0.38],
-          ],
-          [
-            [0.17, -0.18, 0.09],
-            [0.28, 0.19, 0.38],
-          ],
-          [
-            [-0.08, 0.18, 0.05],
-            [0.28, 0.18, 0.34],
-          ],
-          [
-            [0.16, 0.16, -0.06],
-            [0.23, 0.18, 0.34],
-          ],
-        ].map(([position, scale], i) => (
-          <mesh key={i} position={position} scale={scale} renderOrder={5}>
-            <sphereGeometry args={[1, 32, 20]} />
-            <meshStandardMaterial
-              color="#c4d5d5"
-              roughness={1}
-              metalness={0}
-              transparent={false}
-              depthWrite
-            />
-          </mesh>
-        ))}
-      </group>
       <mesh
         position={[0, 2.14, -0.02]}
         scale={[0.31, 0.36, 0.3]}

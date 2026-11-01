@@ -45,7 +45,7 @@ SARI opens on an interactive **BodyParts3D reference human body**. Click the hea
 
 The workspace's **Show full-body context** control places the study at the head of the generic body. This placement is illustrative, not patient-specific registration: the body and MRI come from different reference sources. Imported volumes remain in native voxel axes and must not be assumed to be anatomically aligned.
 
-The body mesh retains its original anatomical geometry; a separate opaque cloud covers the pelvis. Thorax/heart and neck/thyroid are shown only as future regions, not available studies. BodyParts3D attribution and the MRI source details are available through **Data & attribution** and the bundled notices.
+The body mesh retains its original anatomical geometry; an optional screen-space pixelation filter covers the pelvis for recording. Thorax/heart and neck/thyroid are shown only as future regions, not available studies. BodyParts3D attribution and the MRI source details are available through **Data & attribution** and the bundled notices.
 
 The original procedural 96³ T1-like brain phantom remains available as **Try synthetic study**. Its reference and deliberately perturbed proposal are synthetic, not expert annotations or model output.
 
