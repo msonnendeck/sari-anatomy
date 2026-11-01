@@ -58,6 +58,7 @@ import { readVolume } from "./nifti.mjs";
 import { loadResearchSample, researchSamples } from "./datasets.mjs";
 import { displayDefaults } from "./display.mjs";
 import { cutRange, anchorOnPlane, planeOffset, slicePoint, cutIntersection } from "./navigation.mjs";
+import StudyPreview from "./StudyPreview.jsx";
 import SliceFilmstrip from "./SliceFilmstrip.jsx";
 import { growRegion } from "./regions.mjs";
 import "./style.css";
@@ -844,7 +845,7 @@ function App() {
         onChange={(e) => load(e, true)}
       />
       <header className="topbar">
-        <a href="#" className="brand" aria-label="SARI home">
+        <a href="/" className="brand" aria-label="SARI overview" onClick={(e) => { e.preventDefault(); setModal(null); setOverview(true); }}>
           <Logo />
           <span>
             SARI<small>ANATOMY IN CONTEXT</small>
@@ -908,16 +909,17 @@ function App() {
             <br />
             <span>in perspective.</span>
           </h2>
-          <button className="study-tile" onClick={() => setModal("study")}>
+          <button className="study-tile" aria-label={`Choose study. Current: ${volume.name}`} onClick={() => setModal("study")}>
             <div className="study-art">
-              <div className="mini-brain" />
+              <StudyPreview volume={volume} />
               <span className="sample-tag">
                 {volume.synthetic
-                  ? "SYNTHETIC"
-                  : volume.bundled
-                    ? "MRI TEMPLATE"
-                    : "LOCAL FILE"}
+                  ? "PHANTOM"
+                  : volume.atlas
+                    ? "ANATOMY ATLAS"
+                    : volume.bundled ? "RESEARCH MRI" : "LOCAL VOLUME"}
               </span>
+              <span className="study-switch-hint">Choose study <ChevronDown size={11} /></span>
             </div>
             <div className="study-tile-body">
               <span className="tiny-icon">

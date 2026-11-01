@@ -302,33 +302,6 @@ small {
   justify-content: center;
   align-items: center;
 }
-.mini-brain {
-  width: 84px;
-  height: 85px;
-  border-radius: 45% 45% 43% 43%;
-  background: repeating-radial-gradient(
-    ellipse at 40% 50%,
-    #738586 0px,
-    #738586 2px,
-    #384a50 3px,
-    #899796 4px,
-    #52656a 7px
-  );
-  box-shadow:
-    inset 0 0 14px 5px #17242f,
-    0 4px 25px #070d16;
-  transform: rotate(-7deg);
-  opacity: 0.8;
-}
-.mini-brain:after {
-  content: "";
-  position: absolute;
-  width: 2px;
-  height: 70px;
-  background: #283a43;
-  left: 50%;
-  top: 4px;
-}
 .sample-tag {
   position: absolute;
   left: 9px;
@@ -2431,3 +2404,7 @@ kbd {
 .linked-seed { pointer-events: none; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #d6efff; box-shadow: 0 0 0 2px #439ed588; }
 .display-panel select { display: block; margin-top: 8px; width: 100%; padding: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 11px; }
 .cut-key { color: var(--amber); }
+
+.study-preview { width: 100%; height: 100%; display: block; }
+.study-switch-hint { position: absolute; right: 8px; top: 9px; display: flex; align-items: center; gap: 3px; color: #bfd6df; font-size: 8px; padding: 4px 5px; background: #101b24d9; border-radius: 4px; }
+.brand:hover { opacity: .85; }
