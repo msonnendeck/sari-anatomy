@@ -1,3 +1,4 @@
+import SlicePlaneFrame from "./SlicePlaneFrame.jsx";
 import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
@@ -292,11 +293,11 @@ export default function Scene(props) {
           <React.Suspense fallback={null}>
             <HumanBody opacity={0.2} selected />
             <group position={[0, 2.14, -0.02]} scale={0.18}>
-              <Anatomy {...props} /><NavigationMarker {...props} />
+              <Anatomy {...props} /><NavigationMarker {...props} /><SlicePlaneFrame {...props} />
             </group>
           </React.Suspense>
         ) : (
-          <><Anatomy {...props} /><NavigationMarker {...props} /></>
+          <><Anatomy {...props} /><NavigationMarker {...props} /><SlicePlaneFrame {...props} /></>
         )}
         <OrbitControls
           makeDefault

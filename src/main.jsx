@@ -1394,6 +1394,7 @@ function App() {
           </div>
           {(spatial.mode === "solid" || spatial.mode === "atlas" || spatial.mode === "volume") && <details className="spatial-inspector" open={inspectorOpen} onToggle={e=>setInspectorOpen(e.currentTarget.open)}><summary>3D inspector · Cut & isolation</summary><div className="cut-controls">
                 <label><input type="checkbox" checked={spatial.cut} onChange={(e) => changeCut({cut:e.target.checked})} /> Cut plane</label>
+                <label title="Show a subtle frame and inward glow around the active cut plane"><input type="checkbox" checked={!!spatial.planeFrame} onChange={e=>setSpatial(s=>({...s,planeFrame:e.target.checked}))} /> Plane frame</label>
                 <label><input type="checkbox" checked={spatial.linked !== false} onChange={(e) => changeCut({linked:e.target.checked})} /> Link views</label>
                 <select aria-label="Cut plane orientation" value={spatial.pitch===90&&spatial.yaw===0?"axial":spatial.pitch===0&&spatial.yaw===90?"sagittal":spatial.pitch===0&&spatial.yaw===0?"coronal":"free"} onChange={(e)=>{
                   const angles={axial:{pitch:90,yaw:0},coronal:{pitch:0,yaw:0},sagittal:{pitch:0,yaw:90}}[e.target.value];
