@@ -8,19 +8,31 @@ function CitedText({block}){
   return <React.Fragment key={start}>{formatted(text)}{sources.map(c=><a key={`${c.url}:${c.end}`} href={c.url} target="_blank" rel="noreferrer" aria-label={`Source: ${c.title}`} title={c.title}> ↗</a>)}</React.Fragment>;
  })}</p>;
 }
-export default function EvidenceDialog({region,onClose,onSave,initialResult}){
- const [query,setQuery]=useState(initialResult?.query || (region?`What published MRI research describes ${region}? Summarize imaging features, research associations and limitations.`:'')),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[result,setResult]=useState(initialResult || null),[error,setError]=useState('');
+export default function EvidenceDialog({region,onClose,onSave,initialResult,draftContext}){
+ const [query,setQuery]=useState(initialResult?.query || (draftContext?'':region?`What published MRI research describes ${region}? Summarize imaging features, research associations and limitations.`:'')),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[result,setResult]=useState(initialResult || null),[error,setError]=useState('');
+ const [drafted,setDrafted]=useState(!draftContext),[draftConsent,setDraftConsent]=useState(false);
  const live=useRef(true);React.useEffect(()=>()=>{live.current=false;},[]);
+ async function draft(){setBusy(true);setError('');try{
+  const r=await fetch('/api/research-question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(draftContext)});const data=await r.json();if(!r.ok)throw new Error(data.error);if(live.current){setQuery(data.query);setDrafted(true);setConsent(false);}
+ }catch(e){if(live.current)setError(e.message);}finally{if(live.current)setBusy(false);}}
  async function search(){setBusy(true);setError('');setResult(null);try{
-  const r=await fetch('/api/evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});const data=await r.json();if(!r.ok)throw new Error(data.error);if(live.current){setResult(data);onSave(data);}
+  const r=await fetch('/api/evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});const data=await r.json();if(!r.ok)throw new Error(data.error);if(live.current){setResult(data);onSave({...data,conversationContext:draftContext?{question:draftContext.question,answer:draftContext.answer,sourceMessageId:draftContext.sourceMessageId,sourceSnapshotId:draftContext.sourceSnapshotId,imageContext:draftContext.media?{anchor:draftContext.media.anchor,selectionBasis:draftContext.media.selectionBasis}:null}:null});}
  }catch(e){if(live.current)setError(e.message);}finally{if(live.current)setBusy(false);}}
  const sources=result?[...new Map(result.blocks.flatMap(b=>b.citations).map(c=>[c.url,c])).values()]:[];
  return <div className="modal-backdrop"><section className="modal roi-dialog" role="dialog" aria-modal="true" aria-labelledby="evidence-title"><button className="icon-button modal-close" aria-label="Close literature explorer" onClick={onClose}><X size={18}/></button>
  <span className="panel-eyebrow">MUSE · LITERATURE EXPLORER</span><h2 id="evidence-title">Follow the evidence.</h2>
+ {draftContext&&!drafted&&<>
+ <p className="fine-print">Muse will draft a question from this conversation{draftContext.media?' and the original reviewed image slices':''}. You can edit it before searching.</p>
+ <details><summary>Conversation context</summary><p><strong>Your question</strong> {draftContext.question}</p><p><strong>Muse’s answer</strong> {draftContext.answer}</p></details>
+ {draftContext.media&&<div className="roi-views">{draftContext.media.frames.map(f=><div key={f.axis}><strong>{f.axis} · slice {f.slice+1}</strong><img alt={`${f.axis} original grayscale context`} src={f.clean}/><img alt={`${f.axis} original marked context`} src={f.marked}/></div>)}</div>}
+ <label className="consent"><input type="checkbox" checked={draftConsent} disabled={busy} onChange={e=>setDraftConsent(e.target.checked)}/>Share this question, answer{draftContext.media?' and these six reviewed images':''} with Meta to draft a literature question.</label>
+ <button className="button primary" disabled={busy||!draftConsent} onClick={draft}>{busy?'Drafting with Muse…':'Draft research question'}</button>
+ </>}
  <label className="roi-label">Research question<textarea aria-label="Literature research question" rows={3} maxLength={800} disabled={busy} value={query} onChange={e=>{setQuery(e.target.value);setResult(null);}}/></label>
+ {draftContext&&!drafted&&<button className="quiet-button" disabled={busy} onClick={()=>setDrafted(true)}>Write my own question instead</button>}
  <p className="fine-print">Only this question is shared with Meta and its search service. No scan images or workspace measurements are sent. Keep patient identifiers out of the query.</p>
  <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>Share this research question for a sourced literature search.</label>
- <button className="button primary" disabled={!consent||busy||query.trim().length<8} onClick={search}>{busy?<><Loader2 size={14} className="spin"/> Searching literature…</>:'Search with Muse'}</button>
+ <button className="button primary" disabled={!drafted||!consent||busy||query.trim().length<8} onClick={search}>{busy?<><Loader2 size={14} className="spin"/> Searching literature…</>:'Search with Muse'}</button>
  {error&&<p role="alert">{error}</p>}
  {result&&<><p className="fine-print">Retrieved {new Date(result.retrievedAt).toLocaleString()} · {result.model}</p>{result.blocks.flatMap(evidenceSections).map((section,i)=><section key={i} className="evidence-section"><h3>{section.title}</h3><CitedText block={section}/></section>)}<div className="roi-rationale"><strong>Open the original sources</strong><ol>{sources.map(c=><li key={c.url}><a href={c.url} target="_blank" rel="noreferrer">{c.title}</a></li>)}</ol><small>{result.scope}</small></div></>}
  <p className="fine-print">Literature context for professional research and education. Not an interpretation of the selected scan or a patient-specific diagnosis.</p>

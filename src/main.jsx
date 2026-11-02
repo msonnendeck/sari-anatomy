@@ -1,3 +1,4 @@
+import {captureRegionImages} from "./region-images.mjs";
 import {recordId} from "./ids.mjs";
 import {questionViews} from "./question-views.mjs";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -336,6 +337,7 @@ function App() {
   const skipPlaneInitialization=useRef(false);
   const [roiJob,setRoiJob]=useState(null);
   const [evidenceOpen,setEvidenceOpen]=useState(false);
+  const [researchDraft,setResearchDraft]=useState(null);
   const latestRevision=useRef(revision);latestRevision.current=revision;
   const [messages, setMessages] = useState([]),
     [input, setInput] = useState(""),
@@ -860,6 +862,21 @@ function App() {
     } finally {
       setBusy(false);
     }
+  }
+  function researchFromAnswer(index){
+    const answer=messages[index],question=messages.slice(0,index).findLast(m=>m.role==='user');
+    if(!question)return;
+    let media=null,context={dims:volume.dims};
+    try{
+      const savedId=answer.imageSnapshotId || question.imageSnapshotId;
+      if(savedId&&question.imageContext){
+        const saved=restoreView(archive.current,savedId,volume);
+        const savedVolume={...volume,proposal:saved.proposal,reference:saved.reference};
+        media={anchor:question.imageContext.anchor,selectionBasis:question.imageContext.selectionBasis,frames:captureRegionImages(savedVolume,question.imageContext.anchor)};
+      }
+      context={dims:volume.dims,spacing:volume.spacing,affine:volume.affine,orientation:volume.orientation,anatomicalAxes:!!volume.anatomicalAxes,synthetic:volume.synthetic};
+    }catch(e){setToast("The original image context is unavailable. The draft will use the question and answer only.");}
+    setResearchDraft({question:question.text,answer:answer.text,context,media,sourceMessageId:answer.id,sourceSnapshotId:answer.questionSnapshotId || answer.snapshotId});setEvidenceOpen(true);
   }
   function openRoi() {
     if(!point){setToast("Select a point in a slice or the 3D view first.");return;}
@@ -1549,7 +1566,7 @@ function App() {
                 <ChevronRight size={12} />
               </button>
               <div className="assistant-target">Selected anatomy: <strong>{volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || "None"}</strong></div>
-              <button className="quiet-button" disabled={!status.enabled} onClick={()=>setEvidenceOpen(true)}><Layers size={14}/> Explore literature</button>
+              <button className="quiet-button" disabled={!status.enabled} onClick={()=>{setResearchDraft(null);setEvidenceOpen(true);}}><Layers size={14}/> Explore literature</button>
               <div className="assistant-messages">
                 {!messages.length ? (
                   <div className="empty-conversation">
@@ -1589,6 +1606,7 @@ function App() {
                       </span>
                       {m.imageContext && <small className="image-message-note">6 reviewed images · {m.imageContext.selectionBasis} focus</small>}
                       <p>{m.text}</p>
+                      {m.role==="assistant"&&m.source?.startsWith("muse")&&<div className="saved-view-actions"><button disabled={busy||samBusy||m.snapshotPending} onClick={()=>researchFromAnswer(i)}>Research this answer</button></div>}
                       {m.snapshotId && archive.current.views[m.snapshotId]?.version===2 && <div className="saved-view-actions"><button disabled={busy||samBusy||m.snapshotPending} onClick={()=>restoreSavedView(m.snapshotId)}>{m.snapshotPending?"Saving view…":"Restore view"}</button>{m.questionSnapshotId&&m.questionSnapshotId!==m.snapshotId&&<button disabled={busy||samBusy} onClick={()=>restoreSavedView(m.questionSnapshotId)}>Question view</button>}{m.imageSnapshotId&&<button disabled={busy||samBusy} onClick={()=>restoreSavedView(m.imageSnapshotId)}>Shared image slices</button>}</div>}
                     </div>
                   ))
@@ -1780,7 +1798,7 @@ function App() {
         </div>
       )}
       {imageQuestion && <RegionImagesDialog volume={imageQuestion.volume} position={imageQuestion.position} question={imageQuestion.text} onClose={()=>setImageQuestion(null)} onSend={async media=>{if(activeVolume.current!==imageQuestion.volume)throw new Error("Study changed; close this review and review the images again.");const result=await ask(imageQuestion.text,media);if(result!==true)throw new Error(result?.error || "Another request is active. Please try again when it finishes.");setImageQuestion(null);}}/>}
-      {evidenceOpen && <EvidenceDialog initialResult={volume.literatureSearches?.at(-1)} region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
+      {evidenceOpen && <EvidenceDialog draftContext={researchDraft} initialResult={researchDraft?null:volume.literatureSearches?.at(-1)} region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>{setEvidenceOpen(false);setResearchDraft(null);}} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
       {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (
         <div className="modal-backdrop" onClick={() => setModal(null)}>

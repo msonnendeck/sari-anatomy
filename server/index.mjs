@@ -1,3 +1,4 @@
+import {installResearchQuestionRoute} from "./research-question.mjs";
 import "dotenv/config";
 import express from "express";
 import {assistantImageContent} from "./assistant-images.mjs";
@@ -68,6 +69,7 @@ const client = () =>
     timeout: 60000,
     maxRetries: 1,
   });
+installResearchQuestionRoute(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 app.post("/api/assistant", async (req, res) => {
   try {
     const { message, context, history, media } = req.body;
