@@ -6,7 +6,7 @@ function route(output='What published research describes hippocampal spatial-mem
 }
 test('Muse drafts from the original question and answer without claiming absent images',async()=>{
  const {status,result,request}=await route().run({question:'What functions does this have?',answer:'Tentatively hippocampal; identity requires review.',context:{dims:[2,2,2]}});
- assert.equal(status,200);assert.ok(result.query);const content=JSON.parse(request.messages[1].content[0].text);assert.equal(content.context.priorAnswer,'Tentatively hippocampal; identity requires review.');assert.equal(content.imagesAttached,false);assert.match(request.messages[0].content,/hypotheses/);
+ assert.equal(status,200);assert.ok(result.query);assert.ok(request.max_completion_tokens>=1800);const content=JSON.parse(request.messages[1].content[0].text);assert.equal(content.context.priorAnswer,'Tentatively hippocampal; identity requires review.');assert.equal(content.imagesAttached,false);assert.match(request.messages[0].content,/hypotheses/);
 });
 test('drafting retains all six approved images and their shared focus',async()=>{
  const media={selectionBasis:'crosshair',anchor:[1,1,1],frames:['axial','coronal','sagittal'].map(axis=>({axis,slice:1,width:2,height:2,point:{x:1,y:0},clean:'data:image/png;base64,AA==',marked:'data:image/png;base64,AQ=='}))};
@@ -15,4 +15,10 @@ test('drafting retains all six approved images and their shared focus',async()=>
 test('invalid attachments and unusable drafts cannot silently launch a search',async()=>{
  assert.equal((await route().run({question:'Q',answer:'A',media:{}})).status,400);
  assert.equal((await route('x'.repeat(801)).run({question:'Q',answer:'A',context:{}})).status,502);
+});
+
+test('truncated model output is reported explicitly rather than accepted as a draft',async()=>{
+ let handler;installResearchQuestionRoute({post:(p,h)=>handler=h},()=>({chat:{completions:{create:async()=>({choices:[{finish_reason:'length',message:{content:'Incomplete draft'}}]})}}}),()=> 'test');
+ let status,result;await handler({body:{question:'Question',answer:'Answer',context:{}}},{status(n){status=n;return this;},json(x){result=x;}});
+ assert.equal(status,502);assert.match(result.error,/response limit/);
 });
