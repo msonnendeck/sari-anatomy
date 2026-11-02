@@ -1,3 +1,4 @@
+import {questionViews} from "./question-views.mjs";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -781,8 +782,8 @@ function App() {
       if(!status.enabled){setModal("connection");return;}
       setImageQuestion({text,volume,position:{...position}});return;
     }
-    const questionSnapshotId=captureCurrentView();
-    const imageSnapshotId=media?captureCurrentView({position:{sagittal:media.anchor[0],coronal:media.anchor[1],axial:media.anchor[2]},point:slicePoint(volume,axis,media.anchor),spatial:{...spatial,offset:planeOffset(volume,media.anchor,spatial)}}):null;
+    const {questionSnapshotId,imageSnapshotId,error:viewError}=questionViews(captureCurrentView,volume,axis,spatial,media);
+    if(viewError)setToast("The saved view could not be captured. Your question will still be sent.");
     setInput("");
     setMessages((m) => [...m, {id:crypto.randomUUID(),snapshotId:questionSnapshotId,imageSnapshotId, role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }].slice(-100));
     setBusy(true);
@@ -847,11 +848,14 @@ function App() {
           },
         ]);
       }
+      return true;
     } catch (e) {
+      setInput(text);
       setMessages((m) => [
         ...m,
         { role: "assistant", text: e.message, source: "Connection error",snapshotId:questionSnapshotId },
       ]);
+      return {error:e.message || "The question could not be sent. Please try again."};
     } finally {
       setBusy(false);
     }
@@ -1774,7 +1778,7 @@ function App() {
           </button>
         </div>
       )}
-      {imageQuestion && <RegionImagesDialog volume={imageQuestion.volume} position={imageQuestion.position} question={imageQuestion.text} onClose={()=>setImageQuestion(null)} onSend={media=>{if(activeVolume.current!==imageQuestion.volume){setToast("Study changed; review the images again.");setImageQuestion(null);return;}const text=imageQuestion.text;setImageQuestion(null);ask(text,media);}}/>}
+      {imageQuestion && <RegionImagesDialog volume={imageQuestion.volume} position={imageQuestion.position} question={imageQuestion.text} onClose={()=>setImageQuestion(null)} onSend={async media=>{if(activeVolume.current!==imageQuestion.volume)throw new Error("Study changed; close this review and review the images again.");const result=await ask(imageQuestion.text,media);if(result!==true)throw new Error(result?.error || "Another request is active. Please try again when it finishes.");setImageQuestion(null);}}/>}
       {evidenceOpen && <EvidenceDialog initialResult={volume.literatureSearches?.at(-1)} region={volume.atlas?.regions.find(r=>r.id===spatial.region)?.name || volume.roiProvenance?.target || ""} onClose={()=>setEvidenceOpen(false)} onSave={data=>{if(activeVolume.current!==volume)return;volume.literatureSearches=[...(volume.literatureSearches||[]),data].slice(-10);setRevision(r=>r+1);record(`Literature search saved: ${data.query}; ${data.retrievedAt}`);}}/>}
       {roiJob && <RoiDialog job={roiJob} onClose={()=>setRoiJob(null)} onApply={applyRoi}/>}
       {modal && (
