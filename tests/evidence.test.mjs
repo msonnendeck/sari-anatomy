@@ -10,3 +10,18 @@ test('literature refuses javascript and private links rather than rendering mode
   const r=response();r.output[1].content[0].annotations[0].url=url;assert.throws(()=>groundedBlocks(r));
  }
 });
+
+test('literature retries a missing-citation response once, preserving the exact query',async()=>{
+ const {installEvidenceRoute}=await import('../server/evidence.mjs');let handler,calls=[];
+ const unlinked=response();unlinked.output[1].content[0].annotations=[];
+ installEvidenceRoute({post:(p,h)=>handler=h},()=>({responses:{create:async request=>{calls.push(request);return calls.length===1?unlinked:response();}}}),()=> 'test-model');
+ let result;await handler({body:{query:'What published evidence validates MRI anatomical localization?'}},{status(){return this;},json(x){result=x;}});
+ assert.equal(calls.length,2);assert.equal(calls[0].input[1].content,calls[1].input[1].content);assert.equal(result.retried,true);assert.equal(result.blocks.length,1);assert.ok(calls[0].max_output_tokens>=5000);
+});
+test('a second uncited brief is rejected, without an unbounded retry or invented sources',async()=>{
+ const {installEvidenceRoute}=await import('../server/evidence.mjs');let handler,calls=0,status,result;
+ const unlinked=response();unlinked.output[1].content[0].annotations=[];
+ installEvidenceRoute({post:(p,h)=>handler=h},()=>({responses:{create:async()=>{calls++;return unlinked;}}}),()=> 'test');
+ await handler({body:{query:'What published MRI evidence is available?'}},{status(n){status=n;return this;},json(x){result=x;}});
+ assert.equal(calls,2);assert.equal(status,502);assert.match(result.error,/source-linked/);assert.equal(result.blocks,undefined);
+});

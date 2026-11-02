@@ -246,7 +246,7 @@ app.post("/api/segment", async (req, res) => {
       });
   }
 });
-installEvidenceRoute(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
+installEvidenceRoute(app,()=>client().withOptions({timeout:120000,maxRetries:0}),()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 installRoiRoutes(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 app.use((err, req, res, next) =>
   res.status(400).json({ error: "Invalid request body." }),
