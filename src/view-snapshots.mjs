@@ -1,3 +1,4 @@
+import {recordId} from "./ids.mjs";
 import {cameraViewKey} from "./camera-framing.mjs";
 // Binary masks are stored once and shared by immutable view snapshots.
 export function encodeMask(mask){
@@ -37,7 +38,7 @@ function intern(archive,mask){
 export function studySignature(v){return JSON.stringify({id:v.id,dims:v.dims,spacing:v.spacing,affine:v.affine||null});}
 export function captureMasks(archive,v){return {proposal:intern(archive,v.proposal),reference:intern(archive,v.reference),metadata:structuredClone({referenceLabel:v.referenceLabel,referenceKind:v.referenceKind,roiProvenance:v.roiProvenance||null})};}
 export function addView(archive,v,state,masks=captureMasks(archive,v)){
- const id=crypto.randomUUID();archive.views[id]={id,version:2,createdAt:new Date().toISOString(),study:studySignature(v),state:structuredClone(state),masks};return id;
+ const id=recordId();archive.views[id]={id,version:2,createdAt:new Date().toISOString(),study:studySignature(v),state:structuredClone(state),masks};return id;
 }
 export function restoreView(archive,id,v){
  const snap=archive.views[id];if(snap?.version!==2)throw new Error('This older entry has no complete saved view.');if(!snap||snap.study!==studySignature(v))throw new Error('This saved view belongs to another study or grid. Open the matching study first.');

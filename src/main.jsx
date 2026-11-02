@@ -1,3 +1,4 @@
+import {recordId} from "./ids.mjs";
 import {questionViews} from "./question-views.mjs";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -481,7 +482,7 @@ function App() {
     }catch(e){setToast(e.message);}
   }
   function record(text,snapshotId=null) {
-    const id=crypto.randomUUID();
+    const id=recordId();
     if(!snapshotId)pendingSnapshots.current.push({eventId:id});
     setEvents(e=>[{id,text,time:new Date().toISOString(),snapshotId},...e].slice(0,100));
   }
@@ -785,7 +786,7 @@ function App() {
     const {questionSnapshotId,imageSnapshotId,error:viewError}=questionViews(captureCurrentView,volume,axis,spatial,media);
     if(viewError)setToast("The saved view could not be captured. Your question will still be sent.");
     setInput("");
-    setMessages((m) => [...m, {id:crypto.randomUUID(),snapshotId:questionSnapshotId,imageSnapshotId, role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }].slice(-100));
+    setMessages((m) => [...m, {id:recordId(),snapshotId:questionSnapshotId,imageSnapshotId, role: "user", text, imageContext:media?{selectionBasis:media.selectionBasis,anchor:media.anchor,views:media.frames.map(({clean,marked,...f})=>f)}:null }].slice(-100));
     setBusy(true);
     try {
       if (status.enabled) {
@@ -830,7 +831,7 @@ function App() {
         if (!response.ok) throw new Error(data.error);
         if(activeVolume.current !== volume) throw new Error("Study changed while Muse was working; response discarded.");
         applyActions(data.actions);
-        const answerId=crypto.randomUUID();
+        const answerId=recordId();
         if(data.actions.length)pendingSnapshots.current.push({messageId:answerId});
         setMessages((m) => [...m,{id:answerId,role:"assistant",text:data.text,source:data.model,snapshotId:questionSnapshotId,questionSnapshotId,imageSnapshotId,snapshotPending:data.actions.length>0}].slice(-100));
         if(data.actions.length)record(`Muse action: ${JSON.stringify(data.actions)}`);
@@ -838,7 +839,7 @@ function App() {
         if(media) record(`Asked Muse with six reviewed region images; focus ${media.selectionBasis}; anchor ${media.anchor.join(",")}; ${media.frames.map(f=>`${f.axis}:${f.slice}`).join(" ")}`,imageSnapshotId);
       } else {
         let answer = localAction(text);
-        const answerId=crypto.randomUUID();pendingSnapshots.current.push({messageId:answerId});
+        const answerId=recordId();pendingSnapshots.current.push({messageId:answerId});
         setMessages((m) => [
           ...m,
           {
