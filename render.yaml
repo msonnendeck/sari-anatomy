@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: sari-research-demo
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: HOST
+        value: 0.0.0.0
+      - key: META_MODEL
+        value: muse-spark-1.3-contributor
+      - key: META_ENABLED
+        value: false
+      - key: SARI_DEMO_USER
+        value: sari
+      - key: SARI_DEMO_PASSWORD
+        sync: false

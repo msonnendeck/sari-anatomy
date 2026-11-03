@@ -261,3 +261,7 @@ Muse answers offer **Research this answer**. The literature explorer carries the
 Literature searches allow up to 120 seconds per provider request and a 5,000-token response budget. Incomplete or uncited output triggers at most one additional search with stronger source-annotation instructions. A second unusable response remains an error; SARI does not fabricate citations or substitute an uncited brief. Errors distinguish missing citations, incomplete output, timeouts and rate limits. Provider diagnostics omit queries, images and answer content.
 
 **Plane frame** in **3D inspector · Cut & isolation** optionally outlines the active cut plane with a thin blue frame and subtle inward glow. Its centre is transparent, it does not intercept anatomy selection, and it follows the plane depth/orientation including oblique cuts and anisotropic spacing. Available in Solid, Volume and Anatomy while Cut plane is enabled; off by default and retained with saved workspace settings. Verified in Chrome in Anatomy and Four views layouts, including an oblique cut; no console errors.
+
+### Online demo hosting
+
+A password-protected Render Free deployment is prepared in `render.yaml`. See [hosting instructions](docs/hosting.md) for setup, secrets, free-tier tradeoffs and verification. The password protects the app, bundled assets and all AI endpoints; public hosting refuses to start without it. Local development keeps its current behavior unless you explicitly set a demo password.

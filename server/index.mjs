@@ -1,3 +1,4 @@
+import {accessConfig,installAccess} from "./access.mjs";
 import {installResearchQuestionRoute} from "./research-question.mjs";
 import "dotenv/config";
 import express from "express";
@@ -9,29 +10,16 @@ import { validAction, conversationHistory } from "../src/assistant-actions.mjs";
 import OpenAI from "openai";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { networkInterfaces } from "node:os";
 const port = Number(process.env.PORT) || 5187;
 const host = process.env.HOST || "127.0.0.1";
-const localHosts = new Set(["localhost", "127.0.0.1"]);
-if (host !== "127.0.0.1" && host !== "localhost") {
-  for (const addresses of Object.values(networkInterfaces()))
-    for (const address of addresses || [])
-      if (address.family === "IPv4" && !address.internal) localHosts.add(address.address);
-}
-const allowedAuthorities = new Set([...localHosts].map((h) => `${h}:${port}`));
-const allowedOrigins = new Set([...allowedAuthorities].map((h) => `http://${h}`));
+const access=accessConfig();
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const app = express();
 app.disable("x-powered-by");
+installAccess(app,access);
 app.use(express.json({ limit: "12mb" }));
 const ready = () =>
   process.env.META_ENABLED === "true" && !!process.env.MODEL_API_KEY;
-app.use("/api", (req, res, next) => {
-  const origin = req.get("origin");
-  if (!allowedAuthorities.has(req.get("host")) || (origin && !allowedOrigins.has(origin)))
-    return res.status(403).json({ error: "Only requests from this local app are accepted." });
-  next();
-});
 app.get("/api/status", (req, res) =>
   res.json({
     enabled: ready(),
