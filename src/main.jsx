@@ -303,7 +303,7 @@ function App() {
   });
   const [axis, setAxis] = useState("axial");
   const [spatial, setSpatial] = useState({mode: "solid", cut: true, pitch: 0, yaw: 0, offset: 0, threshold: 30, isolate: "all", color: false});
-  const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") === "true");
+  const [privacy, setPrivacy] = useState(() => localStorage.getItem("sari-privacy") !== "false");
   useEffect(() => { localStorage.setItem("sari-privacy", String(privacy)); }, [privacy]);
   const [includeRegionImages,setIncludeRegionImages]=useState(false),[imageQuestion,setImageQuestion]=useState(null);
   const [workspaceFocus,setWorkspaceFocus]=useState(false),[focusTools,setFocusTools]=useState(false);
@@ -467,7 +467,7 @@ function App() {
     setArchiveRevision(n=>n+1);return id;
   }
   function applyViewState(s) {
-    setPosition(s.position);setAxis(s.axis);setSpatial(s.spatial);setSettings(s.settings);setPoint(s.point||null);setTool(s.tool||"navigate");setBrush(s.brush||3);setZoom(s.zoom||1);setBrainOpacity(s.brainOpacity??.18);setRotate(!!s.rotate);setBodyContext(!!s.bodyContext);setPrivacy(!!s.privacy);setTheme(s.theme||"dark");setLayout(s.layout||"anatomy");setLibraryCollapsed(!!s.libraryCollapsed);setAssistantCollapsed(!!s.assistantCollapsed);setLibraryWidth(s.libraryWidth||230);setAssistantWidth(s.assistantWidth||294);setSceneShare(s.sceneShare||60);setRowShare(s.rowShare||50);setWorkspaceFocus(!!s.workspaceFocus);setFocus3d(!!s.focus3d);setFocusTools(!!s.focusTools);setInspectorOpen(!!s.inspectorOpen);
+    setPosition(s.position);setAxis(s.axis);setSpatial(s.spatial);setSettings(s.settings);setPoint(s.point||null);setTool(s.tool||"navigate");setBrush(s.brush||3);setZoom(s.zoom||1);setBrainOpacity(s.brainOpacity??.18);setRotate(!!s.rotate);setBodyContext(!!s.bodyContext);setPrivacy(s.privacy !== false);setTheme(s.theme||"dark");setLayout(s.layout||"anatomy");setLibraryCollapsed(!!s.libraryCollapsed);setAssistantCollapsed(!!s.assistantCollapsed);setLibraryWidth(s.libraryWidth||230);setAssistantWidth(s.assistantWidth||294);setSceneShare(s.sceneShare||60);setRowShare(s.rowShare||50);setWorkspaceFocus(!!s.workspaceFocus);setFocus3d(!!s.focus3d);setFocusTools(!!s.focusTools);setInspectorOpen(!!s.inspectorOpen);
     setCameraCommand(c=>({id:c.id+1,kind:s.camera?"restore":"fit",pose:s.camera}));
   }
   function restoreSavedView(id) {
