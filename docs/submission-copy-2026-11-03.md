@@ -122,6 +122,12 @@ Code: https://github.com/msonnendeck/sari-anatomy
 
 Research and educational use only. Not clinically validated. Not for diagnosis, treatment or medical advice. Brain imaging is the current scope; additional anatomical regions are future extensions.
 
+### Online access — safe for public copy
+
+Open https://sari-research-demo.onrender.com . The demo uses the browser’s sign-in prompt; the username is `sari`. The demo password is supplied separately in the private judge-access note. Render’s free instance can take approximately a minute to wake after inactivity.
+
+The hosted anatomy viewer is available, but Meta model access from Render remains unresolved. The video demonstrates the locally verified AI workflow; README.md includes instructions for running it with an appropriately authorised Meta key. Please do not interpret the hosted connection failure as a completed AI interaction.
+
 ## 10. Preparation notes — not form copy
 
 - Live form inspected on 3 November 2026 at https://cerebralvalley.ai/e/meta-ai-developer-hackathon/hackathon/submit . Its text fields had no HTML maximum lengths when inspected. Use the actual labels in sections 1–8; do not invent extra official fields.
