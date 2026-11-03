@@ -1,6 +1,6 @@
 # SARI — submission copy
 
-Draft prepared 3 November 2026 against the signed-in Cerebral Valley submission form. Nothing has been entered or sent. Sections 1–7 contain copy for the actual form. Section 8 contains suggested personal survey answers for the entrant to confirm. Sections 9–11 are optional supporting copy and private preparation notes, not additional official fields.
+Draft prepared 3 November 2026 against the signed-in Cerebral Valley submission form. Nothing has been entered or sent. Sections 1–7 contain copy for the actual form. Section 8 contains suggested personal survey answers for the entrant to confirm. Sections 9–11 are optional supporting copy and preparation notes, not additional official fields.
 
 ## 1. Team Name
 
@@ -55,7 +55,7 @@ Muse Code helped me turn a medically motivated idea into an interactive spatial 
 
 Inside SARI, Muse Spark connects a researcher’s language to the workspace: selecting a known structure, changing the viewing angle, explaining general anatomy, and helping formulate the next research question. SAM 3.1 adds a complementary capability: prompted image segmentation. Together, they support a workflow in which the human remains in control of the target, prompts and interpretation.
 
-The value is in connecting the steps. A question can lead to a better view, a reviewed region, and a literature search while retaining its original spatial context. I see considerable potential for research and education. I am not claiming a clinical result or that another provider could never implement similar capabilities; this prototype demonstrates what I could build with this Meta stack.
+The value is in connecting the steps. A question can lead to a better view, a reviewed region, and a literature search while retaining its original spatial context. I see considerable potential for research and education. SARI demonstrates the practical value of combining these Meta tools in a single, human-led research workflow.
 
 ## 7. Provide feedback from your experience using partner technologies
 
