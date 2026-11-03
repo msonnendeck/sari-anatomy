@@ -41,6 +41,12 @@ The server binds to loopback only. Set `PORT` if 5187 is occupied. This is a sin
 - Explicit offline workspace commands when Meta is disconnected. These are deterministic commands, not simulated model replies.
 - Server-side Muse Spark navigation tool calling and SAM 3.1 point-prompt segmentation endpoints, disabled by default.
 
+## Imaging sources and downloads
+
+The app-ready MRI samples, atlas labels/surfaces and BodyParts3D surface are **already bundled in this repository**. A normal clone needs no manual sample download. See the [complete source credits, licences and rebuilding guide](docs/data-sources.md).
+
+To obtain the original imaging inputs automatically, run `npm run samples:download` after `npm ci`. It downloads pinned/checksummed SPL/NAC originals, the official MNI archive and the checksum-verified Slicer teaching sample into Git-ignored `workspace/source-data/`. The guide gives exact conversion commands. Rebuilding the optional BodyParts3D input still requires downloading its OBJ from the official site; its converted surface is included already.
+
 ## Included research data and body-first workflow
 
 SARI opens on an interactive **BodyParts3D reference human body**. Click the head or choose **Head & brain** to open the **SPL/NAC brain atlas**, with 0.75 mm MRI and 90 named anatomical surfaces. These are source annotations, not AI findings. MNI population-average templates and the Slicer teaching case are additional studies. Proposals start empty; no model accuracy score is fabricated.

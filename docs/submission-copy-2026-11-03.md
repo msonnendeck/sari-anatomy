@@ -122,6 +122,10 @@ Code: https://github.com/msonnendeck/sari-anatomy
 
 Research and educational use only. Not clinically validated. Not for diagnosis, treatment or medical advice. Brain imaging is the current scope; additional anatomical regions are future extensions.
 
+### Research data credit
+
+SARI uses browser-ready derivatives of the SPL/NAC brain atlas from Brigham and Women’s Hospital and collaborators; MNI ICBM152 templates from McGill University; the 3D Slicer MRBrainTumor1 teaching sample; and a BodyParts3D reference surface from The Database Center for Life Science. These are attributed research/reference assets with their own licences, not original patient scans collected by SARI. Dataset citations, conversion details, licences and automated original-imaging download instructions are in `docs/data-sources.md` in the public repository. Generic body placement is illustrative rather than patient-specific registration.
+
 ### Online access — safe for public copy
 
 Open https://sari-research-demo.onrender.com . The demo uses the browser’s sign-in prompt; the username is `sari`. The demo password is supplied separately in the private judge-access note. Render’s free instance can take approximately a minute to wake after inactivity.
