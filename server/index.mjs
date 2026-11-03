@@ -57,6 +57,12 @@ const client = () =>
     timeout: 60000,
     maxRetries: 1,
   });
+// Protected by the same demo login as every API; never returns key material.
+app.post("/api/connection-check",async(req,res)=>{
+  try{const result=await client().models.list();const availableModels=result.data.map(m=>m.id);const configuredModel=process.env.META_MODEL||"muse-spark-1.3-contributor";
+    res.json({configuredModel,availableModels,modelAvailable:availableModels.includes(configuredModel)});
+  }catch(e){res.status(502).json({error:"Meta connection check failed.",providerStatus:e.status||null,providerCode:typeof e.code==="string"?e.code:null});}
+});
 installResearchQuestionRoute(app,client,()=>process.env.META_MODEL || "muse-spark-1.3-contributor");
 app.post("/api/assistant", async (req, res) => {
   try {
@@ -147,11 +153,14 @@ app.post("/api/assistant", async (req, res) => {
       usage: r.usage,
     });
   } catch (e) {
+    console.warn("Muse assistant request failed",{status:e.status||null,code:typeof e.code==="string"?e.code:null,kind:e.name});
     res
       .status(e.status === 429 ? 429 : 502)
       .json({
         error:
-          e.status === 401
+          e.code === "model_not_found"
+            ? "Meta cannot access the configured model with this server key. Check model access and the Render API key configuration."
+            : e.status === 401
             ? "Meta rejected the API key. Check the server configuration."
             : e.status === 429
               ? "Meta rate limit reached. Try again shortly."
